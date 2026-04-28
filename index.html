@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>远航：国际生申请模拟</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+    <main class="app">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">升学叙事模拟器</p>
+          <h1>远航：国际生申请美国大学</h1>
+          <p class="subtitle">从高一到放榜季，体验真实而有策略的成长路线。</p>
+        </div>
+        <div class="hero-actions">
+          <button id="restartBtn" type="button" class="ghost">重新开始</button>
+          <button id="exportBtn" type="button" class="primary">导出成长总结</button>
+        </div>
+      </header>
+
+      <section class="layout">
+        <section class="stage">
+          <div class="phase">
+            <div>
+              <p class="phase-label">当前阶段</p>
+              <h2 id="termLabel">等待启程</h2>
+              <p id="termHint" class="phase-hint">选择背景后开始旅程。</p>
+            </div>
+            <div class="progress">
+              <div class="progress-track">
+                <span id="progressBar" class="progress-bar"></span>
+              </div>
+              <span id="progressText" class="progress-text">0 / 8</span>
+            </div>
+          </div>
+
+          <div id="eventArea" class="section">
+            <div class="section-header">
+              <h3>本学期抉择</h3>
+              <p>长期主线每学期仅能推进 1 条，其余项目按时间点自由选择。</p>
+              <p class="note" id="termTimeInfo">时间点数：--</p>
+              <p class="note" id="fxNote">汇率系数：--</p>
+            </div>
+            <div id="eventCards" class="card-grid"></div>
+            <div class="section-header">
+              <h4>小型行动</h4>
+              <p class="note">消耗 1 点时间，补齐细节与履历。</p>
+            </div>
+            <div id="miniActions" class="card-grid"></div>
+            <p id="miniNotice" class="note"></p>
+            <div class="action-row split">
+              <button id="aiPlanTermBtn" type="button" class="ghost">AI 规划本学期</button>
+              <span id="aiPlanNote" class="note"></span>
+            </div>
+            <div class="loan-row">
+              <button id="loanBtn" type="button" class="ghost">申请短期贷款</button>
+              <span id="loanNote" class="note"></span>
+            </div>
+            <div class="action-row split">
+              <p id="eventNotice" class="note"></p>
+              <span id="eventCount" class="tag">已选 0</span>
+              <button id="confirmTermBtn" type="button" class="primary">确认本学期</button>
+            </div>
+          </div>
+
+          <div id="applicationArea" class="section hidden">
+            <div class="section-header">
+              <h3 id="applicationTitle">申请季准备</h3>
+              <p id="applicationSubtitle">敲定文书主题、推荐人和申请名单。</p>
+            </div>
+            <div class="application-grid">
+              <div class="panel-card">
+                <h4>文书主题</h4>
+                <p class="note">可选择 2 个主题，并为每所学校指定使用。</p>
+                <div id="essayChoices" class="choice-grid"></div>
+                <div class="action-row split">
+                  <button id="aiEssayAssignBtn" type="button" class="ghost">AI 分配文书主题</button>
+                  <span id="aiEssayNote" class="note"></span>
+                </div>
+              </div>
+              <div class="panel-card">
+                <h4>推荐人策略</h4>
+                <div id="recChoices" class="choice-grid"></div>
+              </div>
+              <div class="panel-card">
+                <h4>申请费减免</h4>
+                <div id="feeWaiverChoices" class="choice-grid"></div>
+              </div>
+              <div class="panel-card">
+                <h4 id="roundStageTitle">当前申请轮次</h4>
+                <p id="roundStageNote" class="note">当前阶段轮次固定，无需手动切换。</p>
+                <div id="roundChoices" class="choice-grid"></div>
+              </div>
+              <div class="panel-card">
+                <h4>申请季行动</h4>
+                <p class="note">可用时间点数在申请季中也会消耗。</p>
+                <div id="appActions" class="choice-grid"></div>
+                <p id="appActionNote" class="note"></p>
+              </div>
+              <div class="panel-card full">
+                <div class="panel-card-head">
+                  <h4 id="schoolPanelTitle">选择申请学校（不限）</h4>
+                  <span id="schoolCount">已选 0</span>
+                </div>
+                <p id="dataNotice" class="note"></p>
+                <p id="appCostInfo" class="note"></p>
+                <div class="action-row split">
+                  <button id="aiSchoolPlanBtn" type="button" class="ghost">AI 生成选校</button>
+                  <span id="aiSchoolNote" class="note"></span>
+                </div>
+                <div id="schoolList" class="school-grid"></div>
+              </div>
+              <div class="panel-card">
+                <h4>申请季备忘清单</h4>
+                <ul id="appChecklist" class="advisor-list"></ul>
+              </div>
+            </div>
+            <div class="action-row">
+              <p id="appNotice" class="note"></p>
+              <button id="submitAppBtn" type="button" class="primary">提交申请</button>
+            </div>
+          </div>
+
+          <div id="resultsArea" class="section hidden">
+            <div class="section-header">
+              <h3 id="resultsTitle">放榜季结果</h3>
+              <p id="resultsSubtitle" class="note"></p>
+              <p id="resultSummary">等待申请结果生成。</p>
+            </div>
+            <div class="action-row split">
+              <p id="releaseNote" class="note"></p>
+              <button id="releaseBatchBtn" type="button" class="ghost">进入下一批放榜</button>
+            </div>
+            <div id="resultsList" class="results-grid"></div>
+            <div class="action-row split">
+              <p id="waitlistNote" class="note"></p>
+              <button id="resolveWaitlistBtn" type="button" class="primary">更新候补结果</button>
+            </div>
+            <div class="action-row split">
+              <p id="offerNote" class="note"></p>
+              <button id="chooseOfferBtn" type="button" class="primary">选择最终去向</button>
+            </div>
+            <div class="action-row split">
+              <p id="extraYearNote" class="note"></p>
+              <button id="extraYearBtn" type="button" class="ghost">再读一年</button>
+            </div>
+            <div id="outcomeMetrics" class="outcome-grid"></div>
+            <div id="postAdmitPanel" class="panel-card hidden">
+              <div class="panel-card-head">
+                <h4>录取后阶段</h4>
+                <span class="tag">入学准备</span>
+              </div>
+              <p id="postAdmitNote" class="note"></p>
+              <div id="postAdmitActions" class="choice-grid"></div>
+            </div>
+            <div id="reviewPanel" class="panel-card">
+              <div class="panel-card-head">
+                <h4>数据复盘</h4>
+                <span class="tag">因果分析</span>
+              </div>
+              <div id="reviewRadar" class="review-radar"></div>
+              <h5 class="section-title">关键回放</h5>
+              <ul id="reviewReplay" class="advisor-list"></ul>
+              <h5 class="section-title">下局建议</h5>
+              <ul id="reviewSuggestions" class="advisor-list"></ul>
+              <div class="action-row split">
+                <button id="balanceCalibrateBtn" type="button" class="ghost">运行平衡校准</button>
+                <span id="balanceCalibrateNote" class="note"></span>
+              </div>
+            </div>
+            <div id="financePanel" class="panel-card">
+              <div class="panel-card-head">
+                <h4>四年财务预测</h4>
+                <span class="tag">成本与债务</span>
+              </div>
+              <ul id="financeForecast" class="advisor-list"></ul>
+            </div>
+          </div>
+
+          <div id="collegeArea" class="section hidden">
+            <div class="section-header">
+              <h3>本科阶段（8 学期）</h3>
+              <p id="collegeSubtitle" class="note">独立阶段：学业、项目、财务与节奏管理。</p>
+            </div>
+              <div id="undergradPanel" class="panel-card hidden">
+                <div class="panel-card-head">
+                  <h4>本科发展</h4>
+                  <span id="undergradProgress" class="tag">未开始</span>
+                </div>
+                <p id="undergradNote" class="note"></p>
+                <div id="undergradMetrics" class="outcome-grid"></div>
+              <div class="action-row split">
+                <button id="undergradAiBtn" type="button" class="ghost">AI 本学期建议</button>
+                <span id="undergradAiNote" class="note"></span>
+              </div>
+              <div class="section-header">
+                <h5>本学期抉择</h5>
+                <p>长期主线每学期仅能推进 1 条，其余项目按时间点自由选择。</p>
+                <p id="undergradTermTimeInfo" class="note">时间点数：--</p>
+                <p id="undergradFxNote" class="note">汇率系数：--</p>
+              </div>
+              <div id="undergradYearChoices" class="card-grid"></div>
+              <div class="section-header">
+                <h5>小型行动</h5>
+                <p class="note">消耗 1 点时间，补齐细节与履历。</p>
+              </div>
+              <div id="undergradMiniActions" class="card-grid"></div>
+              <p id="undergradMiniNotice" class="note"></p>
+              <div class="loan-row">
+                <button id="undergradLoanBtn" type="button" class="ghost">大学阶段贷款</button>
+                <span id="undergradLoanNote" class="note"></span>
+              </div>
+              <div id="undergradProjectProgress" class="project-grid"></div>
+              <div class="action-row split">
+                <p id="undergradEventNotice" class="note"></p>
+                  <span id="undergradEventCount" class="tag">已选 0</span>
+                <button id="undergradConfirmBtn" type="button" class="primary">确认本学期</button>
+              </div>
+              <div class="action-row split">
+                <button id="undergradSkipBtn" type="button" class="ghost">本学期不做项目</button>
+                <button id="undergradPartTimeBtn" type="button" class="ghost">打零工</button>
+              </div>
+              <ul id="undergradTimeline" class="advisor-list"></ul>
+              <div class="action-row split">
+                <button id="startUndergradBtn" type="button" class="primary">开始本科 8 学期</button>
+                <span id="undergradFinanceNote" class="note"></span>
+              </div>
+            </div>
+          </div>
+
+          <div id="gradArea" class="section hidden">
+            <div class="section-header">
+              <h3>研究生阶段（独立界面）</h3>
+              <p id="gradSubtitle" class="note">先硕士后博士，申请结果按邮件逐封拆开。</p>
+            </div>
+            <div id="postGradPanel" class="panel-card hidden">
+              <h5 class="section-title">毕业后选择</h5>
+              <div class="action-row split">
+                <button id="chooseMastersBtn" type="button" class="primary">申请硕士选校</button>
+                <button id="choosePhdBtn" type="button" class="ghost">申请博士选校</button>
+                <button id="chooseJobBtn" type="button" class="ghost">进入找工作界面</button>
+              </div>
+              <p id="postGradNote" class="note"></p>
+              <div id="gradSchoolSelector" class="hidden">
+                <p id="gradSchoolHint" class="note">请选择研究生申请学校（至少 3 所）</p>
+                <label class="field">
+                  <span>硕博连读申请（仅硕士路径）</span>
+                  <input id="msPhdToggle" type="checkbox" />
+                </label>
+                <label class="field">
+                  <span id="gradMajorLabel">申请专业</span>
+                  <select id="gradMajorSelect"></select>
+                </label>
+                <p id="gradMajorNote" class="note"></p>
+                <div id="gradSchoolList" class="school-grid"></div>
+                <div class="action-row split">
+                  <span id="gradSchoolCount" class="tag">已选 0</span>
+                  <span id="gradProgramBadge" class="tag">未选择</span>
+                  <button id="submitMastersBtn" type="button" class="primary">提交硕士申请</button>
+                </div>
+              </div>
+              <div class="action-row split">
+                <p id="gradReleaseNote" class="note"></p>
+                <button id="gradRevealNextBtn" type="button" class="ghost">拆下一封研究生邮件</button>
+                <button id="gradResolveWaitlistBtn" type="button" class="ghost">更新研究生候补结果</button>
+              </div>
+              <div id="gradResultsGrid" class="results-grid"></div>
+              <div id="mastersPanel" class="panel-card hidden">
+                <div class="panel-card-head">
+                  <h5>硕士阶段（4 学期）</h5>
+                  <span id="mastersProgress" class="tag">未开始</span>
+                </div>
+                <p id="mastersNote" class="note"></p>
+                <div id="mastersMetrics" class="outcome-grid"></div>
+                <div class="action-row split">
+                  <button id="mastersAiBtn" type="button" class="ghost">AI 本学期建议</button>
+                  <span id="mastersAiNote" class="note"></span>
+                </div>
+                <div class="section-header">
+                  <h5>本学期抉择</h5>
+                  <p>长期主线每学期仅能推进 1 条，其余项目按时间点自由选择。</p>
+                  <p id="mastersTermTimeInfo" class="note">时间点数：--</p>
+                  <p id="mastersFxNote" class="note">汇率系数：--</p>
+                </div>
+                <div id="mastersYearChoices" class="card-grid"></div>
+                <div class="section-header">
+                  <h5>小型行动</h5>
+                  <p class="note">消耗 1 点时间，补齐细节与履历。</p>
+                </div>
+                <div id="mastersMiniActions" class="card-grid"></div>
+                <p id="mastersMiniNotice" class="note"></p>
+                <div class="loan-row">
+                  <button id="mastersLoanBtn" type="button" class="ghost">研究生贷款</button>
+                  <span id="mastersLoanNote" class="note"></span>
+                </div>
+                <div id="mastersProjectProgress" class="project-grid"></div>
+                <div class="action-row split">
+                  <p id="mastersEventNotice" class="note"></p>
+                  <span id="mastersEventCount" class="tag">已选 0</span>
+                  <button id="mastersConfirmBtn" type="button" class="primary">确认本学期</button>
+                </div>
+                <div class="action-row split">
+                  <button id="mastersSkipBtn" type="button" class="ghost">本学期不做项目</button>
+                  <button id="mastersPartTimeBtn" type="button" class="ghost">助研/助教兼职</button>
+                </div>
+                <ul id="mastersTimeline" class="advisor-list"></ul>
+                <div class="action-row split">
+                  <button id="choosePhdAfterMastersBtn" type="button" class="primary">硕士后读博</button>
+                  <button id="chooseJobAfterMastersBtn" type="button" class="ghost">硕士后就业</button>
+                </div>
+              </div>
+              <div id="phdPanel" class="panel-card hidden">
+                <div class="panel-card-head">
+                  <h5>博士阶段（8 学期）</h5>
+                  <span id="phdProgress" class="tag">未开始</span>
+                </div>
+                <p id="phdNote" class="note"></p>
+                <div id="phdMetrics" class="outcome-grid"></div>
+                <div class="action-row split">
+                  <button id="phdAiBtn" type="button" class="ghost">AI 本学期建议</button>
+                  <span id="phdAiNote" class="note"></span>
+                </div>
+                <div class="section-header">
+                  <h5>本学期抉择</h5>
+                  <p>长期主线每学期仅能推进 1 条，其余项目按时间点自由选择。</p>
+                  <p id="phdTermTimeInfo" class="note">时间点数：--</p>
+                  <p id="phdFxNote" class="note">汇率系数：--</p>
+                </div>
+                <div id="phdYearChoices" class="card-grid"></div>
+                <div class="section-header">
+                  <h5>小型行动</h5>
+                  <p class="note">消耗 1 点时间，补齐细节与履历。</p>
+                </div>
+                <div id="phdMiniActions" class="card-grid"></div>
+                <p id="phdMiniNotice" class="note"></p>
+                <div class="loan-row">
+                  <button id="phdLoanBtn" type="button" class="ghost">博士贷款</button>
+                  <span id="phdLoanNote" class="note"></span>
+                </div>
+                <div id="phdProjectProgress" class="project-grid"></div>
+                <div class="action-row split">
+                  <p id="phdEventNotice" class="note"></p>
+                  <span id="phdEventCount" class="tag">已选 0</span>
+                  <button id="phdConfirmBtn" type="button" class="primary">确认本学期</button>
+                </div>
+                <div class="action-row split">
+                  <button id="phdSkipBtn" type="button" class="ghost">本学期不做项目</button>
+                  <button id="phdPartTimeBtn" type="button" class="ghost">研究助理兼职</button>
+                </div>
+                <ul id="phdTimeline" class="advisor-list"></ul>
+                <div class="action-row split">
+                  <button id="chooseJobAfterPhdBtn" type="button" class="primary">博士后就业</button>
+                </div>
+              </div>
+              <ul id="postGradResults" class="advisor-list"></ul>
+            </div>
+          </div>
+
+          <div id="careerArea" class="section hidden">
+            <div class="section-header">
+              <h3>求职阶段（独立界面）</h3>
+              <p id="careerSubtitle" class="note">每一轮结果按邮件逐封拆开，可继续推进面试轮次。</p>
+            </div>
+            <div class="panel-card">
+              <div id="jobCompanySelector" class="hidden">
+                <p class="note">选择目标公司（至少 5 家，最多 15 家）</p>
+                <div id="jobCompanyList" class="school-grid"></div>
+                <div class="action-row split">
+                  <span id="jobCompanyCount" class="tag">已选 0</span>
+                  <button id="submitJobAppsBtn" type="button" class="primary">提交公司投递</button>
+                  <button id="updateInterviewBtn" type="button" class="ghost">推进面试轮次</button>
+                </div>
+              </div>
+              <div class="action-row split">
+                <p id="careerReleaseNote" class="note"></p>
+                <button id="careerRevealNextBtn" type="button" class="ghost">拆下一封求职邮件</button>
+                <button id="chooseFinalJobBtn" type="button" class="primary hidden">选择最终工作</button>
+              </div>
+              <div id="careerResultsGrid" class="results-grid"></div>
+              <ul id="careerResultList" class="advisor-list"></ul>
+            </div>
+            <div id="careerSettlementPanel" class="panel-card hidden">
+              <div class="panel-card-head">
+                <h4>终局结算</h4>
+                <span class="tag">全流程回顾</span>
+              </div>
+              <p id="careerSettlementSummary" class="note"></p>
+              <div id="careerSettlementMetrics" class="outcome-grid"></div>
+              <h5 class="section-title">全流程时间线</h5>
+              <ul id="careerSettlementTimeline" class="advisor-list"></ul>
+              <h5 class="section-title">关键因果链</h5>
+              <ul id="careerSettlementCausal" class="advisor-list"></ul>
+              <h5 class="section-title">错失机会清单</h5>
+              <ul id="careerSettlementMissed" class="advisor-list"></ul>
+            </div>
+          </div>
+
+          <div class="section log">
+            <div class="section-header">
+              <h3>成长记录</h3>
+              <p>回顾你的关键选择与节点。</p>
+            </div>
+            <ul id="logList" class="log-list"></ul>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <div class="panel-card setup" id="setupCard">
+            <h3>选择起点</h3>
+            <p>确定学术风格与背景地区，模拟从高一开始的申请路径。</p>
+            <label class="field">
+              <span>姓名</span>
+              <input id="studentName" type="text" placeholder="请输入姓名" />
+            </label>
+            <div id="profileOptions" class="profile-grid"></div>
+            <h4 class="section-title">出生背景</h4>
+            <div id="backgroundOptions" class="profile-grid"></div>
+            <label class="field">
+              <span>课程强度</span>
+              <select id="rigorSelect"></select>
+            </label>
+            <h4 class="section-title">难度</h4>
+            <div id="difficultyOptions" class="profile-grid"></div>
+            <h4 class="section-title">标化策略</h4>
+            <div id="testPlanOptions" class="profile-grid"></div>
+            <label class="field">
+              <span>意向专业</span>
+              <select id="majorSelect"></select>
+            </label>
+            <h4 class="section-title">中介选择</h4>
+            <div id="counselorOptions" class="profile-grid"></div>
+            <label class="field">
+              <span>所在地区</span>
+              <select id="regionSelect"></select>
+            </label>
+            <button id="startBtn" type="button" class="primary">开始旅程</button>
+            <p id="setupNotice" class="note"></p>
+          </div>
+
+          <div class="panel-card" id="statsCard">
+            <div class="panel-card-head">
+              <h3>申请画像</h3>
+              <span id="profileTag" class="tag">未启程</span>
+            </div>
+            <div id="statsGrid" class="stats-grid"></div>
+            <div class="meta-grid">
+              <div>
+                <span>压力指数</span>
+                <strong id="stressValue">--</strong>
+              </div>
+              <div>
+                <span>资金支持</span>
+                <strong id="financeValue">--</strong>
+              </div>
+              <div>
+                <span>可用资金</span>
+                <strong id="cashValue">--</strong>
+              </div>
+              <div>
+                <span>时间点数</span>
+                <strong id="timeValue">--</strong>
+              </div>
+              <div>
+                <span>优势标签</span>
+                <strong id="badgeList">--</strong>
+              </div>
+              <div>
+                <span>意向专业</span>
+                <strong id="majorValue">--</strong>
+              </div>
+              <div>
+                <span>中介策略</span>
+                <strong id="counselorValue">--</strong>
+              </div>
+              <div>
+                <span>长期项目</span>
+                <strong id="projectValue">--</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-card" id="advisorCard">
+            <div class="panel-card-head">
+              <h3>AI 顾问</h3>
+              <span class="tag">实时建议</span>
+            </div>
+            <ul id="advisorList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="projectCard">
+            <div class="panel-card-head">
+              <h3>长期项目进度</h3>
+              <span class="tag">连续加成</span>
+            </div>
+            <div id="projectProgress" class="project-grid"></div>
+          </div>
+
+          <div class="panel-card" id="achievementCard">
+            <div class="panel-card-head">
+              <h3>解锁成就</h3>
+              <span class="tag">路线徽章</span>
+            </div>
+            <ul id="achievementList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="chatCard">
+            <div class="panel-card-head">
+              <h3>交流室</h3>
+              <span class="tag">离线对话</span>
+            </div>
+            <label class="field">
+              <span>对话角色</span>
+              <select id="chatRole"></select>
+            </label>
+            <div id="chatRoleCard" class="role-memory-card hidden">
+              <div class="panel-card-head">
+                <h4 id="chatRoleCardTitle">角色记忆卡</h4>
+                <span class="tag" id="chatRoleCardTurns">0 轮</span>
+              </div>
+              <p id="chatRoleCardSummary" class="note"></p>
+              <ul id="chatRoleCardItems" class="advisor-list"></ul>
+            </div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div id="donationPanel" class="donation-panel">
+              <label class="field">
+                <span>申诉捐款（可选）</span>
+                <input id="donationRange" type="range" min="0" max="50000" step="1000" value="0" />
+              </label>
+              <div class="donation-meta">
+                <span id="donationValue" class="note">US$0</span>
+                <span class="muted">捐款越多加成越高（需有更新材料）</span>
+              </div>
+            </div>
+            <div id="appealEvidencePanel" class="donation-panel">
+              <div class="panel-card-head">
+                <h4>申诉附件槽位</h4>
+                <span class="tag">证据化评估</span>
+              </div>
+              <div id="appealEvidenceChoices" class="choice-grid compact-grid"></div>
+              <div class="action-row split">
+                <button id="appealEvidenceAutoBtn" type="button" class="ghost">自动填充有效附件</button>
+                <span id="appealEvidenceNote" class="note"></span>
+              </div>
+            </div>
+            <div id="chatActionPanel" class="chat-action-panel hidden"></div>
+            <div class="chat-input">
+              <textarea id="chatInput" placeholder="输入你想咨询或交流的内容"></textarea>
+              <button id="chatSend" type="button" class="primary">发送</button>
+              <button id="appealTemplateBtn" type="button" class="ghost">申诉模板</button>
+              <button id="chatReset" type="button" class="ghost">清空对话</button>
+            </div>
+          </div>
+
+          <div class="panel-card dev-panel hidden" id="devPanel">
+            <div class="panel-card-head">
+              <h3>开发者模式</h3>
+              <span class="tag">临时编辑</span>
+            </div>
+            <p class="note">仅当前局有效，重开或刷新会清空。</p>
+
+            <div id="devRegressionPanel" class="dev-tool-card hidden">
+              <div class="panel-card-head">
+                <h4>内置回归检查</h4>
+                <span class="tag">P0</span>
+              </div>
+              <div class="action-row split">
+                <button id="devRegressionRunBtn" type="button" class="ghost">运行检查</button>
+                <span id="devRegressionNote" class="note"></span>
+              </div>
+            </div>
+
+            <div id="devTuningPanel" class="dev-tool-card hidden">
+              <div class="panel-card-head">
+                <h4>可视化调参</h4>
+                <span class="tag">P0</span>
+              </div>
+              <p class="note">仅开发者模式生效。调参只影响本局，不会永久保存。</p>
+              <div class="dev-slider-grid">
+                <label class="field">
+                  <span>录取微调 <strong id="devTuneChanceValue">0%</strong></span>
+                  <input id="devTuneChance" type="range" min="-0.08" max="0.08" step="0.005" value="0" />
+                </label>
+                <label class="field">
+                  <span>候补微调 <strong id="devTuneWaitlistValue">0%</strong></span>
+                  <input id="devTuneWaitlist" type="range" min="-0.08" max="0.08" step="0.005" value="0" />
+                </label>
+                <label class="field">
+                  <span>门槛微调 <strong id="devTuneSelectivityValue">0%</strong></span>
+                  <input id="devTuneSelectivity" type="range" min="-0.08" max="0.08" step="0.005" value="0" />
+                </label>
+                <label class="field">
+                  <span>Top20 惩罚 <strong id="devTuneEliteValue">0%</strong></span>
+                  <input id="devTuneElite" type="range" min="-0.08" max="0.08" step="0.005" value="0" />
+                </label>
+              </div>
+              <div class="action-row split">
+                <button id="devTuneApplyBtn" type="button" class="ghost">应用调参</button>
+                <button id="devTuneResetBtn" type="button" class="ghost">重置调参</button>
+                <span id="devTuneNote" class="note"></span>
+              </div>
+            </div>
+
+            <div id="devDataPanel" class="dev-tool-card hidden">
+              <div class="panel-card-head">
+                <h4>内容编辑器</h4>
+                <span class="tag">P2</span>
+              </div>
+              <p class="note">支持新增/覆盖学校、公司、高中项目、意外事件、面试题库。</p>
+              <div class="action-row split">
+                <button id="devDataLoadBtn" type="button" class="ghost">加载当前内容</button>
+                <button id="devDataTemplateBtn" type="button" class="ghost">填充示例模板</button>
+                <button id="devDataApplyBtn" type="button" class="primary">应用内容补丁</button>
+              </div>
+              <textarea id="devDataTextarea" class="dev-textarea" placeholder="在此粘贴 JSON 补丁"></textarea>
+              <p id="devDataNote" class="note"></p>
+            </div>
+
+            <div id="devFlowGrid" class="dev-flow-grid">
+              <button type="button" class="ghost dev-flow-btn" data-dev-flow="highschool">高中阶段</button>
+              <button type="button" class="ghost dev-flow-btn" data-dev-flow="application">申请阶段</button>
+              <button type="button" class="ghost dev-flow-btn" data-dev-flow="release">放榜阶段</button>
+              <button type="button" class="ghost dev-flow-btn" data-dev-flow="undergrad">本科阶段</button>
+              <button type="button" class="ghost dev-flow-btn" data-dev-flow="masters">硕士阶段</button>
+              <button type="button" class="ghost dev-flow-btn" data-dev-flow="phd">博士阶段</button>
+              <button type="button" class="ghost dev-flow-btn" data-dev-flow="career">求职阶段</button>
+            </div>
+            <div class="action-row split">
+              <button id="devLoadBtn" type="button" class="ghost">加载当前数据</button>
+              <button id="devApplyBtn" type="button" class="primary">应用修改</button>
+            </div>
+            <textarea id="devTextarea" class="dev-textarea" placeholder="在此粘贴或修改 JSON 数据"></textarea>
+            <p id="devNotice" class="note"></p>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-card-head">
+              <h3>时间线</h3>
+              <span class="tag">8 个阶段</span>
+            </div>
+            <ol id="timeline" class="timeline"></ol>
+          </div>
+
+          <div class="panel-card" id="savePanel">
+            <div class="panel-card-head">
+              <h3>存档与回放</h3>
+              <span class="tag">3 槽位</span>
+            </div>
+            <label class="field">
+              <span>当前槽位</span>
+              <select id="saveSlotSelect">
+                <option value="1">槽位 1</option>
+                <option value="2">槽位 2</option>
+                <option value="3">槽位 3</option>
+              </select>
+            </label>
+            <div class="action-row split">
+              <button id="saveBtn" type="button" class="ghost">保存</button>
+              <button id="loadBtn" type="button" class="ghost">读取</button>
+              <button id="deleteSaveBtn" type="button" class="ghost">删除</button>
+            </div>
+            <p id="saveNote" class="note"></p>
+            <h4 class="section-title">关键节点回放</h4>
+            <div id="replayList" class="choice-grid"></div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <dialog id="exportDialog" class="export-dialog">
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <h3>成长总结</h3>
+          <button id="closeExport" type="button" class="ghost">关闭</button>
+        </div>
+        <pre id="exportText" class="export-text"></pre>
+      </div>
+    </dialog>
+
+    <dialog id="letterDialog" class="letter-dialog">
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <h3>招生办公室来信</h3>
+          <button id="closeLetter" type="button" class="ghost">关闭</button>
+        </div>
+        <div class="letter-meta">
+          <div><span>学校</span><strong id="letterSchool">--</strong></div>
+          <div><span>招生办邮箱</span><strong id="letterEmail">--</strong></div>
+          <div><span>主题</span><strong id="letterSubject">--</strong></div>
+        </div>
+        <div id="letterStatus" class="letter-status"></div>
+        <div id="letterBody" class="letter-body"></div>
+      </div>
+    </dialog>
+
+    <dialog id="decisionDialog" class="decision-dialog">
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <h3 id="decisionTitle">阶段抉择</h3>
+          <button id="closeDecision" type="button" class="ghost">关闭</button>
+        </div>
+        <p id="decisionDesc" class="note"></p>
+        <div id="decisionOptions" class="choice-grid"></div>
+      </div>
+    </dialog>
+
+    <dialog id="offerDialog" class="decision-dialog">
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <h3>最终去向选择</h3>
+          <button id="closeOffer" type="button" class="ghost">关闭</button>
+        </div>
+        <p class="note">请从录取院校中选择最终去向。</p>
+        <div id="offerOptions" class="choice-grid"></div>
+      </div>
+    </dialog>
+
+    <dialog id="jobOfferDialog" class="decision-dialog">
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <h3>最终工作选择</h3>
+          <button id="closeJobOffer" type="button" class="ghost">关闭</button>
+        </div>
+        <p class="note">请从已拆封录用岗位中选择最终去向。</p>
+        <div id="jobOfferOptions" class="choice-grid"></div>
+      </div>
+    </dialog>
+
+    <dialog id="causalDialog" class="decision-dialog">
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <h3 id="causalTitle">结果因果链</h3>
+          <button id="closeCausal" type="button" class="ghost">关闭</button>
+        </div>
+        <p id="causalSummary" class="note"></p>
+        <ul id="causalItems" class="advisor-list"></ul>
+      </div>
+    </dialog>
+
+    <script src="game-config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
