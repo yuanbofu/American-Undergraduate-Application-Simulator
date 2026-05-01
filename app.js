@@ -6931,6 +6931,12 @@ function createDefaultLegacyBoosts() {
   };
 }
 
+function createDefaultUndergradApplicationFeeLedger() {
+  return {
+    records: [],
+  };
+}
+
 const state = {
   started: false,
   devMode: false,
@@ -6966,6 +6972,7 @@ const state = {
   majorActivityAlignment: createDefaultMajorActivityAlignment(),
   legacyProgress: createDefaultLegacyProgress(),
   legacyBoosts: createDefaultLegacyBoosts(),
+  undergradApplicationFeeLedger: createDefaultUndergradApplicationFeeLedger(),
   choiceEffectCache: {},
   currentEvents: [],
   selectedEventIds: new Set(),
@@ -8881,6 +8888,54 @@ function getEffectiveApplicationFee(school) {
   return Math.round(base * multiplier);
 }
 
+function getCurrentUndergradApplicationCycle() {
+  return Math.max(0, Number(state.extraYearCount || 0));
+}
+
+function getUndergradApplicationFeeRecords(cycle = null) {
+  const records = Array.isArray(state.undergradApplicationFeeLedger?.records)
+    ? state.undergradApplicationFeeLedger.records
+    : [];
+  if (cycle === null || cycle === undefined) return records;
+  return records.filter((item) => Number(item.cycle || 0) === Number(cycle));
+}
+
+function summarizeUndergradApplicationFees(cycle = null) {
+  const records = getUndergradApplicationFeeRecords(cycle);
+  return records.reduce(
+    (summary, item) => {
+      const amount = Math.max(0, Number(item.totalFee || 0));
+      if (item.round === "rd") {
+        summary.rd += amount;
+      } else {
+        summary.ed += amount;
+      }
+      summary.total += amount;
+      return summary;
+    },
+    { ed: 0, rd: 0, total: 0, count: records.length },
+  );
+}
+
+function recordUndergradApplicationFeeCharge(round, schools, totalFee) {
+  if (!state.undergradApplicationFeeLedger || typeof state.undergradApplicationFeeLedger !== "object") {
+    state.undergradApplicationFeeLedger = createDefaultUndergradApplicationFeeLedger();
+  }
+  if (!Array.isArray(state.undergradApplicationFeeLedger.records)) {
+    state.undergradApplicationFeeLedger.records = [];
+  }
+  const normalizedRound = round === "rd" ? "rd" : "ed";
+  state.undergradApplicationFeeLedger.records.push({
+    cycle: getCurrentUndergradApplicationCycle(),
+    round: normalizedRound,
+    totalFee: Math.max(0, Math.round(Number(totalFee || 0))),
+    schoolIds: Array.isArray(schools) ? schools.map((school) => String(school?.id || "")).filter(Boolean) : [],
+    schoolNames: Array.isArray(schools) ? schools.map((school) => String(school?.name || "")).filter(Boolean) : [],
+    waiverChoice: typeof state.feeWaiverChoice === "string" ? state.feeWaiverChoice : "none",
+    submittedAtTerm: Number.isFinite(Number(state.termIndex)) ? Number(state.termIndex) : -1,
+  });
+}
+
 function getRankIndex(school) {
   if (Number.isFinite(school.qsRank)) {
     return school.qsRank;
@@ -9507,6 +9562,24 @@ function applyStateObject(snapshot, options = {}) {
   }
   if (!state.legacyBoosts || typeof state.legacyBoosts !== "object") {
     state.legacyBoosts = createDefaultLegacyBoosts();
+  }
+  if (!state.undergradApplicationFeeLedger || typeof state.undergradApplicationFeeLedger !== "object") {
+    state.undergradApplicationFeeLedger = createDefaultUndergradApplicationFeeLedger();
+  }
+  if (!Array.isArray(state.undergradApplicationFeeLedger.records)) {
+    state.undergradApplicationFeeLedger.records = [];
+  } else {
+    state.undergradApplicationFeeLedger.records = state.undergradApplicationFeeLedger.records
+      .filter((item) => item && typeof item === "object")
+      .map((item) => ({
+        cycle: Number.isFinite(Number(item.cycle)) ? Number(item.cycle) : 0,
+        round: item.round === "rd" ? "rd" : "ed",
+        totalFee: Math.max(0, Math.round(Number(item.totalFee || 0))),
+        schoolIds: Array.isArray(item.schoolIds) ? item.schoolIds.map((value) => String(value)) : [],
+        schoolNames: Array.isArray(item.schoolNames) ? item.schoolNames.map((value) => String(value)) : [],
+        waiverChoice: typeof item.waiverChoice === "string" ? item.waiverChoice : "none",
+        submittedAtTerm: Number.isFinite(Number(item.submittedAtTerm)) ? Number(item.submittedAtTerm) : -1,
+      }));
   }
 
   if (!state.chatContext || typeof state.chatContext !== "object") {
@@ -11851,6 +11924,7 @@ function resetGame() {
   state.currentEvents = [];
   state.selectedEventIds = new Set();
   state.customProjectUsedThisTerm = false;
+  state.undergradApplicationFeeLedger = createDefaultUndergradApplicationFeeLedger();
   state.essayChoices = [];
   state.recChoice = null;
   state.aidChoice = null;
@@ -13180,6 +13254,7 @@ function updateSchoolCount() {
   schoolCount.textContent = `已选 ${state.selectedSchools.size}`;
   if (!appCostInfo) return;
   const stage = getApplicationStage();
+  const currentCycleFeeSummary = summarizeUndergradApplicationFees(getCurrentUndergradApplicationCycle());
   const selected = Array.from(state.selectedSchools)
     .map((id) => UNIVERSITIES.find((item) => item.id === id))
     .filter(Boolean);
@@ -13207,9 +13282,11 @@ function updateSchoolCount() {
   const tierLine = selected.length
     ? ` · 结构 保底${tierCounts.safety}/匹配${tierCounts.match}/冲刺${tierCounts.reach} · 结构分 ${structure.score}（${riskLine}）`
     : "";
+  const edPaidLine =
+    currentCycleFeeSummary.ed > 0 ? ` · 已支付ED申请费 ${formatUsd(currentCycleFeeSummary.ed)}` : "";
   appCostInfo.textContent =
     state.selectedSchools.size > 0
-      ? `申请成本预估：${formatUsd(totalFee)} · 压力 +${stressCost}${tierLine} ${waiverLine}`
+      ? `申请成本预估：${formatUsd(totalFee)} · 压力 +${stressCost}${tierLine}${edPaidLine} ${waiverLine}`
       : "申请成本预估：--";
 }
 
@@ -13527,6 +13604,11 @@ function submitApplications() {
   appNotice.textContent = "";
   state.cash -= totalFee;
   state.stats.stress = clamp(state.stats.stress + selectedSchools.length * 1.5, 0, 100);
+  recordUndergradApplicationFeeCharge(
+    stage === APPLICATION_STAGES.ED_APPLY ? "ed" : "rd",
+    selectedSchools,
+    totalFee,
+  );
 
   if (stage === APPLICATION_STAGES.ED_APPLY) {
     const edSchool = selectedSchools[0];
@@ -13543,6 +13625,7 @@ function submitApplications() {
     state.finalChoice = null;
     applyLoanInterest("贷款利息（ED申请）");
     updateAchievements();
+    state.log.unshift(`ED申请费支出：${formatUsd(totalFee)}（${edSchool.name}）`);
     state.log.unshift(`ED 提交：${edSchool.name}`);
     state.log.unshift("ED 提交完成，进入 ED 放榜。");
     pushReplayNode("提交ED申请");
@@ -13574,6 +13657,11 @@ function submitApplications() {
   state.postAdmitActionsUsed = new Set();
   applyLoanInterest("贷款利息（RD申请）");
   updateAchievements();
+  state.log.unshift(
+    `RD申请费支出：${formatUsd(totalFee)}（${selectedSchools.length} 所：${selectedSchools
+      .map((school) => school.name)
+      .join("、")}）`,
+  );
   state.log.unshift(`选校结构：${structureProfile.summary}（${structureProfile.label}）`);
   if (structureProfile.level !== "healthy") {
     state.log.unshift(
@@ -27107,6 +27195,8 @@ function buildProfessionalFinalReportSections() {
   const undergrad = state.undergradProfile || getDefaultUndergradProfile();
   const masters = state.mastersProfile || getDefaultMastersProfile();
   const phd = state.phdProfile || getDefaultPhdProfile();
+  const undergradFeeLifetime = summarizeUndergradApplicationFees();
+  const undergradFeeCurrentCycle = summarizeUndergradApplicationFees(getCurrentUndergradApplicationCycle());
   const applicationSummary = summarizeApplicationResults(state.results);
   const gradSummary = summarizeApplicationResults(state.gradResults);
   const calibration = state.balanceCalibration || null;
@@ -27195,6 +27285,9 @@ function buildProfessionalFinalReportSections() {
   sections.push(
     buildReportSection("财务结算", [
       `当前资金：${formatUsd(state.cash || 0)} · 贷款余额：${formatUsd(state.loanBalance || 0)}`,
+      `本科申请费累计：${formatUsd(undergradFeeLifetime.total)}（本申请季 ED ${formatUsd(
+        undergradFeeCurrentCycle.ed,
+      )} + RD ${formatUsd(undergradFeeCurrentCycle.rd)}）`,
       `汇率系数：x${Number(state.fxRate || 1).toFixed(2)} · 过劳债务：${state.overworkDebt || 0} · 再读一年：${state.extraYearCount || 0} 次`,
       `学业支持：录取后行动 ${state.postAdmitActionsUsed?.size || 0} 项 · 奖助自动发放（按学校等级与实力匹配）`,
     ]),

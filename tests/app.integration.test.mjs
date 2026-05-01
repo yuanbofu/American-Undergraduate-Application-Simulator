@@ -1253,6 +1253,47 @@ describe("chess-game app", () => {
     expect(window.document.getElementById("schoolList").textContent).toContain("已在 ED 提交，本轮 RD 不可重复申请");
   });
 
+  it("charges and tracks ED application fees, then shows the paid ED fee during RD planning", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 6;
+    snapshot.applicationStage = "ed_apply";
+    snapshot.resultReleaseStage = "early";
+    snapshot.cash = 10000;
+    snapshot.essayChoices = ["research"];
+    snapshot.recChoice = "teacher";
+    snapshot.feeWaiverChoice = "none";
+    snapshot.selectedSchools = [];
+    applyStateSnapshot(window, snapshot);
+
+    const edSchool = window.getLegacySchoolById("harvard");
+    const edFee = window.getEffectiveApplicationFee(edSchool);
+    window.toggleSchool("harvard");
+    window.submitApplications();
+
+    const afterEd = getStateSnapshot(window);
+    expect(afterEd.cash).toBe(10000 - edFee);
+    expect(afterEd.undergradApplicationFeeLedger.records).toHaveLength(1);
+    expect(afterEd.undergradApplicationFeeLedger.records[0].round).toBe("ed");
+    expect(afterEd.undergradApplicationFeeLedger.records[0].totalFee).toBe(edFee);
+    expect(afterEd.log.some((line) => String(line).includes("ED申请费支出"))).toBe(true);
+
+    const rdSnapshot = getStateSnapshot(window);
+    rdSnapshot.termIndex = 6;
+    rdSnapshot.applicationStage = "rd_apply";
+    rdSnapshot.resultReleaseStage = "regular";
+    rdSnapshot.selectedSchools = [];
+    applyStateSnapshot(window, rdSnapshot);
+
+    window.toggleSchool("mit");
+    const feeText = window.document.getElementById("appCostInfo").textContent;
+    expect(feeText).toContain("已支付ED申请费");
+    expect(feeText).toContain(window.formatUsd(edFee));
+  });
+
   it("shows ED waitlist update letters automatically during RD release", () => {
     const dom = bootstrap();
     const { window } = dom;
