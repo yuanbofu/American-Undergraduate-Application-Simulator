@@ -4,6 +4,8 @@
   "description": "- Option 1: Open `index.html` directly in a browser - Option 2: Start a local static server",
   "main": "app.js",
   "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -21,6 +21,18 @@
         </div>
       </header>
 
+      <section id="fileModeBanner" class="runtime-banner hidden">
+        <div class="runtime-banner-copy">
+          <strong>当前是静态文件打开模式</strong>
+          <p id="fileModeBannerText" class="note"></p>
+          <code id="fileModeCommand" class="runtime-command"></code>
+        </div>
+        <div class="runtime-banner-actions">
+          <button id="copyFileModeCommandBtn" type="button" class="ghost">复制启动命令</button>
+          <button id="dismissFileModeBannerBtn" type="button" class="ghost">知道了</button>
+        </div>
+      </section>
+
       <section class="layout">
         <section class="stage">
           <div class="phase">
@@ -233,42 +245,55 @@
 
           <div id="gradArea" class="section hidden">
             <div class="section-header">
-              <h3>研究生阶段（独立界面）</h3>
+              <h3>研究生申请阶段（独立界面）</h3>
               <p id="gradSubtitle" class="note">先硕士后博士，申请结果按邮件逐封拆开。</p>
             </div>
             <div id="postGradPanel" class="panel-card hidden">
-              <h5 class="section-title">毕业后选择</h5>
-              <div class="action-row split">
-                <button id="chooseMastersBtn" type="button" class="primary">申请硕士选校</button>
-                <button id="choosePhdBtn" type="button" class="ghost">申请博士选校</button>
-                <button id="chooseJobBtn" type="button" class="ghost">进入找工作界面</button>
-              </div>
-              <p id="postGradNote" class="note"></p>
-              <div id="gradSchoolSelector" class="hidden">
-                <p id="gradSchoolHint" class="note">请选择研究生申请学校（至少 3 所）</p>
-                <label class="field">
-                  <span>硕博连读申请（仅硕士路径）</span>
-                  <input id="msPhdToggle" type="checkbox" />
-                </label>
-                <label class="field">
-                  <span id="gradMajorLabel">申请专业</span>
-                  <select id="gradMajorSelect"></select>
-                </label>
-                <p id="gradMajorNote" class="note"></p>
-                <div id="gradSchoolList" class="school-grid"></div>
+              <div id="gradApplicationPanel">
+                <h5 class="section-title">毕业后选择</h5>
                 <div class="action-row split">
-                  <span id="gradSchoolCount" class="tag">已选 0</span>
-                  <span id="gradProgramBadge" class="tag">未选择</span>
-                  <button id="submitMastersBtn" type="button" class="primary">提交硕士申请</button>
+                  <button id="chooseMastersBtn" type="button" class="primary">申请硕士选校</button>
+                  <button id="choosePhdBtn" type="button" class="ghost">申请博士选校</button>
+                  <button id="chooseJobBtn" type="button" class="ghost">进入找工作界面</button>
+                </div>
+                <p id="postGradNote" class="note"></p>
+                <div id="gradSchoolSelector" class="hidden">
+                  <p id="gradSchoolHint" class="note">请选择研究生申请学校（至少 3 所）</p>
+                  <label class="field">
+                    <span>硕博连读申请（仅硕士路径）</span>
+                    <input id="msPhdToggle" type="checkbox" />
+                  </label>
+                  <label class="field">
+                    <span id="gradMajorLabel">申请专业</span>
+                    <select id="gradMajorSelect"></select>
+                  </label>
+                  <p id="gradMajorNote" class="note"></p>
+                  <div id="gradSchoolList" class="school-grid"></div>
+                  <div class="action-row split">
+                    <span id="gradSchoolCount" class="tag">已选 0</span>
+                    <span id="gradProgramBadge" class="tag">未选择</span>
+                    <button id="submitMastersBtn" type="button" class="primary">提交硕士申请</button>
+                  </div>
                 </div>
               </div>
-              <div class="action-row split">
-                <p id="gradReleaseNote" class="note"></p>
-                <button id="gradRevealNextBtn" type="button" class="ghost">拆下一封研究生邮件</button>
-                <button id="gradResolveWaitlistBtn" type="button" class="ghost">更新研究生候补结果</button>
+              <div id="gradResultsPanel">
+                <div class="action-row split">
+                  <p id="gradReleaseNote" class="note"></p>
+                  <button id="gradRevealNextBtn" type="button" class="ghost">拆下一封研究生邮件</button>
+                  <button id="gradResolveWaitlistBtn" type="button" class="ghost">更新研究生候补结果</button>
+                </div>
+                <div id="gradResultsGrid" class="results-grid"></div>
+                <ul id="postGradResults" class="advisor-list"></ul>
               </div>
-              <div id="gradResultsGrid" class="results-grid"></div>
-              <div id="mastersPanel" class="panel-card hidden">
+            </div>
+          </div>
+
+          <div id="mastersArea" class="section hidden">
+            <div class="section-header">
+              <h3>硕士阶段（独立界面）</h3>
+              <p id="mastersSubtitle" class="note">硕士入读后按学期推进，连读结果会在学期切换前及时公布。</p>
+            </div>
+            <div id="mastersPanel" class="panel-card hidden">
                 <div class="panel-card-head">
                   <h5>硕士阶段（4 学期）</h5>
                   <span id="mastersProgress" class="tag">未开始</span>
@@ -312,7 +337,14 @@
                   <button id="chooseJobAfterMastersBtn" type="button" class="ghost">硕士后就业</button>
                 </div>
               </div>
-              <div id="phdPanel" class="panel-card hidden">
+          </div>
+
+          <div id="phdArea" class="section hidden">
+            <div class="section-header">
+              <h3>博士阶段（独立界面）</h3>
+              <p id="phdSubtitle" class="note">博士入读后按学期推进，聚焦课题、发表与毕业去向。</p>
+            </div>
+            <div id="phdPanel" class="panel-card hidden">
                 <div class="panel-card-head">
                   <h5>博士阶段（8 学期）</h5>
                   <span id="phdProgress" class="tag">未开始</span>
@@ -355,8 +387,6 @@
                   <button id="chooseJobAfterPhdBtn" type="button" class="primary">博士后就业</button>
                 </div>
               </div>
-              <ul id="postGradResults" class="advisor-list"></ul>
-            </div>
           </div>
 
           <div id="careerArea" class="section hidden">
@@ -482,39 +512,50 @@
             </div>
           </div>
 
-          <div class="panel-card" id="advisorCard">
-            <div class="panel-card-head">
-              <h3>AI 顾问</h3>
-              <span class="tag">实时建议</span>
-            </div>
-            <ul id="advisorList" class="advisor-list"></ul>
-          </div>
-
-          <div class="panel-card" id="projectCard">
-            <div class="panel-card-head">
-              <h3>长期项目进度</h3>
-              <span class="tag">连续加成</span>
-            </div>
-            <div id="projectProgress" class="project-grid"></div>
-          </div>
-
-          <div class="panel-card" id="achievementCard">
-            <div class="panel-card-head">
-              <h3>解锁成就</h3>
-              <span class="tag">路线徽章</span>
-            </div>
-            <ul id="achievementList" class="advisor-list"></ul>
-          </div>
-
           <div class="panel-card" id="chatCard">
             <div class="panel-card-head">
               <h3>交流室</h3>
-              <span class="tag">离线对话</span>
+              <span class="tag">离线 / MiMo</span>
             </div>
             <label class="field">
               <span>对话角色</span>
               <select id="chatRole"></select>
             </label>
+            <div class="chat-ai-panel" id="chatAiPanel">
+              <div class="panel-card-head">
+                <h4 id="chatAiPanelTitle">AI 设置</h4>
+                <span class="tag" id="chatAiPanelTag">本地保存</span>
+              </div>
+              <p id="chatAiPublicNote" class="note hidden">公开版默认由内置 AI 驱动；若服务暂不可用，会自动切换为离线规则。</p>
+              <div id="chatAiConfigControls">
+                <div class="chat-ai-grid">
+                  <label class="field">
+                    <span>回复模式</span>
+                    <select id="chatAiMode">
+                      <option value="offline">离线规则引擎</option>
+                      <option value="mimo">MiMo API</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>模型</span>
+                    <input id="chatAiModel" type="text" placeholder="例如：mimo-v2.5（更快）" />
+                  </label>
+                </div>
+                <label class="field">
+                  <span>Base URL</span>
+                  <input id="chatAiBaseUrl" type="text" placeholder="https://token-plan-cn.xiaomimimo.com/v1" />
+                </label>
+                <label class="field">
+                  <span>API Key（可留空，自动配置）</span>
+                  <input id="chatAiKey" type="password" placeholder="tp-..." autocomplete="off" />
+                </label>
+                <div class="action-row split">
+                  <button id="chatAiPingBtn" type="button" class="ghost">检查 AI 可用性</button>
+                  <span id="chatAiPingNote" class="note"></span>
+                </div>
+              </div>
+              <p id="chatAiStatus" class="note">当前使用离线规则引擎。</p>
+            </div>
             <div id="chatRoleCard" class="role-memory-card hidden">
               <div class="panel-card-head">
                 <h4 id="chatRoleCardTitle">角色记忆卡</h4>
@@ -552,6 +593,48 @@
               <button id="appealTemplateBtn" type="button" class="ghost">申诉模板</button>
               <button id="chatReset" type="button" class="ghost">清空对话</button>
             </div>
+          </div>
+
+          <div class="panel-card" id="advisorCard">
+            <div class="panel-card-head">
+              <h3>AI 顾问</h3>
+              <span class="tag">实时建议</span>
+            </div>
+            <ul id="advisorList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="routeCard">
+            <div class="panel-card-head">
+              <h3>路线与反馈</h3>
+              <span id="routeSummaryTag" class="tag">透明提示</span>
+            </div>
+            <p id="routeHeadline" class="note">旅程开始后会显示主路线、顺逆风和组合技。</p>
+            <ul id="routeFeedbackList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="projectCard">
+            <div class="panel-card-head">
+              <h3>长期项目进度</h3>
+              <span class="tag">连续加成</span>
+            </div>
+            <div id="projectProgress" class="project-grid"></div>
+          </div>
+
+          <div class="panel-card" id="achievementCard">
+            <div class="panel-card-head">
+              <h3>解锁成就</h3>
+              <span class="tag">路线徽章</span>
+            </div>
+            <ul id="achievementList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="legacyCard">
+            <div class="panel-card-head">
+              <h3>多周目传承</h3>
+              <span class="tag">自动继承</span>
+            </div>
+            <p id="legacySummary" class="note">完成一局后，会自动解锁跨周目微加成与回顾。</p>
+            <ul id="legacyList" class="advisor-list"></ul>
           </div>
 
           <div class="panel-card dev-panel hidden" id="devPanel">
@@ -736,6 +819,33 @@
         </div>
         <p id="causalSummary" class="note"></p>
         <ul id="causalItems" class="advisor-list"></ul>
+      </div>
+    </dialog>
+
+    <dialog id="customProjectDialog" class="decision-dialog">
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <h3 id="customProjectDialogTitle">AI 自定义项目</h3>
+          <button id="closeCustomProject" type="button" class="ghost">关闭</button>
+        </div>
+        <p id="customProjectDialogHint" class="note">输入你自己想到的项目/活动想法，AI 会估算时间、费用和大致收益。</p>
+        <label class="field">
+          <span>你的项目想法</span>
+          <textarea
+            id="customProjectIdea"
+            rows="5"
+            placeholder="例如：我想做一个面向本地高中生的 AI 法律素养播客，并邀请律师和老师来做案例讨论。"
+          ></textarea>
+        </label>
+        <div class="action-row split">
+          <button id="generateCustomProjectBtn" type="button" class="primary">AI 估算并生成</button>
+          <span id="customProjectNote" class="note"></span>
+        </div>
+        <div id="customProjectPreview" class="custom-project-preview hidden"></div>
+        <div class="action-row split">
+          <button id="applyCustomProjectBtn" type="button" class="ghost" disabled>生成后自动加入</button>
+          <button id="resetCustomProjectBtn" type="button" class="ghost">重置</button>
+        </div>
       </div>
     </dialog>
 

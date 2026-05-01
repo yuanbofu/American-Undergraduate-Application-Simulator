@@ -80,6 +80,47 @@ body {
   gap: 12px;
 }
 
+.runtime-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(29, 106, 117, 0.18);
+  background:
+    linear-gradient(135deg, rgba(29, 106, 117, 0.12), rgba(246, 231, 205, 0.52)),
+    rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 28px rgba(18, 24, 40, 0.06);
+}
+
+.runtime-banner-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.runtime-banner-copy strong {
+  font-size: 16px;
+}
+
+.runtime-banner-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.runtime-command {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(29, 106, 117, 0.14);
+  font-size: 12px;
+  color: var(--ink);
+  word-break: break-all;
+}
+
 button {
   font-family: inherit;
 }
@@ -411,6 +452,14 @@ button {
   box-shadow: 0 12px 24px rgba(240, 143, 103, 0.2);
 }
 
+.school-card.blocked {
+  cursor: not-allowed;
+  opacity: 0.68;
+  border-style: dashed;
+  transform: none;
+  box-shadow: none;
+}
+
 .school-card small {
   color: var(--muted);
 }
@@ -437,6 +486,11 @@ button {
   background: rgba(29, 106, 117, 0.12);
   color: var(--primary-dark);
   font-size: 11px;
+  font-weight: 600;
+}
+
+.school-legacy-note {
+  color: #8a5b12;
   font-weight: 600;
 }
 
@@ -766,6 +820,24 @@ button {
   background: #fbf8f2;
 }
 
+.chat-ai-panel {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.chat-ai-panel.public-mode {
+  background: rgba(29, 106, 117, 0.06);
+}
+
+.chat-ai-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
 .chat-bubble {
   padding: 10px 14px;
   border-radius: 16px;
@@ -813,6 +885,11 @@ button {
 .chat-input .ghost {
   padding: 8px 14px;
   font-size: 13px;
+}
+
+#chatSend[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .chat-action-panel {
@@ -1126,6 +1203,29 @@ button {
   gap: 12px;
 }
 
+#customProjectIdea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.custom-project-preview {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(29, 106, 117, 0.16);
+  background: #fbf8f2;
+  display: grid;
+  gap: 10px;
+}
+
+.custom-project-preview h4 {
+  margin: 0;
+}
+
+.custom-project-preview p {
+  margin: 0;
+}
+
 .letter-meta {
   margin: 12px 0;
   display: grid;
@@ -1234,6 +1334,11 @@ button {
 
 @media (max-width: 1000px) {
   .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .runtime-banner {
     flex-direction: column;
     align-items: flex-start;
   }

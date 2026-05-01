@@ -19,6 +19,8 @@ const applicationArea = document.getElementById("applicationArea");
 const resultsArea = document.getElementById("resultsArea");
 const collegeArea = document.getElementById("collegeArea");
 const gradArea = document.getElementById("gradArea");
+const mastersArea = document.getElementById("mastersArea");
+const phdArea = document.getElementById("phdArea");
 const careerArea = document.getElementById("careerArea");
 const resultsList = document.getElementById("resultsList");
 const resultsTitle = document.getElementById("resultsTitle");
@@ -67,6 +69,9 @@ const startUndergradBtn = document.getElementById("startUndergradBtn");
 const undergradProgress = document.getElementById("undergradProgress");
 const undergradFinanceNote = document.getElementById("undergradFinanceNote");
 const postGradPanel = document.getElementById("postGradPanel");
+const gradSubtitle = document.getElementById("gradSubtitle");
+const gradApplicationPanel = document.getElementById("gradApplicationPanel");
+const gradResultsPanel = document.getElementById("gradResultsPanel");
 const chooseMastersBtn = document.getElementById("chooseMastersBtn");
 const choosePhdBtn = document.getElementById("choosePhdBtn");
 const chooseJobBtn = document.getElementById("chooseJobBtn");
@@ -86,6 +91,7 @@ const jobCompanyList = document.getElementById("jobCompanyList");
 const jobCompanyCount = document.getElementById("jobCompanyCount");
 const submitJobAppsBtn = document.getElementById("submitJobAppsBtn");
 const updateInterviewBtn = document.getElementById("updateInterviewBtn");
+const mastersSubtitle = document.getElementById("mastersSubtitle");
 const mastersPanel = document.getElementById("mastersPanel");
 const mastersNote = document.getElementById("mastersNote");
 const mastersMetrics = document.getElementById("mastersMetrics");
@@ -108,6 +114,7 @@ const mastersTimeline = document.getElementById("mastersTimeline");
 const mastersProgress = document.getElementById("mastersProgress");
 const choosePhdAfterMastersBtn = document.getElementById("choosePhdAfterMastersBtn");
 const chooseJobAfterMastersBtn = document.getElementById("chooseJobAfterMastersBtn");
+const phdSubtitle = document.getElementById("phdSubtitle");
 const phdPanel = document.getElementById("phdPanel");
 const phdNote = document.getElementById("phdNote");
 const phdMetrics = document.getElementById("phdMetrics");
@@ -171,8 +178,13 @@ const majorValue = document.getElementById("majorValue");
 const counselorValue = document.getElementById("counselorValue");
 const projectValue = document.getElementById("projectValue");
 const advisorList = document.getElementById("advisorList");
+const routeSummaryTag = document.getElementById("routeSummaryTag");
+const routeHeadline = document.getElementById("routeHeadline");
+const routeFeedbackList = document.getElementById("routeFeedbackList");
 const projectProgress = document.getElementById("projectProgress");
 const achievementList = document.getElementById("achievementList");
+const legacySummary = document.getElementById("legacySummary");
+const legacyList = document.getElementById("legacyList");
 const timeline = document.getElementById("timeline");
 const essayChoices = document.getElementById("essayChoices");
 const aiEssayAssignBtn = document.getElementById("aiEssayAssignBtn");
@@ -198,6 +210,11 @@ const appChecklist = document.getElementById("appChecklist");
 const submitAppBtn = document.getElementById("submitAppBtn");
 const appNotice = document.getElementById("appNotice");
 const setupCard = document.getElementById("setupCard");
+const fileModeBanner = document.getElementById("fileModeBanner");
+const fileModeBannerText = document.getElementById("fileModeBannerText");
+const fileModeCommand = document.getElementById("fileModeCommand");
+const copyFileModeCommandBtn = document.getElementById("copyFileModeCommandBtn");
+const dismissFileModeBannerBtn = document.getElementById("dismissFileModeBannerBtn");
 const setupNotice = document.getElementById("setupNotice");
 const studentName = document.getElementById("studentName");
 const letterDialog = document.getElementById("letterDialog");
@@ -212,6 +229,16 @@ const decisionTitle = document.getElementById("decisionTitle");
 const decisionDesc = document.getElementById("decisionDesc");
 const decisionOptions = document.getElementById("decisionOptions");
 const closeDecision = document.getElementById("closeDecision");
+const customProjectDialog = document.getElementById("customProjectDialog");
+const customProjectDialogTitle = document.getElementById("customProjectDialogTitle");
+const customProjectDialogHint = document.getElementById("customProjectDialogHint");
+const customProjectIdea = document.getElementById("customProjectIdea");
+const generateCustomProjectBtn = document.getElementById("generateCustomProjectBtn");
+const customProjectNote = document.getElementById("customProjectNote");
+const customProjectPreview = document.getElementById("customProjectPreview");
+const applyCustomProjectBtn = document.getElementById("applyCustomProjectBtn");
+const resetCustomProjectBtn = document.getElementById("resetCustomProjectBtn");
+const closeCustomProject = document.getElementById("closeCustomProject");
 const offerDialog = document.getElementById("offerDialog");
 const offerOptions = document.getElementById("offerOptions");
 const closeOffer = document.getElementById("closeOffer");
@@ -224,6 +251,18 @@ const chatRoleCardTitle = document.getElementById("chatRoleCardTitle");
 const chatRoleCardTurns = document.getElementById("chatRoleCardTurns");
 const chatRoleCardSummary = document.getElementById("chatRoleCardSummary");
 const chatRoleCardItems = document.getElementById("chatRoleCardItems");
+const chatAiPanel = document.getElementById("chatAiPanel");
+const chatAiPanelTitle = document.getElementById("chatAiPanelTitle");
+const chatAiPanelTag = document.getElementById("chatAiPanelTag");
+const chatAiPublicNote = document.getElementById("chatAiPublicNote");
+const chatAiConfigControls = document.getElementById("chatAiConfigControls");
+const chatAiMode = document.getElementById("chatAiMode");
+const chatAiModel = document.getElementById("chatAiModel");
+const chatAiBaseUrl = document.getElementById("chatAiBaseUrl");
+const chatAiKey = document.getElementById("chatAiKey");
+const chatAiPingBtn = document.getElementById("chatAiPingBtn");
+const chatAiPingNote = document.getElementById("chatAiPingNote");
+const chatAiStatus = document.getElementById("chatAiStatus");
 const chatMessages = document.getElementById("chatMessages");
 const chatInput = document.getElementById("chatInput");
 const chatSend = document.getElementById("chatSend");
@@ -305,6 +344,104 @@ function toPositiveInt(value, fallbackValue) {
   if (!Number.isFinite(num) || num <= 0) return fallbackValue;
   return Math.round(num);
 }
+
+const CHAT_AI_SETTINGS_STORAGE_KEY = "college-sim-chat-ai-settings-v1";
+const CHAT_AI_AUTO_KEY = "tp-c2lhj8h31fhzg34uymcgtd8ks5sgqp9c2kkqn58iguiabtmc";
+const CHAT_PUBLIC_RELEASE = getRuntimeConfig("chat.publicRelease", true) !== false;
+const CHAT_AI_SHOW_SETTINGS = getRuntimeConfig("chat.showSettings", !CHAT_PUBLIC_RELEASE) === true;
+const CHAT_AI_ALLOW_DIRECT = getRuntimeConfig("chat.allowDirect", true) !== false;
+const CHAT_AI_DEFAULT_MODEL = String(getRuntimeConfig("chat.defaultModel", "mimo-v2.5") || "mimo-v2.5").trim() || "mimo-v2.5";
+const CHAT_AI_DEFAULT_BASE_URL =
+  String(getRuntimeConfig("chat.defaultBaseUrl", "https://token-plan-cn.xiaomimimo.com/v1") || "https://token-plan-cn.xiaomimimo.com/v1").trim() ||
+  "https://token-plan-cn.xiaomimimo.com/v1";
+const CHAT_AI_DEFAULTS = {
+  mode: "mimo",
+  model: CHAT_AI_DEFAULT_MODEL,
+  baseUrl: CHAT_AI_DEFAULT_BASE_URL,
+  apiKey: "",
+};
+const CHAT_AI_HISTORY_LIMIT = 3;
+const CHAT_AI_MAX_TOKENS = null;
+const CHAT_AI_PROXY_TIMEOUT_MS = 12000;
+const CHAT_AI_DIRECT_TIMEOUT_MS = 15000;
+const CHAT_AI_ALLOWED_MODES = new Set(["offline", "mimo"]);
+const CHAT_AI_PROMPTS = {
+  default:
+    "你是模拟器中的对话角色。请用中文简洁回复，保持一致口径，不虚构不存在的规则。",
+  counselor:
+    "你是留学中介顾问。像靠谱顾问一样利落、具体、略带掌控感。优先给：最值得做的一步、时间/预算约束、最大风险，不要空泛安慰。",
+  family:
+    "你是家人。语气关心、口语化、会惦记压力和花费，但不是模板鸡汤；要像真的家人一样先接情绪，再给朴素建议。",
+  peer:
+    "你是同学。语气自然一点，可以有轻微比较感和八卦感，但别刻薄；能说出同龄人的真实体感与对比。",
+  teacher:
+    "你是学科老师。标准高但愿意帮忙，重点给学术与项目质量反馈；说优点时要具体，说问题时要指出怎么改。",
+  interviewer:
+    "你是公司面试官。保持专业、真实、友好，但不要学术拷打。优先考察表达清晰度、思路和岗位匹配。每次只问一个简短问题，允许用户用 2-4 句自然作答。",
+  admissions:
+    "你是大学招生委员会。口吻正式克制、有一点官腔，只解释评估维度、匹配度与流程，不承诺录取结果。",
+};
+let chatAiSettings = { ...CHAT_AI_DEFAULTS };
+let chatSendBusy = false;
+let chatAiPreferredRoute = "direct";
+let fileModeBannerDismissed = false;
+let customProjectBusy = false;
+let customProjectDraft = null;
+const LEGACY_PROFILE_STORAGE_KEY = "college-sim-legacy-profile-v1";
+const ROUTE_DEFINITIONS = {
+  research: { label: "科研学术流", short: "科研", hint: "更吃研究深度、论文与方法积累。" },
+  career: { label: "就业实战流", short: "就业", hint: "更吃实习、项目落地与行业匹配。" },
+  impact: { label: "公共影响流", short: "影响", hint: "更吃公益、政策、社会倡议与可验证外部影响。" },
+  leadership: { label: "领导组织流", short: "领导", hint: "更吃组织能力、带队和资源整合。" },
+  creative: { label: "创作表达流", short: "创作", hint: "更吃作品、叙事、设计和表达辨识度。" },
+  law: { label: "法律论证流", short: "法律", hint: "更吃论证、辩论、规则理解与政策表达。" },
+};
+const ROUTE_KEYS = Object.keys(ROUTE_DEFINITIONS);
+const ROUTE_TAG_SCORES = {
+  科研: { research: 2.2 },
+  研究: { research: 2 },
+  实验: { research: 1.8 },
+  数据: { research: 1.4, career: 0.8 },
+  数学: { research: 1.5, career: 0.6 },
+  工程: { research: 1.1, career: 1.5 },
+  商业: { career: 2, leadership: 0.8 },
+  创业: { career: 1.8, leadership: 1.4 },
+  职业: { career: 1.6 },
+  实习: { career: 2 },
+  公益: { impact: 2.1, leadership: 0.6 },
+  政策: { impact: 1.8, law: 1.3 },
+  人文: { impact: 1.1, creative: 0.8, law: 0.9 },
+  领导力: { leadership: 2.2 },
+  社团: { leadership: 1.6, impact: 0.8 },
+  社群: { leadership: 1.4, impact: 1.1 },
+  论文: { research: 1.8, law: 0.6 },
+  写作: { creative: 1.5, law: 1.2, impact: 0.5 },
+  媒体: { creative: 1.8, impact: 0.8 },
+  艺术: { creative: 2.2 },
+  设计: { creative: 1.8, career: 0.6 },
+  法律: { law: 2.4, impact: 0.8 },
+  辩论: { law: 1.8, leadership: 0.7 },
+  国际: { impact: 1, leadership: 0.5 },
+};
+const ROUTE_PROJECT_SCORES = {
+  "research-track": { research: 2.4 },
+  research: { research: 2.2 },
+  career: { career: 2.2 },
+  leadership: { leadership: 2.2 },
+  impact: { impact: 2.2 },
+  balance: { impact: 0.7, leadership: 0.7, research: 0.7, creative: 0.7 },
+  "writing-archive": { creative: 1.8, law: 1.1 },
+  "art-portfolio": { creative: 2.2 },
+  "startup-track": { career: 1.8, leadership: 1.4 },
+  "impact-project": { impact: 1.8, leadership: 1.2 },
+};
+const ROUTE_CHAIN_RULES = [
+  { id: "research-output", label: "研究成果转化", match: (ctx) => ctx.researchCue && (ctx.writingCue || ctx.publicationCue), route: "research" },
+  { id: "impact-leadership", label: "公共影响放大", match: (ctx) => ctx.impactCue && ctx.leadershipCue, route: "impact" },
+  { id: "career-builder", label: "实战履历闭环", match: (ctx) => ctx.careerCue && (ctx.leadershipCue || ctx.dataCue), route: "career" },
+  { id: "creative-story", label: "内容表达联动", match: (ctx) => ctx.creativeCue && ctx.writingCue, route: "creative" },
+  { id: "law-policy", label: "法政论证联动", match: (ctx) => ctx.lawCue && (ctx.writingCue || ctx.impactCue), route: "law" },
+];
 
 const TERMS = [
   { name: "高一上", hint: "建立基础学术节奏。" },
@@ -388,6 +525,7 @@ const CHAT_MEMORY_LIMIT_BY_ROLE = getRuntimeConfig("chat.memoryLimitByRole", {
   counselor: 10,
   family: 8,
   peer: 8,
+  teacher: 8,
   interviewer: 8,
   admissions: 8,
   default: 8,
@@ -410,8 +548,8 @@ const STATE_MACHINE_GUARDS = getRuntimeConfig("stateMachine.actionStages", {
   revealNextCareerResult: ["career"],
   chooseFinalJobOffer: ["career"],
   confirmUndergradTerm: ["undergrad"],
-  confirmMastersTerm: ["grad"],
-  confirmPhdTerm: ["grad"],
+  confirmMastersTerm: ["masters"],
+  confirmPhdTerm: ["phd"],
 });
 
 const INCIDENT_CHAIN_MAP = getRuntimeConfig("events.incidentChainMap", {
@@ -715,9 +853,15 @@ const UNDERGRAD_TOTAL_TERMS = 8;
 const MASTERS_TOTAL_TERMS = 4;
 const PHD_TOTAL_TERMS = 8;
 const STAGE_REPEAT_YEAR_SPAN = 2;
+const STAGE_REPEAT_CONFIG = {
+  undergrad: { label: "本科", cost: 18000, stress: 10, restartTerm: UNDERGRAD_TOTAL_TERMS - (STAGE_REPEAT_YEAR_SPAN - 1) },
+  masters: { label: "硕士", cost: 22000, stress: 11, restartTerm: MASTERS_TOTAL_TERMS - (STAGE_REPEAT_YEAR_SPAN - 1) },
+  phd: { label: "博士", cost: 26000, stress: 12, restartTerm: PHD_TOTAL_TERMS - (STAGE_REPEAT_YEAR_SPAN - 1) },
+  career: { label: "求职", cost: 12000, stress: 8 },
+};
 const MASTERS_TERM_SCALE = 0.5;
 const PHD_TERM_SCALE = 0.5;
-const INTERVIEW_SESSION_QUESTION_COUNT = 3;
+const INTERVIEW_SESSION_QUESTION_COUNT = 2;
 const INTERVIEW_FOLLOWUP_SCORE_THRESHOLD = 64;
 const INTERVIEW_MAX_FOLLOWUPS_PER_QUESTION = 0;
 const INTERVIEW_WITHDRAW_KEYWORDS = [
@@ -750,145 +894,169 @@ const INTERVIEW_QUESTION_BANK = [
   {
     id: "self_intro",
     tags: ["general", "behavioral"],
-    prompt: (app) => `请用 60-90 秒说明你为什么匹配 ${app.role}，重点讲一段最相关经历。`,
+    complexity: 1,
+    prompt: (app) => `简单介绍一下你为什么适合 ${app.role}，带一个最相关的小例子。`,
     keywords: ["匹配", "经历", "技能", "贡献", "结果", "数据"],
   },
   {
     id: "motivation",
     tags: ["general", "behavioral"],
-    prompt: (app) => `为什么你想加入 ${app.company}，而不是同类公司？`,
+    complexity: 1,
+    prompt: (app) => `为什么想来 ${app.company} 做这份 ${app.role}？`,
     keywords: ["动机", "业务", "价值", "匹配", "成长", "贡献"],
   },
   {
     id: "project_ownership",
     tags: ["general", "technical"],
-    prompt: () => "请讲一个你主导的项目：目标、你的职责、关键决策和最终结果。",
+    complexity: 1.2,
+    prompt: () => "讲一个你做得最投入的项目，你具体做了什么，结果怎样？",
     keywords: ["目标", "职责", "决策", "结果", "指标", "复盘"],
   },
   {
     id: "collaboration_conflict",
     tags: ["general", "behavioral"],
-    prompt: () => "请分享一次团队分歧，你如何推动达成一致并落地执行？",
+    complexity: 1.1,
+    prompt: () => "如果团队里意见不一致，你一般怎么推进事情往前走？",
     keywords: ["分歧", "沟通", "协调", "方案", "执行", "结果"],
   },
   {
     id: "prioritization",
     tags: ["general", "product", "business"],
-    prompt: () => "当资源有限、需求冲突时，你如何做优先级排序？",
+    complexity: 1.4,
+    prompt: () => "事情很多但时间不够时，你通常怎么排优先级？",
     keywords: ["优先级", "取舍", "影响", "风险", "数据", "决策"],
   },
   {
     id: "problem_solving",
     tags: ["general", "technical"],
-    prompt: () => "遇到不确定问题时，你会如何拆解、验证并迭代方案？",
+    complexity: 1.5,
+    prompt: () => "遇到没把握的问题时，你第一步通常怎么拆？",
     keywords: ["拆解", "假设", "验证", "实验", "迭代", "风险"],
   },
   {
     id: "learning_speed",
     tags: ["general", "technical"],
-    prompt: () => "说一个你快速学习新领域并在短时间内产出结果的案例。",
+    complexity: 1.1,
+    prompt: () => "说一个你快速学会新东西并很快用上的小例子。",
     keywords: ["学习", "迁移", "实践", "产出", "效率", "复盘"],
   },
   {
     id: "failure_recovery",
     tags: ["general", "behavioral"],
-    prompt: () => "请讲一次失败经历：你如何定位问题并恢复项目进度？",
+    complexity: 1.2,
+    prompt: () => "讲一次你做得不顺的经历，你后来怎么补救？",
     keywords: ["失败", "定位", "改进", "恢复", "结果", "复盘"],
   },
   {
     id: "technical_tradeoff",
     tags: ["technical", "research"],
-    prompt: () => "请讲一个技术方案取舍：你为何选择该方案，放弃了什么？",
+    complexity: 1.9,
+    prompt: () => "做方案选择时，你一般怎么判断哪种做法更合适？",
     keywords: ["方案", "取舍", "性能", "复杂度", "风险", "理由"],
   },
   {
     id: "system_design",
     tags: ["technical"],
-    prompt: () => "如果要设计一个可扩展系统/服务，你会怎么分层与监控？",
+    complexity: 2.3,
+    prompt: () => "如果一个系统访问量突然变大，你最先会关注什么？",
     keywords: ["架构", "扩展", "稳定性", "监控", "性能", "容错"],
   },
   {
     id: "debugging",
     tags: ["technical"],
-    prompt: () => "请讲一次线上或关键问题排查过程，你如何快速定位并修复？",
+    complexity: 1.8,
+    prompt: () => "系统出问题时，你通常怎么快速定位原因？",
     keywords: ["排查", "定位", "根因", "修复", "验证", "预防"],
   },
   {
     id: "data_quality",
     tags: ["technical", "data", "research"],
-    prompt: () => "数据质量不稳定时，你如何确保结论可靠？",
+    complexity: 1.8,
+    prompt: () => "如果数据不太干净，你会怎么判断它还能不能用？",
     keywords: ["数据", "清洗", "偏差", "验证", "鲁棒性", "结论"],
   },
   {
     id: "ml_experiment",
     tags: ["research", "technical", "data"],
-    prompt: () => "讲一个模型/实验迭代案例：基线、改动、指标变化、最终结论。",
+    complexity: 2,
+    prompt: () => "讲一个你调模型或做实验的小例子：改了什么，结果怎样？",
     keywords: ["基线", "实验", "指标", "提升", "误差", "结论"],
   },
   {
     id: "research_depth",
     tags: ["research"],
-    prompt: () => "请讲你最深入的一项研究：问题定义、方法选择和限制。",
+    complexity: 2,
+    prompt: () => "说一个你研究过的问题：你怎么开始，最后学到了什么？",
     keywords: ["问题定义", "方法", "假设", "验证", "限制", "贡献"],
   },
   {
     id: "product_metric",
     tags: ["product", "business", "general"],
-    prompt: () => "你如何定义产品成功指标？如果指标下滑，你会怎么定位？",
+    complexity: 1.9,
+    prompt: () => "一个产品做得好不好，你会先看什么指标？",
     keywords: ["指标", "漏斗", "用户", "定位", "A/B", "优化"],
   },
   {
     id: "product_launch",
     tags: ["product", "general"],
-    prompt: () => "讲一个从需求到上线的产品闭环，你做了哪些关键判断？",
+    complexity: 1.7,
+    prompt: () => "讲一个你把事情从想法推进到落地的小例子。",
     keywords: ["需求", "方案", "上线", "反馈", "迭代", "影响"],
   },
   {
     id: "business_case",
     tags: ["business", "finance"],
-    prompt: () => "给你一个增长停滞的业务，你会先看哪些数据并怎么决策？",
+    complexity: 1.9,
+    prompt: () => "如果业务增长变慢，你会先看哪几类信息？",
     keywords: ["增长", "收入", "成本", "分析", "策略", "执行"],
   },
   {
     id: "finance_risk",
     tags: ["finance", "business"],
-    prompt: () => "请讲一次你做风险评估或估值判断的过程。",
+    complexity: 2,
+    prompt: () => "做风险判断时，你通常最先看哪两个点？",
     keywords: ["风险", "假设", "估值", "敏感性", "结论", "依据"],
   },
   {
     id: "legal_reasoning",
     tags: ["legal", "policy", "general"],
-    prompt: () => "给一个法律/合规场景，你会如何构建论证路径？",
+    complexity: 1.9,
+    prompt: () => "遇到合规问题时，你会先确认哪些事实和规则？",
     keywords: ["事实", "规则", "论证", "边界", "风险", "结论"],
   },
   {
     id: "policy_impact",
     tags: ["policy", "business", "general"],
-    prompt: () => "一项政策变化影响业务时，你会如何评估并提出应对方案？",
+    complexity: 1.8,
+    prompt: () => "如果政策突然变了，你会怎么判断它对业务有没有影响？",
     keywords: ["政策", "影响", "评估", "方案", "执行", "反馈"],
   },
   {
     id: "design_iteration",
     tags: ["design", "product", "general"],
-    prompt: () => "讲一次设计迭代：你如何用用户反馈改进方案？",
+    complexity: 1.6,
+    prompt: () => "说一个你根据反馈把方案改得更好的例子。",
     keywords: ["用户", "洞察", "原型", "迭代", "可用性", "结果"],
   },
   {
     id: "stakeholder_management",
     tags: ["general", "behavioral", "business"],
-    prompt: () => "利益相关方意见冲突时，你如何管理预期并推动落地？",
+    complexity: 1.5,
+    prompt: () => "不同人想法不一样时，你怎么把大家拉回同一目标？",
     keywords: ["沟通", "对齐", "目标", "推进", "风险", "结果"],
   },
   {
     id: "ethics_judgement",
     tags: ["general", "policy", "research"],
-    prompt: () => "如果效率和伦理发生冲突，你会如何权衡？",
+    complexity: 1.5,
+    prompt: () => "如果效率和原则冲突了，你会怎么选？为什么？",
     keywords: ["伦理", "边界", "权衡", "责任", "决策", "影响"],
   },
   {
     id: "future_plan",
     tags: ["general", "behavioral"],
-    prompt: () => "你入职后前 90 天的工作计划会怎么排？",
+    complexity: 1.1,
+    prompt: () => "如果你入职，前一两个月你最想先做好什么？",
     keywords: ["目标", "优先级", "里程碑", "协作", "交付", "复盘"],
   },
 ];
@@ -2136,6 +2304,304 @@ HIGHER_ED_INCIDENTS.phd.push(
   },
 );
 
+// Enrich stage-specific catalogs so each stage offers more differentiated routes.
+UNDERGRAD_YEAR_ACTIONS.push(
+  {
+    id: "ug-data-product-studio",
+    name: "数据产品工作室学期",
+    desc: "把分析、产品与协作结合，适合数据/商科/产品方向。",
+    effects: { gpa: 0.08, research: 7, internship: 11, leadership: 6, stress: 5, cost: 4300 },
+  },
+  {
+    id: "ug-engineering-build-semester",
+    name: "工程搭建学期",
+    desc: "围绕硬件/软件系统做长期构建，适合理工科主线。",
+    effects: { gpa: 0.09, research: 12, internship: 6, leadership: 4, stress: 7, cost: 5200 },
+  },
+  {
+    id: "ug-prelaw-clinic-semester",
+    name: "法学实践学期",
+    desc: "案例分析、论证写作与公共议题表达并进。",
+    effects: { gpa: 0.1, research: 6, internship: 5, leadership: 9, stress: 5, cost: 3400 },
+  },
+  {
+    id: "ug-civic-policy-semester",
+    name: "公共政策学期",
+    desc: "研究、社会议题与组织推动并行，叙事感强。",
+    effects: { gpa: 0.07, research: 8, internship: 5, leadership: 11, stress: 5, cost: 3800 },
+  },
+);
+
+MASTERS_YEAR_ACTIONS.push(
+  {
+    id: "ms-pre-doc-track",
+    name: "Pre-doc 研究助理学期",
+    desc: "以高强度研究协作为核心，申博优势明显。",
+    effects: { gpa: 0.08, research: 16, internship: 3, leadership: 3, stress: 7, cost: 5900, thesis: 10 },
+  },
+  {
+    id: "ms-clinic-policy-practicum",
+    name: "政策/法律实践学期",
+    desc: "真实议题、案例写作与组织协调结合。",
+    effects: { gpa: 0.07, research: 7, internship: 8, leadership: 10, stress: 5, cost: 4800, thesis: 5 },
+  },
+  {
+    id: "ms-data-platform-build",
+    name: "数据平台搭建学期",
+    desc: "做可复用的数据/工程基础设施，兼顾研究与就业。",
+    effects: { gpa: 0.07, research: 11, internship: 10, leadership: 4, stress: 6, cost: 6100, thesis: 6 },
+  },
+  {
+    id: "ms-crossborder-consulting",
+    name: "跨境咨询项目学期",
+    desc: "多方协作解决真实业务问题，适合商科与管理方向。",
+    effects: { gpa: 0.06, research: 4, internship: 13, leadership: 9, stress: 5, cost: 6600, thesis: 3 },
+  },
+);
+
+PHD_YEAR_ACTIONS.push(
+  {
+    id: "phd-fieldwork-cycle",
+    name: "田野/场景研究路线",
+    desc: "走入真实场景收集数据，适合法政、社科与应用研究。",
+    effects: { research: 12, internship: 4, leadership: 6, stress: 6, cost: 6200, publication: 9, teaching: 4 },
+  },
+  {
+    id: "phd-methods-consortium",
+    name: "方法论联盟路线",
+    desc: "强化方法创新与跨组协作，适合冲击高质量成果。",
+    effects: { research: 14, internship: 2, leadership: 5, stress: 7, cost: 7000, publication: 10, teaching: 3 },
+  },
+  {
+    id: "phd-public-intellectual-track",
+    name: "公共学者路线",
+    desc: "兼顾研究发表、公众表达与社会影响。",
+    effects: { research: 9, internship: 4, leadership: 11, stress: 5, cost: 4600, publication: 7, teaching: 8 },
+  },
+  {
+    id: "phd-startup-spinout",
+    name: "成果创业转化路线",
+    desc: "把研究成果转向产品/公司化验证，适合就业与创业。",
+    effects: { research: 8, internship: 12, leadership: 10, stress: 8, cost: 9200, publication: 5, teaching: 2 },
+  },
+);
+
+UNDERGRAD_MINI_ACTIONS.push(
+  { id: "ug-mini-case-sprint", name: "案例分析快练", desc: "补商业判断与表达", time: 1, cost: 220, effects: { internship: 2, leadership: 2 }, tags: ["商业"] },
+  { id: "ug-mini-prototype-polish", name: "原型细节打磨", desc: "提高项目呈现完成度", time: 1, cost: 260, effects: { research: 2, internship: 1, leadership: 1 }, tags: ["理工"] },
+  { id: "ug-mini-prelaw-brief", name: "案例短评写作", desc: "训练论证与法学表达", time: 1, cost: 160, effects: { gpa: 0.015, leadership: 2, research: 1 }, tags: ["法学"] },
+  { id: "ug-mini-lab-notebook", name: "实验记录整理", desc: "沉淀研究过程与复盘", time: 1, cost: 140, effects: { research: 2, gpa: 0.01 }, tags: ["科研"] },
+);
+
+MASTERS_MINI_ACTIONS.push(
+  { id: "ms-mini-dataset-clean", name: "数据清洗冲刺", desc: "提升研究与项目质量", time: 1, cost: 210, effects: { research: 2, thesis: 2 }, tags: ["数据"] },
+  { id: "ms-mini-mock-defense", name: "答辩模拟", desc: "提前暴露论文表达问题", time: 1, cost: 260, effects: { thesis: 3, leadership: 2, stress: -1 }, tags: ["论文"] },
+  { id: "ms-mini-client-sync", name: "客户/合作方对齐", desc: "提升项目交付与管理能力", time: 1, cost: 300, effects: { internship: 2, leadership: 2 }, tags: ["管理"] },
+  { id: "ms-mini-theory-drill", name: "理论难点补强", desc: "短时间补课程硬核内容", time: 1, cost: 180, effects: { gpa: 0.02, research: 1 }, tags: ["学术"] },
+);
+
+PHD_MINI_ACTIONS.push(
+  { id: "phd-mini-preprint-polish", name: "预印本润色", desc: "加快公开传播节奏", time: 1, cost: 200, effects: { publication: 2, research: 1 }, tags: ["论文"] },
+  { id: "phd-mini-citation-map", name: "引文图谱整理", desc: "快速发现研究空位", time: 1, cost: 170, effects: { research: 2, publication: 1 }, tags: ["研究"] },
+  { id: "phd-mini-guest-talk", name: "客座短讲", desc: "提升学术表达与影响力", time: 1, cost: 260, effects: { teaching: 2, leadership: 2, publication: 1 }, tags: ["表达"] },
+  { id: "phd-mini-grant-summary", name: "经费摘要打磨", desc: "为后续项目申请做准备", time: 1, cost: 220, effects: { research: 1, leadership: 2, stress: -1 }, tags: ["管理"] },
+);
+
+HIGHER_ED_EXTRA_ACTIONS.undergrad.push(
+  {
+    id: "ug-x-legal-aid-fellowship",
+    name: "法律援助 Fellowship",
+    desc: "高质量公共服务与论证写作结合，法学叙事很强。",
+    effects: { gpa: 0.04, research: 4, internship: 7, leadership: 12, stress: 5, cost: 5600 },
+    projectId: "impact",
+  },
+  {
+    id: "ug-x-biotech-translational-lab",
+    name: "生医转化实验计划",
+    desc: "把实验成果推进到应用场景，适合理工/生医主线。",
+    effects: { gpa: 0.07, research: 14, internship: 5, leadership: 4, stress: 7, cost: 8800 },
+    projectId: "research",
+  },
+  {
+    id: "ug-x-quant-research-desk",
+    name: "量化研究 Desk",
+    desc: "数理、编程与商业判断并行，冲刺高难岗位。",
+    effects: { gpa: 0.05, research: 10, internship: 13, leadership: 4, stress: 8, cost: 10800 },
+    projectId: "career",
+  },
+);
+
+HIGHER_ED_EXTRA_ACTIONS.masters.push(
+  {
+    id: "ms-x-pre-doc-consortium",
+    name: "Pre-doc 联盟项目",
+    desc: "多导师协作、数据与写作密集推进，申博含金量高。",
+    effects: { gpa: 0.05, research: 15, internship: 2, leadership: 4, stress: 8, cost: 7400, thesis: 10 },
+    projectId: "research",
+  },
+  {
+    id: "ms-x-regulatory-clinic",
+    name: "监管/合规诊所",
+    desc: "法律、政策与真实组织场景结合，适合相关专业。",
+    effects: { gpa: 0.04, research: 6, internship: 8, leadership: 11, stress: 5, cost: 5900, thesis: 5 },
+    projectId: "impact",
+  },
+  {
+    id: "ms-x-growth-lab",
+    name: "增长实验室",
+    desc: "把分析、产品与商业执行串起来，求职转化明显。",
+    effects: { gpa: 0.03, research: 4, internship: 15, leadership: 7, stress: 6, cost: 8200, thesis: 3 },
+    projectId: "career",
+  },
+);
+
+HIGHER_ED_EXTRA_ACTIONS.phd.push(
+  {
+    id: "phd-x-global-field-network",
+    name: "全球田野协作网络",
+    desc: "跨区域样本与合作资源同步推进，强化应用研究深度。",
+    effects: { research: 12, internship: 4, leadership: 8, stress: 7, cost: 7800, publication: 9, teaching: 4 },
+    projectId: "research",
+  },
+  {
+    id: "phd-x-open-source-platform",
+    name: "开源研究平台",
+    desc: "把研究工具平台化，兼顾学术影响和行业可见度。",
+    effects: { research: 9, internship: 7, leadership: 7, stress: 5, cost: 6200, publication: 8, teaching: 4 },
+    projectId: "impact",
+  },
+  {
+    id: "phd-x-founder-spinout",
+    name: "博士成果 Spinout",
+    desc: "高投入创业转化路线，适合最终走就业/创业。",
+    effects: { research: 7, internship: 14, leadership: 12, stress: 9, cost: 10800, publication: 4, teaching: 2 },
+    projectId: "career",
+  },
+);
+
+(UNDERGRAD_TERM_ACTIONS[1] ||= []).push({
+  id: "ug-t1-maker-foundation",
+  name: "工程基础搭建",
+  desc: "从零开始做一个可展示的小系统/原型。",
+  effects: { gpa: 0.06, research: 6, internship: 3, leadership: 2, stress: 4, cost: 2400 },
+});
+(UNDERGRAD_TERM_ACTIONS[2] ||= []).push({
+  id: "ug-t2-argument-writing-lab",
+  name: "论证写作实验室",
+  desc: "强化政策/法学/人文方向的论证和表达能力。",
+  effects: { gpa: 0.06, research: 3, internship: 2, leadership: 5, stress: 3, cost: 1800 },
+});
+(UNDERGRAD_TERM_ACTIONS[3] ||= []).push({
+  id: "ug-t3-data-visual-studio",
+  name: "数据可视化工作坊",
+  desc: "把数据分析做成可展示作品，适合数据与商科方向。",
+  effects: { gpa: 0.05, research: 6, internship: 6, leadership: 3, stress: 4, cost: 3000 },
+});
+(UNDERGRAD_TERM_ACTIONS[4] ||= []).push({
+  id: "ug-t4-nonprofit-ops",
+  name: "公益组织运营",
+  desc: "从执行走向组织推进，提升长期影响力。",
+  effects: { gpa: 0.04, research: 2, internship: 4, leadership: 10, stress: 4, cost: 2200 },
+});
+(UNDERGRAD_TERM_ACTIONS[5] ||= []).push({
+  id: "ug-t5-prelaw-clinic",
+  name: "法学诊所实训",
+  desc: "案例梳理、文书写作与公共服务并进。",
+  effects: { gpa: 0.06, research: 4, internship: 5, leadership: 7, stress: 4, cost: 3600 },
+});
+(UNDERGRAD_TERM_ACTIONS[6] ||= []).push({
+  id: "ug-t6-engineering-prototype",
+  name: "工程原型冲刺",
+  desc: "完成一个更成熟的系统/设备原型。",
+  effects: { gpa: 0.05, research: 10, internship: 5, leadership: 3, stress: 6, cost: 5200 },
+});
+(UNDERGRAD_TERM_ACTIONS[7] ||= []).push({
+  id: "ug-t7-pre-doc-ramp",
+  name: "预研究助理准备",
+  desc: "提前训练研究协作和读文献节奏。",
+  effects: { gpa: 0.06, research: 9, internship: 3, leadership: 2, stress: 5, cost: 3800 },
+});
+(UNDERGRAD_TERM_ACTIONS[8] ||= []).push({
+  id: "ug-t8-founder-handover",
+  name: "项目交接与品牌收官",
+  desc: "把长期项目沉淀成成果集与可讲述故事。",
+  effects: { gpa: 0.03, research: 3, internship: 6, leadership: 9, stress: 3, cost: 2400 },
+});
+
+(MASTERS_TERM_ACTIONS[1] ||= []).push({
+  id: "ms-t1-skill-bridge",
+  name: "方法工具补桥",
+  desc: "快速补足研究/行业所需关键工具链。",
+  effects: { gpa: 0.06, research: 5, internship: 3, leadership: 2, stress: 3, cost: 2600, thesis: 3 },
+});
+(MASTERS_TERM_ACTIONS[2] ||= []).push({
+  id: "ms-t2-policy-memo-sprint",
+  name: "政策备忘录冲刺",
+  desc: "适合法政/管理方向，强化简洁论证与输出。",
+  effects: { gpa: 0.05, research: 5, internship: 5, leadership: 5, stress: 3, cost: 2400, thesis: 4 },
+});
+(MASTERS_TERM_ACTIONS[3] ||= []).push({
+  id: "ms-t3-live-client-project",
+  name: "真实客户项目",
+  desc: "处理开放问题，提升交付与就业转化。",
+  effects: { gpa: 0.04, research: 4, internship: 10, leadership: 6, stress: 5, cost: 4300, thesis: 3 },
+});
+(MASTERS_TERM_ACTIONS[4] ||= []).push({
+  id: "ms-t4-thesis-commercialization",
+  name: "论文成果转化",
+  desc: "把论文思路转成产品/方案/提案，讲好价值。",
+  effects: { gpa: 0.05, research: 7, internship: 8, leadership: 5, stress: 4, cost: 4100, thesis: 8 },
+});
+
+(PHD_TERM_ACTIONS[1] ||= []).push({
+  id: "phd-t1-research-map",
+  name: "研究版图梳理",
+  desc: "系统搭建研究问题树与论文路线图。",
+  effects: { research: 7, internship: 1, leadership: 2, stress: 3, cost: 2500, publication: 3, teaching: 1 },
+});
+(PHD_TERM_ACTIONS[2] ||= []).push({
+  id: "phd-t2-shared-dataset-build",
+  name: "共享数据集构建",
+  desc: "沉淀可复用资源，提升后续研究效率。",
+  effects: { research: 8, internship: 2, leadership: 3, stress: 4, cost: 3200, publication: 4, teaching: 2 },
+});
+(PHD_TERM_ACTIONS[3] ||= []).push({
+  id: "phd-t3-method-paper",
+  name: "方法论文打磨",
+  desc: "聚焦方法创新与可复现表达。",
+  effects: { research: 10, internship: 1, leadership: 2, stress: 5, cost: 3600, publication: 7, teaching: 2 },
+});
+(PHD_TERM_ACTIONS[4] ||= []).push({
+  id: "phd-t4-fieldwork-block",
+  name: "田野/样本采集块",
+  desc: "集中推进一轮高质量样本与场景资料。",
+  effects: { research: 9, internship: 3, leadership: 4, stress: 5, cost: 4200, publication: 5, teaching: 2 },
+});
+(PHD_TERM_ACTIONS[5] ||= []).push({
+  id: "phd-t5-teaching-portfolio",
+  name: "教学作品集建设",
+  desc: "沉淀课程、讲义与教学反馈，适合学术求职。",
+  effects: { research: 4, internship: 2, leadership: 4, stress: 3, cost: 1800, publication: 2, teaching: 8 },
+});
+(PHD_TERM_ACTIONS[6] ||= []).push({
+  id: "phd-t6-crosslab-collab",
+  name: "跨组合作项目",
+  desc: "扩大合作网络，提升研究和就业两端价值。",
+  effects: { research: 8, internship: 5, leadership: 6, stress: 5, cost: 3900, publication: 6, teaching: 3 },
+});
+(PHD_TERM_ACTIONS[7] ||= []).push({
+  id: "phd-t7-job-market-paper",
+  name: "求职论文冲刺",
+  desc: "围绕毕业去向打磨最能代表你的成果。",
+  effects: { research: 9, internship: 5, leadership: 3, stress: 6, cost: 4400, publication: 8, teaching: 2 },
+});
+(PHD_TERM_ACTIONS[8] ||= []).push({
+  id: "phd-t8-defense-roadshow",
+  name: "答辩与路演收官",
+  desc: "同时提升答辩稳定性和外部表达能力。",
+  effects: { research: 5, internship: 4, leadership: 6, stress: 4, cost: 2600, publication: 4, teaching: 5 },
+});
+
 const JOB_APPLICATION_COUNT = 10;
 const JOB_RECOMMEND_MIN_FIT = 0.8;
 const JOB_RECOMMEND_POOL_LIMIT = 60;
@@ -3119,7 +3585,7 @@ const BACKGROUNDS = [
     desc: "家庭校友背景带来隐性加成。",
     effects: { essay: 2, stress: 3 },
     baseCash: 110000,
-    admissionsBonus: 0.03,
+    admissionsBonus: 0,
     badge: "Legacy",
   },
 ];
@@ -3411,11 +3877,57 @@ const EVENT_EFFECT_SKILL_MAP = {
   english: "writing",
   activities: "impact",
   awards: "research",
+  research: "research",
+  internship: "business",
   leadership: "leadership",
   essay: "writing",
   essayTrack: "writing",
   recStrength: "leadership",
   reputation: "impact",
+};
+
+const MAJOR_MATCH_SENSITIVE_KEYS = new Set([
+  "activities",
+  "awards",
+  "research",
+  "internship",
+  "leadership",
+  "essay",
+  "essayTrack",
+  "recStrength",
+  "reputation",
+]);
+
+const TAG_SKILL_BOOST_MAP = {
+  科研: { research: 1, quant: 0.35 },
+  工程: { research: 0.7, quant: 0.55 },
+  数据: { research: 0.6, quant: 0.75 },
+  商业: { business: 1 },
+  创业: { business: 0.75, leadership: 0.45 },
+  公益: { impact: 1 },
+  政策: { impact: 0.55, writing: 0.45 },
+  人文: { writing: 0.7, impact: 0.45 },
+  艺术: { creative: 1 },
+  法律: { writing: 0.85, impact: 0.5 },
+  辩论: { writing: 0.72, leadership: 0.28 },
+  写作: { writing: 1 },
+  论文: { research: 0.75, writing: 0.35 },
+  实习: { business: 0.5, leadership: 0.25 },
+  领导力: { leadership: 1 },
+  平衡: { research: 0.25, writing: 0.25, impact: 0.25 },
+};
+
+const PROJECT_SKILL_BOOST_MAP = {
+  "research-track": { research: 1, quant: 0.35 },
+  "writing-archive": { writing: 1 },
+  "art-portfolio": { creative: 1 },
+  "startup-track": { business: 0.85, leadership: 0.45 },
+  "impact-project": { impact: 0.85, writing: 0.25, leadership: 0.25 },
+  research: { research: 0.95, quant: 0.3 },
+  career: { business: 0.75, leadership: 0.35 },
+  leadership: { leadership: 0.95 },
+  impact: { impact: 0.9, writing: 0.2 },
+  balance: { research: 0.25, writing: 0.25, impact: 0.25 },
 };
 
 const EVENT_EFFECT_NORMALIZER = {
@@ -3644,6 +4156,30 @@ const APP_ACTIONS = [
 
 const MINI_ACTIONS = [
   {
+    id: "test-drill",
+    name: "标化刷题冲刺",
+    desc: "补薄弱题型，稳住 SAT/ACT/托福/雅思这类硬指标。",
+    effects: { test: 28, stress: 2 },
+    cost: 120,
+    time: 1,
+  },
+  {
+    id: "english-boost-mini",
+    name: "英语输入强化",
+    desc: "用精听精读和口语复盘补语言能力，避免英语拖后腿。",
+    effects: { english: 5, essay: 1, stress: 1 },
+    cost: 90,
+    time: 1,
+  },
+  {
+    id: "gpa-mini-tutoring",
+    name: "课堂补弱答疑",
+    desc: "集中补错题和课堂难点，稳住校内 GPA，避免只有活动强但成绩掉队。",
+    effects: { gpa: 0.05, essayTrack: 1, stress: 1 },
+    cost: 110,
+    time: 1,
+  },
+  {
     id: "volunteer-hour",
     name: "公益时长积累",
     desc: "补足公益时长与社会评价。",
@@ -3692,6 +4228,11 @@ const BASE_CHAT_ROLES = [
     id: "peer",
     name: "同学",
     tone: "有点竞争但也会分享信息",
+  },
+  {
+    id: "teacher",
+    name: "老师",
+    tone: "学术严谨、强调证据与可改进项",
   },
   {
     id: "interviewer",
@@ -3782,6 +4323,8 @@ const UNIVERSITIES = [
   makeUni("kyoto", "Kyoto University", "Japan", "JP", "research", ["premed_bio", "humanities"], 57),
   makeUni("osaka", "Osaka University", "Japan", "JP", "research", ["cs_engineering", "data_ai"], 1401),
 ];
+
+const IVY_LEAGUE_SCHOOL_IDS = ["harvard", "princeton", "yale", "columbia", "upenn", "cornell", "brown", "dartmouth"];
 
 const REGION_TUITION = {
   US: 70000,
@@ -5890,6 +6433,93 @@ const EXPANDED_INCIDENTS = [
 EVENTS.push(...EXPANDED_EVENTS);
 INCIDENTS.push(...EXPANDED_INCIDENTS);
 
+EVENTS.push(
+  {
+    id: "robotics-research-team",
+    title: "机器人研究队",
+    desc: "围绕工程搭建、控制与展示做长期技术项目。",
+    tags: ["科研", "商业"],
+    effects: { awards: 10, activities: 9, leadership: 4, stress: 5 },
+    cost: 2400,
+    time: 4,
+    projectId: "research-track",
+    minTerm: 1,
+  },
+  {
+    id: "bio-lab-shadow",
+    title: "生物实验跟研",
+    desc: "跟随实验室完成观察、记录与基础实验流程。",
+    tags: ["科研"],
+    effects: { activities: 8, essay: 5, recStrength: 5, stress: 4 },
+    cost: 1800,
+    time: 3,
+    projectId: "research-track",
+    minTerm: 2,
+  },
+  {
+    id: "econ-policy-paper",
+    title: "经济与政策研究简报",
+    desc: "围绕真实议题完成数据分析与政策建议。",
+    tags: ["商业", "人文"],
+    effects: { essay: 8, awards: 6, activities: 6, reputation: 4, stress: 4 },
+    cost: 1600,
+    time: 3,
+    minTerm: 2,
+  },
+  {
+    id: "youth-law-clinic",
+    title: "青年法律实践项目",
+    desc: "参与案例整理、法条检索与公共普法活动。",
+    tags: ["人文", "公益"],
+    effects: { essay: 8, leadership: 5, activities: 7, english: 4, stress: 4 },
+    cost: 1200,
+    time: 3,
+    minTerm: 2,
+  },
+  {
+    id: "maker-prototype",
+    title: "工程原型制作",
+    desc: "从问题定义到硬件/产品原型展示。",
+    tags: ["科研", "艺术"],
+    effects: { awards: 8, activities: 8, leadership: 3, stress: 5 },
+    cost: 2600,
+    time: 4,
+    minTerm: 1,
+  },
+  {
+    id: "student-podcast",
+    title: "学生播客栏目",
+    desc: "围绕学术、社会或专业议题持续输出内容。",
+    tags: ["人文", "艺术"],
+    effects: { essay: 9, english: 5, reputation: 6, activities: 4, stress: 3 },
+    cost: 600,
+    time: 2,
+    projectId: "writing-archive",
+    minTerm: 1,
+  },
+  {
+    id: "climate-campaign",
+    title: "气候倡议行动",
+    desc: "发起校园与社区联动的环境倡议。",
+    tags: ["公益", "人文"],
+    effects: { leadership: 8, activities: 9, reputation: 7, essay: 5, stress: 5 },
+    cost: 1500,
+    time: 4,
+    projectId: "impact-project",
+    minTerm: 1,
+  },
+  {
+    id: "math-circle-coach",
+    title: "数学社群带教",
+    desc: "组织解题活动并带低年级学生训练。",
+    tags: ["科研"],
+    effects: { awards: 6, leadership: 6, gpa: 0.06, stress: 3 },
+    cost: 400,
+    time: 2,
+    minTerm: 1,
+  },
+);
+
 const LETTER_TEMPLATES = {
   admit: [
     {
@@ -6102,6 +6732,9 @@ function normalizeInterviewQuestionEntry(rawQuestion) {
     else if (item.tags.includes("business") || item.tags.includes("product")) item.type = "case";
     else item.type = "general";
   }
+  const fallbackComplexity =
+    item.type === "behavioral" || item.type === "general" ? 1.2 : item.type === "case" ? 1.6 : 2;
+  item.complexity = clamp(Number.isFinite(Number(item.complexity)) ? Number(item.complexity) : fallbackComplexity, 1, 3);
   const weights = { ...DEFAULT_INTERVIEW_DIMENSION_WEIGHTS, ...(item.dimensions || {}) };
   const total = Object.values(weights).reduce((sum, value) => sum + Number(value || 0), 0) || 1;
   item.dimensions = Object.fromEntries(
@@ -6174,6 +6807,18 @@ function applyDataPatchObject(patch, options = {}) {
     const result = mergeArrayByIdInPlace(PHD_MINI_ACTIONS, patch.phdMiniActions);
     stats.push(`博士小行动 +${result.added}/~${result.updated}`);
   }
+  if (Array.isArray(patch.undergradExtraActions)) {
+    const result = mergeArrayByIdInPlace(HIGHER_ED_EXTRA_ACTIONS.undergrad, patch.undergradExtraActions);
+    stats.push(`本科扩展项目 +${result.added}/~${result.updated}`);
+  }
+  if (Array.isArray(patch.mastersExtraActions)) {
+    const result = mergeArrayByIdInPlace(HIGHER_ED_EXTRA_ACTIONS.masters, patch.mastersExtraActions);
+    stats.push(`硕士扩展项目 +${result.added}/~${result.updated}`);
+  }
+  if (Array.isArray(patch.phdExtraActions)) {
+    const result = mergeArrayByIdInPlace(HIGHER_ED_EXTRA_ACTIONS.phd, patch.phdExtraActions);
+    stats.push(`博士扩展项目 +${result.added}/~${result.updated}`);
+  }
   if (patch.undergradTermActions && typeof patch.undergradTermActions === "object") {
     normalizeTermActionMapInPlace(UNDERGRAD_TERM_ACTIONS, patch.undergradTermActions);
     stats.push("本科学期项目已覆盖");
@@ -6185,6 +6830,18 @@ function applyDataPatchObject(patch, options = {}) {
   if (patch.phdTermActions && typeof patch.phdTermActions === "object") {
     normalizeTermActionMapInPlace(PHD_TERM_ACTIONS, patch.phdTermActions);
     stats.push("博士学期项目已覆盖");
+  }
+  if (Array.isArray(patch.undergradIncidents)) {
+    const result = mergeArrayByIdInPlace(HIGHER_ED_INCIDENTS.undergrad, patch.undergradIncidents);
+    stats.push(`本科意外事件 +${result.added}/~${result.updated}`);
+  }
+  if (Array.isArray(patch.mastersIncidents)) {
+    const result = mergeArrayByIdInPlace(HIGHER_ED_INCIDENTS.masters, patch.mastersIncidents);
+    stats.push(`硕士意外事件 +${result.added}/~${result.updated}`);
+  }
+  if (Array.isArray(patch.phdIncidents)) {
+    const result = mergeArrayByIdInPlace(HIGHER_ED_INCIDENTS.phd, patch.phdIncidents);
+    stats.push(`博士意外事件 +${result.added}/~${result.updated}`);
   }
   if (Array.isArray(patch.interviewQuestions)) {
     const result = mergeArrayByIdInPlace(INTERVIEW_QUESTION_BANK, patch.interviewQuestions, {
@@ -6213,6 +6870,7 @@ function createHigherEdStageTermState() {
     currentEvents: [],
     selectedEventIds: [],
     selectedMiniIds: [],
+    customProjectUsed: false,
     aiPlanEventIds: [],
     aiPlanMiniIds: [],
     usedEventIds: [],
@@ -6244,6 +6902,35 @@ function createDefaultHigherEdTermStateSnapshot() {
   };
 }
 
+function createDefaultRouteScores() {
+  return ROUTE_KEYS.reduce((acc, key) => {
+    acc[key] = 0;
+    return acc;
+  }, {});
+}
+
+function createDefaultLegacyProgress() {
+  return {
+    completedRuns: 0,
+    bestScore: 0,
+    bestSchoolRank: null,
+    bestSalary: 0,
+    routeWins: createDefaultRouteScores(),
+    recentRuns: [],
+    lastRun: null,
+  };
+}
+
+function createDefaultLegacyBoosts() {
+  return {
+    cash: 0,
+    awards: 0,
+    essayTrack: 0,
+    leadership: 0,
+    highschoolTime: 0,
+  };
+}
+
 const state = {
   started: false,
   devMode: false,
@@ -6251,6 +6938,8 @@ const state = {
   playerName: "",
   profileId: null,
   backgroundId: null,
+  legacySchoolId: null,
+  legacySchoolName: null,
   rigorId: null,
   difficultyId: null,
   testPlanId: null,
@@ -6266,12 +6955,21 @@ const state = {
   usedDecisionIds: new Set(),
   badges: new Set(),
   tagCounts: {},
+  highschoolHistory: [],
   projectStreaks: {},
   activeProjectId: null,
   activeProjectStreak: 0,
+  routeScores: createDefaultRouteScores(),
+  routeMoments: [],
+  comboHistory: [],
+  feedbackLedger: [],
+  majorActivityAlignment: createDefaultMajorActivityAlignment(),
+  legacyProgress: createDefaultLegacyProgress(),
+  legacyBoosts: createDefaultLegacyBoosts(),
   choiceEffectCache: {},
   currentEvents: [],
   selectedEventIds: new Set(),
+  customProjectUsedThisTerm: false,
   essayChoices: [],
   recChoice: null,
   aidChoice: null,
@@ -6304,6 +7002,12 @@ const state = {
   extraYearCount: 0,
   extraYearFocusId: null,
   stageRepeatCounts: {
+    undergrad: 0,
+    masters: 0,
+    phd: 0,
+    career: 0,
+  },
+  academicRepeatCounts: {
     undergrad: 0,
     masters: 0,
     phd: 0,
@@ -6370,15 +7074,19 @@ const state = {
   directPhdApplied: false,
   directPhdApproved: false,
   directPhdSchoolId: null,
+  directPhdLastWindow: null,
   msPhdApplied: false,
   msPhdApproved: false,
   msPhdSchoolId: null,
+  msPhdLastWindow: null,
   jobSelectedCompanies: [],
   jobOutcome: null,
   combinedDegreeEligible: false,
   combinedDegreeApplied: false,
   combinedDegreeApproved: false,
   combinedDegreeSchoolId: null,
+  combinedDegreeLastWindow: null,
+  pendingCombinedAnnouncements: [],
   replayNodes: [],
   balanceCalibration: null,
   dynamicBalanceTuning: {
@@ -6426,12 +7134,14 @@ const state = {
     counselor: [],
     family: [],
     peer: [],
+    teacher: [],
     interviewer: [],
   },
   chatRelationships: {
     counselor: 60,
     family: 55,
     peer: 45,
+    teacher: 58,
     interviewer: 50,
   },
 };
@@ -6460,6 +7170,42 @@ const DEV_FLOW_LABELS = {
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function getLegacySchoolPool() {
+  return UNIVERSITIES.filter((school) => IVY_LEAGUE_SCHOOL_IDS.includes(school.id));
+}
+
+function getLegacySchoolById(schoolId = "") {
+  if (!schoolId) return null;
+  return UNIVERSITIES.find((school) => school.id === schoolId) || null;
+}
+
+function assignLegacySchoolForRun() {
+  const pool = getLegacySchoolPool();
+  if (!pool.length) {
+    state.legacySchoolId = null;
+    state.legacySchoolName = null;
+    return null;
+  }
+  const picked = pool[Math.floor(Math.random() * pool.length)] || pool[0];
+  state.legacySchoolId = picked?.id || null;
+  state.legacySchoolName = picked?.name || null;
+  return picked || null;
+}
+
+function isLegacySchoolForPlayer(school) {
+  return !!school?.id && state.backgroundId === "legacy" && state.legacySchoolId === school.id;
+}
+
+function getLegacyAdmissionsBonus(school, roundChoice = null) {
+  if (!isLegacySchoolForPlayer(school)) return { scoreBonus: 0, chanceBonus: 0, label: "" };
+  const edBoost = roundChoice === "ed" ? 0.006 : 0;
+  return {
+    scoreBonus: 0.034 + edBoost,
+    chanceBonus: 0.028 + edBoost,
+    label: `${state.legacySchoolName || school.name} Legacy 加成`,
+  };
 }
 
 function createDefaultWorldState() {
@@ -6522,6 +7268,381 @@ function createDefaultWorldSandboxState() {
     };
   });
   return snapshot;
+}
+
+function copyRouteScores(source = {}) {
+  const next = createDefaultRouteScores();
+  ROUTE_KEYS.forEach((key) => {
+    const value = Number(source?.[key] || 0);
+    next[key] = Number.isFinite(value) ? value : 0;
+  });
+  return next;
+}
+
+function addRouteScores(base = {}, delta = {}) {
+  const next = copyRouteScores(base);
+  ROUTE_KEYS.forEach((key) => {
+    next[key] += Number(delta?.[key] || 0);
+  });
+  return next;
+}
+
+function getRouteProfileLabel(routeId) {
+  return ROUTE_DEFINITIONS[routeId]?.label || "综合路线";
+}
+
+function getMajorRouteBias(majorId = state.majorId) {
+  const major = MAJORS.find((item) => item.id === majorId);
+  const weights = major?.weights || {};
+  const bias = createDefaultRouteScores();
+  bias.research += (weights.research || 0) * 6 + (weights.quant || 0) * 2.4;
+  bias.career += (weights.business || 0) * 6 + (weights.quant || 0) * 1.2;
+  bias.impact += (weights.impact || 0) * 6 + (weights.writing || 0) * 1.8;
+  bias.leadership += (weights.leadership || 0) * 6 + (weights.business || 0) * 1.2;
+  bias.creative += (weights.creative || 0) * 6 + (weights.writing || 0) * 1.4;
+  bias.law += (weights.writing || 0) * 3.6 + (weights.impact || 0) * 2.2 + (majorId === "law" ? 6 : 0);
+  if (major?.tags?.includes("科研")) bias.research += 1.6;
+  if (major?.tags?.includes("商业")) bias.career += 1.4;
+  if (major?.tags?.includes("艺术")) bias.creative += 1.6;
+  if (major?.tags?.includes("人文")) bias.impact += 1.2;
+  if (major?.id === "politics_ir" || major?.id === "soc_policy") bias.law += 1.5;
+  return bias;
+}
+
+function getWorldRouteBias() {
+  const world = state.worldState || createDefaultWorldState();
+  const bias = createDefaultRouteScores();
+  const industry = (Number(world.industryBoom || 50) - 50) / 10;
+  const policy = (Number(world.policySupport || 50) - 50) / 10;
+  const economy = (Number(world.economyStrength || 50) - 50) / 10;
+  bias.career += industry * 0.9 + economy * 0.5;
+  bias.research += policy * 0.45 + industry * 0.35;
+  bias.impact += policy * 0.85;
+  bias.law += policy * 0.7;
+  bias.creative += economy * 0.25;
+  bias.leadership += economy * 0.2 + policy * 0.2;
+  return bias;
+}
+
+function getRouteScoresFromTags(tags = []) {
+  return (tags || []).reduce((acc, tag) => addRouteScores(acc, ROUTE_TAG_SCORES[tag] || {}), createDefaultRouteScores());
+}
+
+function getRouteScoresFromEffects(effects = {}) {
+  const delta = createDefaultRouteScores();
+  const add = (key, value) => {
+    if (!Number.isFinite(value) || value <= 0) return;
+    delta[key] += value;
+  };
+  add("research", Number(effects.research || 0) * 0.9 + Number(effects.awards || 0) * 0.25 + Number(effects.gpa || 0) * 18);
+  add("career", Number(effects.internship || 0) * 0.95 + Number(effects.finance || 0) * 0.04 + Number(effects.activities || 0) * 0.08);
+  add("impact", Number(effects.reputation || 0) * 0.28 + Number(effects.activities || 0) * 0.15 + Number(effects.essayTrack || 0) * 0.08);
+  add("leadership", Number(effects.leadership || 0) * 0.6 + Number(effects.recStrength || 0) * 0.16);
+  add("creative", Number(effects.essay || 0) * 0.2 + Number(effects.essayTrack || 0) * 0.18 + Number(effects.english || 0) * 0.07);
+  add("law", Number(effects.essayTrack || 0) * 0.16 + Number(effects.essay || 0) * 0.12 + Number(effects.reputation || 0) * 0.06 + Number(effects.leadership || 0) * 0.05);
+  add("research", Number(effects.thesis || 0) * 0.7 + Number(effects.publication || 0) * 0.85);
+  add("law", Number(effects.thesis || 0) * 0.2 + Number(effects.publication || 0) * 0.12);
+  return delta;
+}
+
+function getRouteScoresFromProjectId(projectId = "") {
+  return copyRouteScores(ROUTE_PROJECT_SCORES[projectId] || {});
+}
+
+function getRouteDeltaForItem(item = {}) {
+  const tags = getRouteScoresFromTags(item.tags || []);
+  const effects = getRouteScoresFromEffects(item.effects || {});
+  const project = getRouteScoresFromProjectId(item.projectId || "");
+  return addRouteScores(addRouteScores(tags, effects), project);
+}
+
+function getSortedRouteEntries(scores = state.routeScores) {
+  return ROUTE_KEYS.map((key) => ({
+    id: key,
+    label: ROUTE_DEFINITIONS[key]?.label || key,
+    short: ROUTE_DEFINITIONS[key]?.short || key,
+    value: Number(scores?.[key] || 0),
+  })).sort((a, b) => b.value - a.value);
+}
+
+function getDominantRouteProfile(scores = state.routeScores) {
+  const sorted = getSortedRouteEntries(scores);
+  const top = sorted[0] || null;
+  const second = sorted[1] || null;
+  if (!top || top.value <= 0.01) {
+    return { id: null, label: "尚未成型", short: "未成型", score: 0, second, balanced: true };
+  }
+  const balanced = second && Math.abs(top.value - second.value) <= 2.2;
+  return {
+    id: top.id,
+    label: balanced && second ? `${top.label} + ${second.label}` : top.label,
+    short: balanced && second ? `${top.short}+${second.short}` : top.short,
+    score: top.value,
+    second,
+    balanced,
+  };
+}
+
+function buildRouteSignalContext(items = []) {
+  const tags = new Set();
+  let text = "";
+  (items || []).forEach((item) => {
+    (item?.tags || []).forEach((tag) => tags.add(tag));
+    text += ` ${String(item?.id || "")} ${String(item?.name || item?.title || "")}`.toLowerCase();
+  });
+  const hasTag = (value) => tags.has(value) || text.includes(String(value).toLowerCase());
+  return {
+    researchCue: ["科研", "研究", "实验", "lab", "paper", "robotics", "bio", "数据"].some(hasTag),
+    writingCue: ["写作", "文书", "播客", "memo", "brief", "essay", "表达"].some(hasTag),
+    publicationCue: ["论文", "publication", "投稿", "thesis", "preprint"].some(hasTag),
+    impactCue: ["公益", "政策", "社会", "影响", "倡议", "ngo", "公共"].some(hasTag),
+    leadershipCue: ["领导力", "社团", "组织", "带教", "运营", "club", "leader"].some(hasTag),
+    careerCue: ["实习", "职业", "创业", "consulting", "client", "产品", "工程", "就业"].some(hasTag),
+    dataCue: ["数据", "量化", "math", "quant", "分析", "platform"].some(hasTag),
+    creativeCue: ["艺术", "设计", "传媒", "播客", "content", "创作", "作品集"].some(hasTag),
+    lawCue: ["法律", "法学", "辩论", "合规", "policy", "legal", "regulatory"].some(hasTag),
+  };
+}
+
+function getChainReactionEffects(stage, comboId) {
+  if (stage === "highschool") {
+    if (comboId === "research-output") return { awards: 4, essayTrack: 4, recStrength: 1 };
+    if (comboId === "impact-leadership") return { leadership: 4, reputation: 4 };
+    if (comboId === "career-builder") return { activities: 4, leadership: 3, finance: 1 };
+    if (comboId === "creative-story") return { essay: 4, essayTrack: 3, activities: 2 };
+    if (comboId === "law-policy") return { essayTrack: 4, reputation: 3, leadership: 2 };
+    if (comboId === "route-momentum") return { awards: 2, activities: 2, leadership: 2, essayTrack: 2 };
+    return null;
+  }
+  if (stage === "undergrad") {
+    if (comboId === "research-output") return { research: 4, gpa: 0.03 };
+    if (comboId === "impact-leadership") return { leadership: 4, internship: 2 };
+    if (comboId === "career-builder") return { internship: 5, leadership: 2 };
+    if (comboId === "creative-story") return { leadership: 2, research: 2, gpa: 0.02 };
+    if (comboId === "law-policy") return { leadership: 3, research: 2, internship: 1 };
+    if (comboId === "route-momentum") return { research: 2, internship: 2, leadership: 2 };
+    return null;
+  }
+  if (stage === "masters") {
+    if (comboId === "research-output") return { research: 5, thesis: 4 };
+    if (comboId === "impact-leadership") return { leadership: 4, thesis: 2 };
+    if (comboId === "career-builder") return { internship: 5, leadership: 2 };
+    if (comboId === "creative-story") return { thesis: 3, leadership: 2 };
+    if (comboId === "law-policy") return { thesis: 3, leadership: 2, research: 1 };
+    if (comboId === "route-momentum") return { research: 3, thesis: 2, leadership: 1 };
+    return null;
+  }
+  if (comboId === "research-output") return { research: 4, publication: 4 };
+  if (comboId === "impact-leadership") return { leadership: 4, teaching: 3 };
+  if (comboId === "career-builder") return { internship: 3, leadership: 2, publication: 1 };
+  if (comboId === "creative-story") return { teaching: 2, publication: 2 };
+  if (comboId === "law-policy") return { teaching: 2, leadership: 2, publication: 2 };
+  if (comboId === "route-momentum") return { research: 2, publication: 2, teaching: 2 };
+  return null;
+}
+
+function recordFeedbackEntry(entry) {
+  if (!entry) return;
+  state.feedbackLedger = [entry, ...(state.feedbackLedger || [])].slice(0, 18);
+}
+
+function recordRouteMoment(entry) {
+  if (!entry) return;
+  state.routeMoments = [entry, ...(state.routeMoments || [])].slice(0, 24);
+}
+
+function applyRouteProgress(delta, source = "") {
+  state.routeScores = addRouteScores(state.routeScores, delta);
+  const dominant = getDominantRouteProfile();
+  recordRouteMoment({
+    source,
+    routeScores: copyRouteScores(state.routeScores),
+    dominantRoute: dominant.id,
+    dominantLabel: dominant.label,
+    ts: Date.now(),
+  });
+}
+
+function buildStageHistoryRecord(stage, summary, selectedEvents = [], selectedMini = [], comboIds = []) {
+  const all = [...selectedEvents, ...selectedMini];
+  const routeDelta = all.reduce((acc, item) => addRouteScores(acc, getRouteDeltaForItem(item)), createDefaultRouteScores());
+  const dominant = getDominantRouteProfile(addRouteScores(state.routeScores, routeDelta));
+  return {
+    stage,
+    term:
+      stage === "highschool"
+        ? Number(state.termIndex || 0) + 1
+        : getHigherEdCurrentTermNumber(stage),
+    actionName: summary,
+    selectedIds: all.map((item) => item.id).filter(Boolean),
+    selectedNames: all.map((item) => item.name || item.title).filter(Boolean),
+    dominantRoute: dominant.id,
+    dominantRouteLabel: dominant.label,
+    routeDelta,
+    comboIds,
+    ts: Date.now(),
+  };
+}
+
+function detectChainReactions(stage, selectedEvents = [], selectedMini = []) {
+  const all = [...selectedEvents, ...selectedMini];
+  const ctx = buildRouteSignalContext(all);
+  const matched = ROUTE_CHAIN_RULES.filter((rule) => {
+    try {
+      return !!rule.match(ctx);
+    } catch (error) {
+      return false;
+    }
+  });
+  const stageHistory =
+    stage === "highschool"
+      ? state.highschoolHistory || []
+      : stage === "undergrad"
+        ? state.undergradHistory || []
+        : stage === "masters"
+          ? state.mastersHistory || []
+          : state.phdHistory || [];
+  const previous = stageHistory[stageHistory.length - 1];
+  const currentDominant = getDominantRouteProfile(
+    addRouteScores(
+      state.routeScores,
+      all.reduce((acc, item) => addRouteScores(acc, getRouteDeltaForItem(item)), createDefaultRouteScores()),
+    ),
+  );
+  if (previous?.dominantRoute && currentDominant.id && previous.dominantRoute === currentDominant.id) {
+    matched.push({ id: "route-momentum", label: `${getRouteProfileLabel(currentDominant.id)}势能延续`, route: currentDominant.id });
+  }
+  const unique = [];
+  const used = new Set();
+  matched.forEach((rule) => {
+    if (!rule?.id || used.has(rule.id)) return;
+    used.add(rule.id);
+    unique.push(rule);
+  });
+  return unique;
+}
+
+function getTopRouteWinKey(routeWins = {}) {
+  return getSortedRouteEntries(routeWins)[0]?.id || null;
+}
+
+function readLegacyProgress() {
+  try {
+    const raw = localStorage.getItem(LEGACY_PROFILE_STORAGE_KEY);
+    if (!raw) return createDefaultLegacyProgress();
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return createDefaultLegacyProgress();
+    return {
+      ...createDefaultLegacyProgress(),
+      ...parsed,
+      routeWins: copyRouteScores(parsed.routeWins || {}),
+      recentRuns: Array.isArray(parsed.recentRuns) ? parsed.recentRuns.slice(0, 8) : [],
+    };
+  } catch (error) {
+    return createDefaultLegacyProgress();
+  }
+}
+
+function writeLegacyProgress(progress) {
+  try {
+    localStorage.setItem(LEGACY_PROFILE_STORAGE_KEY, JSON.stringify(progress));
+  } catch (error) {
+    // Ignore storage failures during gameplay.
+  }
+}
+
+function computeLegacyBoosts(progress = state.legacyProgress) {
+  const completedRuns = Number(progress?.completedRuns || 0);
+  const bestScore = Number(progress?.bestScore || 0);
+  const bestSchoolRank = Number(progress?.bestSchoolRank || 999);
+  const bestSalary = Number(progress?.bestSalary || 0);
+  return {
+    cash: completedRuns >= 1 ? 5000 + Math.min(3, completedRuns - 1) * 1000 : 0,
+    awards: bestScore >= 78 ? 3 : bestScore >= 60 ? 1 : 0,
+    essayTrack: bestSchoolRank <= 20 ? 4 : bestSchoolRank <= 60 ? 2 : 0,
+    leadership: bestSalary >= 180000 ? 3 : bestSalary >= 120000 ? 1 : 0,
+    highschoolTime: completedRuns >= 3 ? 1 : 0,
+  };
+}
+
+function hydrateLegacyProgress() {
+  state.legacyProgress = readLegacyProgress();
+  state.legacyBoosts = computeLegacyBoosts(state.legacyProgress);
+  return state.legacyProgress;
+}
+
+function registerLegacyRun() {
+  const existing = readLegacyProgress();
+  const dominant = getDominantRouteProfile();
+  const finalSchool = getFinalChoiceResult();
+  const jobApps = Array.isArray(state.jobOutcome?.applications) ? state.jobOutcome.applications : [];
+  const offers = jobApps.filter((item) => item.status === "录用");
+  const bestSalary = offers.length ? Math.max(...offers.map((item) => Number(item.salaryHigh || 0))) : 0;
+  const summary = {
+    playerName: state.playerName || "未命名",
+    score: Number(state.seasonRun?.score || 0),
+    finalSchool: finalSchool?.name || "",
+    finalSchoolRank: finalSchool ? getRankIndex(finalSchool) : null,
+    chosenJob: state.jobOutcome?.chosenOfferCompany || "",
+    bestSalary,
+    dominantRoute: dominant.id,
+    dominantRouteLabel: dominant.label,
+    ts: Date.now(),
+  };
+  const next = {
+    ...existing,
+    completedRuns: Number(existing.completedRuns || 0) + 1,
+    bestScore: Math.max(Number(existing.bestScore || 0), summary.score),
+    bestSchoolRank:
+      summary.finalSchoolRank && Number.isFinite(summary.finalSchoolRank)
+        ? Math.min(Number(existing.bestSchoolRank || 999), Number(summary.finalSchoolRank))
+        : existing.bestSchoolRank,
+    bestSalary: Math.max(Number(existing.bestSalary || 0), bestSalary),
+    routeWins: copyRouteScores(existing.routeWins || {}),
+    recentRuns: [summary, ...(existing.recentRuns || [])].slice(0, 8),
+    lastRun: summary,
+  };
+  if (summary.dominantRoute) {
+    next.routeWins[summary.dominantRoute] = Number(next.routeWins[summary.dominantRoute] || 0) + 1;
+  }
+  writeLegacyProgress(next);
+  state.legacyProgress = next;
+  state.legacyBoosts = computeLegacyBoosts(next);
+}
+
+function getCurrentWorldTailwinds(limit = 2) {
+  const lines = [];
+  const world = state.worldState || createDefaultWorldState();
+  const major = state.majorId || "";
+  if (Number(world.industryBoom || 50) >= 58 && /cs|data|ee|math|finance|business|economics/.test(major)) {
+    lines.push("行业景气偏强：理工/商科的项目与求职转化更顺。");
+  }
+  if (Number(world.policySupport || 50) >= 58 && /law|policy|politics|humanities|soc_policy/.test(major)) {
+    lines.push("政策支持偏强：法政/公共影响型路线更容易放大成果。");
+  }
+  if (Number(world.economyStrength || 50) >= 58) {
+    lines.push("整体经济较强：高投入项目的性价比更高。");
+  }
+  return lines.slice(0, limit);
+}
+
+function getCurrentWorldHeadwinds(limit = 2) {
+  const lines = [];
+  const world = state.worldState || createDefaultWorldState();
+  const major = state.majorId || "";
+  if (Number(world.visaEase || 50) <= 42) {
+    lines.push("签证环境偏紧：跨境升学和求职的不确定性更高。");
+  }
+  if (Number(world.industryBoom || 50) <= 44 && /cs|data|ee|math|finance|business|economics/.test(major)) {
+    lines.push("行业周期转冷：理工/商科实习与岗位竞争更卷。");
+  }
+  if (Number(world.policySupport || 50) <= 44 && /law|policy|politics|humanities|soc_policy/.test(major)) {
+    lines.push("政策风向偏弱：法政/公共项目需要更强证据支撑。");
+  }
+  if (Number(world.economyStrength || 50) <= 44) {
+    lines.push("经济偏弱：高成本项目容错率下降。");
+  }
+  return lines.slice(0, limit);
 }
 
 function normalizeWorldState() {
@@ -7616,7 +8737,8 @@ function getTermTimeBudget() {
   const stressPenalty = getStressBudgetPenalty(state.stats.stress, { mild: 65, high: 80, critical: 92 });
   const leadershipBoost = state.stats.leadership >= 60 ? 1 : 0;
   const debtPenalty = Math.min(OVERWORK_DEBT_MAX, state.overworkDebt || 0);
-  return Math.max(4, base + stressPenalty + leadershipBoost - debtPenalty);
+  const legacyBoost = Number(state.legacyBoosts?.highschoolTime || 0);
+  return Math.max(4, base + stressPenalty + leadershipBoost - debtPenalty + legacyBoost);
 }
 
 function getApplicationTimeBudget() {
@@ -7624,7 +8746,8 @@ function getApplicationTimeBudget() {
   const essayBoost = (state.stats.essayTrack ?? 0) >= 60 ? 1 : 0;
   const stressPenalty = getStressBudgetPenalty(state.stats.stress, { mild: 65, high: 80, critical: 90 });
   const debtPenalty = (state.overworkDebt || 0) >= 2 ? -1 : 0;
-  return Math.max(3, base + essayBoost + stressPenalty + debtPenalty);
+  const legacyBoost = Number(state.legacyBoosts?.highschoolTime || 0);
+  return Math.max(3, base + essayBoost + stressPenalty + debtPenalty + legacyBoost);
 }
 
 function getCurrentTimeUsage() {
@@ -7786,26 +8909,42 @@ function getEliteSchoolDifficultyProfile(rankIndex) {
   const r = Math.max(1, rankIndex || 1);
   if (r <= 10) {
     return {
-      selectivityBoost: 0.05,
-      assistMultiplier: 0.4,
-      chancePenalty: 0.075,
-      chanceCap: 0.58,
+      selectivityBoost: 0.085,
+      assistMultiplier: 0.32,
+      chancePenalty: 0.12,
+      chanceCap: state.difficultyId === "relaxed" ? 0.3 : state.difficultyId === "hard" ? 0.2 : 0.24,
     };
   }
   if (r <= 20) {
     return {
-      selectivityBoost: 0.035,
-      assistMultiplier: 0.55,
-      chancePenalty: 0.055,
-      chanceCap: 0.66,
+      selectivityBoost: 0.06,
+      assistMultiplier: 0.44,
+      chancePenalty: 0.09,
+      chanceCap: state.difficultyId === "relaxed" ? 0.4 : state.difficultyId === "hard" ? 0.28 : 0.33,
     };
   }
   if (r <= 30) {
     return {
-      selectivityBoost: 0.02,
-      assistMultiplier: 0.72,
-      chancePenalty: 0.03,
-      chanceCap: 0.76,
+      selectivityBoost: 0.04,
+      assistMultiplier: 0.6,
+      chancePenalty: 0.055,
+      chanceCap: state.difficultyId === "relaxed" ? 0.52 : state.difficultyId === "hard" ? 0.4 : 0.46,
+    };
+  }
+  if (r <= 60) {
+    return {
+      selectivityBoost: 0.018,
+      assistMultiplier: 0.82,
+      chancePenalty: 0.02,
+      chanceCap: state.difficultyId === "relaxed" ? 0.75 : state.difficultyId === "hard" ? 0.62 : 0.68,
+    };
+  }
+  if (r <= 120) {
+    return {
+      selectivityBoost: 0.006,
+      assistMultiplier: 0.92,
+      chancePenalty: 0.006,
+      chanceCap: state.difficultyId === "relaxed" ? 0.9 : state.difficultyId === "hard" ? 0.78 : 0.84,
     };
   }
   return {
@@ -7860,13 +8999,209 @@ function getPositiveStrengthScore() {
   );
 }
 
+function getRealisticChanceFloor(rankIndex, strengthScore, fitScore, adaptiveAssist) {
+  const r = Math.max(1, rankIndex || 1);
+  if (r <= 30 || strengthScore < 0.72) return 0;
+  const difficultyShift = state.difficultyId === "relaxed" ? 0.04 : state.difficultyId === "hard" ? -0.05 : 0;
+  const strengthEdge = clamp(strengthScore - 0.76, 0, 0.24);
+  const fitLift = clamp((fitScore - 0.56) * 0.18, 0, 0.08);
+  const assistLift = clamp(adaptiveAssist * 0.24, 0, 0.04);
+  if (r <= 60) {
+    return clamp(0.08 + difficultyShift * 0.45 + strengthEdge * 0.68 + fitLift * 0.65 + assistLift, 0, 0.28);
+  }
+  if (r <= 120) {
+    return clamp(0.3 + difficultyShift * 0.65 + strengthEdge * 0.95 + fitLift * 1.05 + assistLift, 0, 0.62);
+  }
+  if (r <= 220) {
+    return clamp(0.42 + difficultyShift * 0.75 + strengthEdge * 1.12 + fitLift * 1.15 + assistLift, 0, 0.8);
+  }
+  return clamp(0.52 + difficultyShift * 0.8 + strengthEdge * 1.18 + fitLift * 1.22 + assistLift, 0, 0.9);
+}
+
 function getTierThresholds() {
   const assist = getAdaptiveAssistLevel();
   const strength = getPositiveStrengthScore();
-  const strengthBonus = clamp((strength - 0.82) * 0.38, 0, 0.09);
-  const safety = clamp(0.33 - assist * 1.25 - strengthBonus * 1.1, 0.14, 0.36);
-  const match = clamp(0.16 - assist * 1.05 - strengthBonus, 0.05, 0.2);
+  const difficultyShift = state.difficultyId === "relaxed" ? -0.04 : state.difficultyId === "hard" ? 0.04 : 0;
+  const strengthBonus = clamp((strength - 0.8) * 0.14, 0, 0.04);
+  const assistBonus = clamp(assist * 0.22, 0, 0.03);
+  const safety = clamp(0.74 + difficultyShift - strengthBonus - assistBonus, 0.62, 0.82);
+  const match = clamp(0.48 + difficultyShift * 0.85 - strengthBonus * 0.9 - assistBonus * 0.75, 0.34, 0.6);
   return { safety, match };
+}
+
+function getRegionalAdmissionProfile(school, majorId = state.majorId) {
+  const region = String(school?.region || "").toUpperCase();
+  const rankIndex = getRankIndex(school);
+  const majorKey = String(majorId || "").toLowerCase();
+  const stemMajor = /cs|data|ee|math|me_|premed|bio|chem|pharma/.test(majorKey);
+  const businessMajor = /business|finance|economics/.test(majorKey);
+  const lawHumanitiesMajor = /law|humanities|politics|soc_policy|media|psychology/.test(majorKey);
+  const topSchool = rankIndex <= 30;
+  if (region === "UK") {
+    return {
+      academicBias: 0.032,
+      holisticBias: -0.008,
+      fitBias: 0.024,
+      essayBias: lawHumanitiesMajor ? 0.012 : 0.004,
+      selectivityBoost: topSchool ? 0.022 : 0.014,
+      chanceShift: -0.006,
+      floorBoost: 0,
+      varianceShift: -0.012,
+      rejectNote: "英国院校更看重学术与专业匹配",
+    };
+  }
+  if (region === "SG") {
+    return {
+      academicBias: 0.034,
+      holisticBias: -0.004,
+      fitBias: 0.02,
+      essayBias: 0.003,
+      selectivityBoost: topSchool ? 0.028 : 0.018,
+      chanceShift: stemMajor || businessMajor ? -0.02 : -0.012,
+      floorBoost: 0,
+      varianceShift: -0.008,
+      rejectNote: "新加坡热门专业录取竞争更集中",
+    };
+  }
+  if (region === "HK") {
+    return {
+      academicBias: 0.024,
+      holisticBias: 0.002,
+      fitBias: 0.018,
+      essayBias: 0.004,
+      selectivityBoost: topSchool ? 0.012 : 0.006,
+      chanceShift: 0.012,
+      floorBoost: rankIndex >= 35 ? 0.025 : 0,
+      varianceShift: -0.01,
+      rejectNote: "港校更重视成绩与专业契合度",
+    };
+  }
+  if (region === "AU") {
+    return {
+      academicBias: 0.016,
+      holisticBias: -0.003,
+      fitBias: 0.014,
+      essayBias: 0.002,
+      selectivityBoost: topSchool ? 0.002 : -0.01,
+      chanceShift: 0.026,
+      floorBoost: rankIndex >= 35 ? 0.05 : 0.02,
+      varianceShift: -0.014,
+      rejectNote: "澳洲院校整体结果更稳定，但仍会看基本学术线",
+    };
+  }
+  if (region === "JP") {
+    return {
+      academicBias: 0.018,
+      holisticBias: -0.004,
+      fitBias: 0.026,
+      essayBias: 0.002,
+      selectivityBoost: topSchool ? 0.012 : 0.004,
+      chanceShift: 0.006,
+      floorBoost: rankIndex >= 45 ? 0.02 : 0,
+      varianceShift: -0.012,
+      rejectNote: "日本院校更强调方向契合与准备度",
+    };
+  }
+  return {
+    academicBias: 0.008,
+    holisticBias: 0.022,
+    fitBias: 0.012,
+    essayBias: 0.006,
+    selectivityBoost: topSchool ? 0.008 : 0.003,
+    chanceShift: 0,
+    floorBoost: 0,
+    varianceShift: 0.012,
+    rejectNote: "美国院校更重视综合背景与叙事完整度",
+  };
+}
+
+function getMajorAdmissionProfile(majorId = state.majorId, school = null) {
+  const majorKey = String(majorId || "").toLowerCase();
+  const rankIndex = getRankIndex(school);
+  const schoolStrengths = Array.isArray(school?.strengths) ? school.strengths : [];
+  const matched = schoolStrengths.includes(majorId);
+  if (/cs|data_ai|ee_ce|math_stats|me_ie/.test(majorKey)) {
+    return {
+      academicBias: 0.014,
+      holisticBias: 0.002,
+      fitBias: 0.018,
+      essayBias: -0.003,
+      strengthBonus: matched ? 0.012 : 0,
+      selectivityBoost: rankIndex <= 30 ? 0.03 : rankIndex <= 80 ? 0.016 : 0.007,
+      chanceShift: matched ? 0 : -0.01,
+      floorBoost: rankIndex >= 90 ? 0.022 : 0,
+      varianceShift: -0.004,
+      rejectNote: "理工与计算机方向属于高热度赛道",
+    };
+  }
+  if (/business|finance|economics/.test(majorKey)) {
+    return {
+      academicBias: 0.011,
+      holisticBias: 0.006,
+      fitBias: 0.016,
+      essayBias: 0.002,
+      strengthBonus: matched ? 0.01 : 0,
+      selectivityBoost: rankIndex <= 30 ? 0.024 : rankIndex <= 80 ? 0.013 : 0.006,
+      chanceShift: matched ? 0.004 : -0.006,
+      floorBoost: rankIndex >= 100 ? 0.016 : 0,
+      varianceShift: -0.003,
+      rejectNote: "商科与金融方向申请人数通常更多",
+    };
+  }
+  if (/law|politics|soc_policy|humanities|media|psychology/.test(majorKey)) {
+    return {
+      academicBias: 0.006,
+      holisticBias: 0.006,
+      fitBias: 0.022,
+      essayBias: 0.018,
+      strengthBonus: matched ? 0.01 : 0,
+      selectivityBoost: rankIndex <= 30 ? 0.014 : rankIndex <= 80 ? 0.008 : 0.003,
+      chanceShift: matched ? 0.006 : 0,
+      floorBoost: rankIndex >= 100 ? 0.012 : 0,
+      varianceShift: 0.002,
+      rejectNote: "法政与人文方向会更看表达质量与论证匹配",
+    };
+  }
+  if (/premed|bio|chem|material|pharma/.test(majorKey)) {
+    return {
+      academicBias: 0.015,
+      holisticBias: 0.004,
+      fitBias: 0.018,
+      essayBias: 0.004,
+      strengthBonus: matched ? 0.012 : 0,
+      selectivityBoost: rankIndex <= 30 ? 0.022 : rankIndex <= 80 ? 0.012 : 0.005,
+      chanceShift: matched ? 0.003 : -0.004,
+      floorBoost: rankIndex >= 100 ? 0.014 : 0,
+      varianceShift: -0.002,
+      rejectNote: "生化与医学相关方向重视持续学术投入",
+    };
+  }
+  if (/arts|architecture/.test(majorKey)) {
+    return {
+      academicBias: 0.003,
+      holisticBias: 0.014,
+      fitBias: 0.02,
+      essayBias: 0.01,
+      strengthBonus: matched ? 0.01 : 0,
+      selectivityBoost: rankIndex <= 20 ? 0.016 : rankIndex <= 80 ? 0.006 : 0.002,
+      chanceShift: matched ? 0.006 : 0,
+      floorBoost: rankIndex >= 90 ? 0.015 : 0,
+      varianceShift: 0.004,
+      rejectNote: "艺术与建筑方向更看作品感和路线契合",
+    };
+  }
+  return {
+    academicBias: 0.006,
+    holisticBias: 0.004,
+    fitBias: 0.012,
+    essayBias: 0.006,
+    strengthBonus: matched ? 0.008 : 0,
+    selectivityBoost: rankIndex <= 30 ? 0.01 : rankIndex <= 80 ? 0.004 : 0,
+    chanceShift: matched ? 0.002 : 0,
+    floorBoost: rankIndex >= 100 ? 0.01 : 0,
+    varianceShift: 0,
+    rejectNote: "该专业会看长期方向是否稳定",
+  };
 }
 
 function getSchoolTierByChance(chance) {
@@ -8122,6 +9457,57 @@ function applyStateObject(snapshot, options = {}) {
   } else if (!Array.isArray(state.replayNodes)) {
     state.replayNodes = [];
   }
+  if (!Array.isArray(state.highschoolHistory)) {
+    state.highschoolHistory = [];
+  }
+  if (!state.routeScores || typeof state.routeScores !== "object") {
+    state.routeScores = createDefaultRouteScores();
+  }
+  ROUTE_KEYS.forEach((key) => {
+    const value = Number(state.routeScores[key] || 0);
+    state.routeScores[key] = Number.isFinite(value) ? value : 0;
+  });
+  if (!Array.isArray(state.routeMoments)) {
+    state.routeMoments = [];
+  }
+  if (!Array.isArray(state.comboHistory)) {
+    state.comboHistory = [];
+  }
+  if (!Array.isArray(state.feedbackLedger)) {
+    state.feedbackLedger = [];
+  }
+  if (!state.majorActivityAlignment || typeof state.majorActivityAlignment !== "object") {
+    state.majorActivityAlignment = createDefaultMajorActivityAlignment();
+  }
+  ["weightedScore", "totalWeight", "totalItems", "alignedItems"].forEach((key) => {
+    const numeric = Number(state.majorActivityAlignment[key] || 0);
+    state.majorActivityAlignment[key] = Number.isFinite(numeric) ? numeric : 0;
+  });
+  if (typeof state.legacySchoolId !== "string") {
+    state.legacySchoolId = null;
+  }
+  if (typeof state.legacySchoolName !== "string") {
+    state.legacySchoolName = null;
+  }
+  if (typeof state.customProjectUsedThisTerm !== "boolean") {
+    state.customProjectUsedThisTerm = false;
+  }
+  if (!state.legacyProgress || typeof state.legacyProgress !== "object") {
+    state.legacyProgress = createDefaultLegacyProgress();
+  }
+  if (!state.legacyProgress.routeWins || typeof state.legacyProgress.routeWins !== "object") {
+    state.legacyProgress.routeWins = createDefaultRouteScores();
+  }
+  ROUTE_KEYS.forEach((key) => {
+    const value = Number(state.legacyProgress.routeWins[key] || 0);
+    state.legacyProgress.routeWins[key] = Number.isFinite(value) ? value : 0;
+  });
+  if (!Array.isArray(state.legacyProgress.recentRuns)) {
+    state.legacyProgress.recentRuns = [];
+  }
+  if (!state.legacyBoosts || typeof state.legacyBoosts !== "object") {
+    state.legacyBoosts = createDefaultLegacyBoosts();
+  }
 
   if (!state.chatContext || typeof state.chatContext !== "object") {
     state.chatContext = {
@@ -8167,14 +9553,15 @@ function applyStateObject(snapshot, options = {}) {
   if (typeof state.combinedDegreeApplied !== "boolean") state.combinedDegreeApplied = false;
   if (typeof state.combinedDegreeApproved !== "boolean") state.combinedDegreeApproved = false;
   if (typeof state.combinedDegreeSchoolId !== "string") state.combinedDegreeSchoolId = null;
+  if (typeof state.combinedDegreeLastWindow !== "string") state.combinedDegreeLastWindow = null;
   if (!state.chatMemory || typeof state.chatMemory !== "object") {
-    state.chatMemory = { counselor: [], family: [], peer: [], interviewer: [] };
+    state.chatMemory = { counselor: [], family: [], peer: [], teacher: [], interviewer: [] };
   }
   if (!state.chatRoleCards || typeof state.chatRoleCards !== "object") {
     state.chatRoleCards = {};
   }
   if (!state.chatRelationships || typeof state.chatRelationships !== "object") {
-    state.chatRelationships = { counselor: 60, family: 55, peer: 45, interviewer: 50 };
+    state.chatRelationships = { counselor: 60, family: 55, peer: 45, teacher: 58, interviewer: 50 };
   }
   if (!state.resultReleaseStage) {
     state.resultReleaseStage = "early";
@@ -8467,6 +9854,7 @@ function finalizeSeasonRun() {
       state.seasonRun.leaderboardRank ? ` · 排名 #${state.seasonRun.leaderboardRank}` : ""
     }`,
   );
+  registerLegacyRun();
 }
 
 function getSeasonLeaderboardPreview(limit = 5) {
@@ -8538,12 +9926,41 @@ function computePreferenceFit(school) {
   return clamp(score, 0.35, 0.95);
 }
 
+function getSchoolRouteFit(school) {
+  const dominant = getDominantRouteProfile();
+  if (!school || !dominant.id) return 0.55;
+  const type = String(school.type || "").toLowerCase();
+  const route = dominant.id;
+  if (route === "research") {
+    if (type === "research" || type === "polytechnic") return 0.88;
+    if (type === "liberal") return 0.62;
+  }
+  if (route === "career") {
+    if (type === "polytechnic") return 0.86;
+    if (type === "research") return 0.68;
+  }
+  if (route === "impact" || route === "law") {
+    if (type === "liberal") return 0.86;
+    if (type === "research") return 0.72;
+  }
+  if (route === "creative") {
+    if (type === "liberal") return 0.82;
+    if (type === "polytechnic") return 0.7;
+  }
+  if (route === "leadership") {
+    if (type === "liberal") return 0.76;
+    if (type === "polytechnic") return 0.72;
+  }
+  return 0.66;
+}
+
 function calculateFitScore(school, majorId = state.majorId) {
   const majorFit = computeMajorFit(school, majorId);
   const tagFit = computeTagFit(school);
   const essayFit = computeEssayFit(school, getEssayForSchool(school.id));
   const preferenceFit = computePreferenceFit(school);
-  return clamp(majorFit * 0.35 + tagFit * 0.25 + essayFit * 0.15 + preferenceFit * 0.25, 0, 1);
+  const routeFit = getSchoolRouteFit(school);
+  return clamp(majorFit * 0.32 + tagFit * 0.23 + essayFit * 0.15 + preferenceFit * 0.22 + routeFit * 0.08, 0, 1);
 }
 
 function getDefaultUndergradProfile() {
@@ -9080,7 +10497,20 @@ function pickHigherEdEventsForTerm(stage, catalog, count = HIGHER_ED_EVENT_OPTIO
   const used = new Set(termState.usedEventIds || []);
   const fresh = catalog.filter((item) => !used.has(item.id));
   const pool = fresh.length >= count ? fresh : [...fresh, ...catalog.filter((item) => !fresh.includes(item))];
-  const shuffled = shuffle(pool);
+  const shuffled = pool
+    .map((event) => ({
+      event,
+      score:
+        scoreEventForCurrentBuild(
+          {
+            ...event,
+            cost: getHigherEdEventCost(stage, event),
+          },
+          stage,
+        ) + Math.random() * 0.16,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.event);
   const picks = [];
   const seen = new Set();
   const byTier = {
@@ -9122,6 +10552,7 @@ function drawHigherEdEvents(stage) {
   termState.currentEvents = pickHigherEdEventsForTerm(stage, catalog);
   termState.selectedEventIds = [];
   termState.selectedMiniIds = [];
+  termState.customProjectUsed = false;
   termState.aiPlanEventIds = [];
   termState.aiPlanMiniIds = [];
   termState.timeBudget = getHigherEdTermTimeBudget(stage);
@@ -9429,6 +10860,20 @@ function advanceHigherEdTerm(stage) {
         return;
       }
     }
+    const repeatCheck = evaluateAcademicRepeatRisk(stage);
+    if (repeatCheck.mustRepeat) {
+      const repeatConfig = STAGE_REPEAT_CONFIG[stage];
+      restartHigherEdStage(stage, {
+        academicFailure: true,
+        cost: repeatConfig?.cost,
+        stress: (repeatConfig?.stress || EXTRA_YEAR_STRESS) + 2,
+      });
+      state.log.unshift(repeatCheck.reason);
+      pushReplayNode(`${getHigherEdStageLabel(stage)}未达毕业线`);
+      updateAchievements();
+      updateUI();
+      return;
+    }
     state[config.graduatedKey] = true;
     state[config.currentTermKey] = config.totalTerms;
     completeStoryArcsByStage(stage, `${getHigherEdStageLabel(stage)}毕业`);
@@ -9577,6 +11022,8 @@ function renderHigherEdTermCards(stage) {
     btn.addEventListener("click", () => toggleHigherEdEventSelection(stage, event.id));
     refs.eventCards.appendChild(card);
   });
+
+  appendCustomProjectLauncherCard(refs.eventCards, stage);
 
   refs.miniCards.innerHTML = "";
   miniPool.forEach((action) => {
@@ -9790,6 +11237,40 @@ function confirmHigherEdTerm(stage) {
     }
   });
 
+  const eventSummary = selectedEvents.map((item) => item.name).join(" + ");
+  const miniSummary = selectedMini.map((item) => item.name).join(" + ");
+  const termSummary =
+    eventSummary && miniSummary
+      ? `${eventSummary} + 小行动：${miniSummary}`
+      : eventSummary || (miniSummary ? `小行动：${miniSummary}` : "休整（无项目）");
+  const routeRecord = buildStageHistoryRecord(stage, termSummary, selectedEvents, selectedMini, []);
+  applyRouteProgress(routeRecord.routeDelta, `${getHigherEdStageLabel(stage)}：${termSummary}`);
+  const chainReactions = detectChainReactions(stage, selectedEvents, selectedMini);
+  if (chainReactions.length) {
+    chainReactions.forEach((combo) => {
+      if (combo.route) {
+        applyRouteProgress({ [combo.route]: 1.8 }, `${getHigherEdStageLabel(stage)}：${combo.label}`);
+      }
+      const bonus = getChainReactionEffects(stage, combo.id);
+      if (bonus) {
+        applyHigherEdEffectsToProfile(stage, bonus, { randomize: false, multiplier: 1 });
+      }
+      state.log.unshift(`${getHigherEdStageLabel(stage)}连锁反应：${combo.label}`);
+      state.comboHistory = [
+        {
+          id: combo.id,
+          label: combo.label,
+          stage,
+          term: getHigherEdCurrentTermNumber(stage),
+          summary: termSummary,
+          ts: Date.now(),
+        },
+        ...(state.comboHistory || []),
+      ].slice(0, 20);
+    });
+    routeRecord.comboIds = chainReactions.map((item) => item.id);
+  }
+
   if (!selectedEvents.length && !selectedMini.length) {
     if (stage === "undergrad") {
       applyHigherEdEffectsToProfile(stage, { stress: -7, leadership: 1 }, { randomize: false, multiplier: 1 });
@@ -9801,15 +11282,30 @@ function confirmHigherEdTerm(stage) {
     state.log.unshift(`${getHigherEdStageLabel(stage)}第${getHigherEdCurrentTermNumber(stage)}学期：休整（无项目）。`);
     appendHigherEdHistory(stage, "休整（无项目）");
   } else {
-    const eventSummary = selectedEvents.map((item) => item.name).join(" + ");
-    const miniSummary = selectedMini.map((item) => item.name).join(" + ");
-    const summary =
-      eventSummary && miniSummary
-        ? `${eventSummary} + 小行动：${miniSummary}`
-        : eventSummary || (miniSummary ? `小行动：${miniSummary}` : "休整");
-    appendHigherEdHistory(stage, summary);
-    state.log.unshift(`${getHigherEdStageLabel(stage)}第${getHigherEdCurrentTermNumber(stage)}学期：${summary}`);
+    appendHigherEdHistory(stage, termSummary);
+    state.log.unshift(`${getHigherEdStageLabel(stage)}第${getHigherEdCurrentTermNumber(stage)}学期：${termSummary}`);
   }
+  const stageHistory = stage === "undergrad" ? state.undergradHistory : stage === "masters" ? state.mastersHistory : state.phdHistory;
+  if (Array.isArray(stageHistory) && stageHistory.length) {
+    const latest = stageHistory[stageHistory.length - 1];
+    latest.dominantRoute = routeRecord.dominantRoute;
+    latest.dominantRouteLabel = routeRecord.dominantRouteLabel;
+    latest.comboIds = routeRecord.comboIds || [];
+  }
+  recordFeedbackEntry({
+    stage,
+    term: getHigherEdCurrentTermNumber(stage),
+    title: `${getHigherEdStageLabel(stage)}第${getHigherEdCurrentTermNumber(stage)}学期`,
+    summary: termSummary,
+    lines: [
+      `主路线：${getDominantRouteProfile().label}`,
+      chainReactions.length ? `连锁反应：${chainReactions.map((item) => item.label).join("、")}` : "连锁反应：本学期未触发",
+      `先修链：${buildHigherEdCourseSummary(stage)}`,
+      stage === "masters" || stage === "phd" ? summarizePublicationPipeline(stage) : "发表流水线：当前阶段未启用",
+    ],
+    dominantRoute: getDominantRouteProfile().id,
+    ts: Date.now(),
+  });
   if (totalCost > 0) {
     state.log.unshift(`${getHigherEdStageLabel(stage)}学期支出：${formatUsd(totalCost)}`);
   }
@@ -10019,9 +11515,13 @@ function resetHigherEducationState() {
   state.directPhdApplied = false;
   state.directPhdApproved = false;
   state.directPhdSchoolId = null;
+  state.directPhdLastWindow = null;
   state.msPhdApplied = false;
   state.msPhdApproved = false;
   state.msPhdSchoolId = null;
+  state.msPhdLastWindow = null;
+  state.msPhdLastWindow = null;
+  state.pendingCombinedAnnouncements = [];
 
   state.higherEdTermState = createDefaultHigherEdTermStateSnapshot();
 
@@ -10057,6 +11557,7 @@ function normalizeHigherEducationState() {
     if (!Array.isArray(termState.currentEvents)) termState.currentEvents = [];
     if (!Array.isArray(termState.selectedEventIds)) termState.selectedEventIds = [];
     if (!Array.isArray(termState.selectedMiniIds)) termState.selectedMiniIds = [];
+    if (typeof termState.customProjectUsed !== "boolean") termState.customProjectUsed = false;
     if (!Array.isArray(termState.aiPlanEventIds)) termState.aiPlanEventIds = [];
     if (!Array.isArray(termState.aiPlanMiniIds)) termState.aiPlanMiniIds = [];
     if (!Array.isArray(termState.usedEventIds)) termState.usedEventIds = [];
@@ -10216,20 +11717,31 @@ function normalizeHigherEducationState() {
   if (typeof state.extraYearCount !== "number") state.extraYearCount = 0;
   if (typeof state.extraYearFocusId !== "string") state.extraYearFocusId = null;
   if (!state.stageRepeatCounts || typeof state.stageRepeatCounts !== "object") {
-    state.stageRepeatCounts = { undergrad: 0, masters: 0, phd: 0 };
+    state.stageRepeatCounts = { undergrad: 0, masters: 0, phd: 0, career: 0 };
   }
-  ["undergrad", "masters", "phd"].forEach((stage) => {
+  ["undergrad", "masters", "phd", "career"].forEach((stage) => {
     if (typeof state.stageRepeatCounts[stage] !== "number" || Number.isNaN(state.stageRepeatCounts[stage])) {
       state.stageRepeatCounts[stage] = 0;
+    }
+  });
+  if (!state.academicRepeatCounts || typeof state.academicRepeatCounts !== "object") {
+    state.academicRepeatCounts = { undergrad: 0, masters: 0, phd: 0 };
+  }
+  ["undergrad", "masters", "phd"].forEach((stage) => {
+    if (typeof state.academicRepeatCounts[stage] !== "number" || Number.isNaN(state.academicRepeatCounts[stage])) {
+      state.academicRepeatCounts[stage] = 0;
     }
   });
 
   if (typeof state.directPhdApplied !== "boolean") state.directPhdApplied = false;
   if (typeof state.directPhdApproved !== "boolean") state.directPhdApproved = false;
   if (typeof state.directPhdSchoolId !== "string") state.directPhdSchoolId = null;
+  if (typeof state.directPhdLastWindow !== "string") state.directPhdLastWindow = null;
   if (typeof state.msPhdApplied !== "boolean") state.msPhdApplied = false;
   if (typeof state.msPhdApproved !== "boolean") state.msPhdApproved = false;
   if (typeof state.msPhdSchoolId !== "string") state.msPhdSchoolId = null;
+  if (typeof state.msPhdLastWindow !== "string") state.msPhdLastWindow = null;
+  if (!Array.isArray(state.pendingCombinedAnnouncements)) state.pendingCombinedAnnouncements = [];
 
   if (state.jobOutcome && typeof state.jobOutcome === "object") {
     if (!Array.isArray(state.jobOutcome.offers)) state.jobOutcome.offers = [];
@@ -10301,12 +11813,16 @@ function normalizeHigherEducationState() {
 }
 
 function resetGame() {
+  customProjectDraft = null;
+  customProjectBusy = false;
   state.started = false;
   state.devMode = false;
   state.termIndex = -1;
   state.playerName = "";
   state.profileId = null;
   state.backgroundId = null;
+  state.legacySchoolId = null;
+  state.legacySchoolName = null;
   state.rigorId = RIGOR_CHOICES[0]?.id || null;
   state.difficultyId = DIFFICULTY_LEVELS[0]?.id || null;
   state.testPlanId = TEST_PLAN_CHOICES[0]?.id || null;
@@ -10322,12 +11838,19 @@ function resetGame() {
   state.usedDecisionIds = new Set();
   state.badges = new Set();
   state.tagCounts = {};
+  state.highschoolHistory = [];
   state.projectStreaks = {};
   state.activeProjectId = null;
   state.activeProjectStreak = 0;
+  state.routeScores = createDefaultRouteScores();
+  state.routeMoments = [];
+  state.comboHistory = [];
+  state.feedbackLedger = [];
+  state.majorActivityAlignment = createDefaultMajorActivityAlignment();
   state.choiceEffectCache = {};
   state.currentEvents = [];
   state.selectedEventIds = new Set();
+  state.customProjectUsedThisTerm = false;
   state.essayChoices = [];
   state.recChoice = null;
   state.aidChoice = null;
@@ -10360,7 +11883,8 @@ function resetGame() {
   state.phdPartTimeTermUsed = 0;
   state.extraYearCount = 0;
   state.extraYearFocusId = null;
-  state.stageRepeatCounts = { undergrad: 0, masters: 0, phd: 0 };
+  state.stageRepeatCounts = { undergrad: 0, masters: 0, phd: 0, career: 0 };
+  state.academicRepeatCounts = { undergrad: 0, masters: 0, phd: 0 };
   state.overworkDebt = 0;
   state.skipStreak = 0;
   state.fxRate = 1;
@@ -10370,6 +11894,8 @@ function resetGame() {
   state.combinedDegreeApplied = false;
   state.combinedDegreeApproved = false;
   state.combinedDegreeSchoolId = null;
+  state.combinedDegreeLastWindow = null;
+  state.pendingCombinedAnnouncements = [];
   state.replayNodes = [];
   state.balanceCalibration = null;
   state.dynamicBalanceTuning = {
@@ -10417,14 +11943,17 @@ function resetGame() {
     counselor: [],
     family: [],
     peer: [],
+    teacher: [],
     interviewer: [],
   };
   state.chatRelationships = {
     counselor: 60,
     family: 55,
     peer: 45,
+    teacher: 58,
     interviewer: 50,
   };
+  hydrateLegacyProgress();
   if (chatInput) {
     chatInput.value = "";
   }
@@ -10488,13 +12017,31 @@ function startGame() {
   const difficulty = DIFFICULTY_LEVELS.find((item) => item.id === state.difficultyId);
 
   state.stats = { ...profile.base };
+  hydrateLegacyProgress();
   applyEffects(region.bonus || {}, [], { boostAffinity: false });
   applyEffects(background.effects || {}, [], { boostAffinity: false });
   applyEffects(rigor?.effects || {}, [], { boostAffinity: false });
   applyEffects(testPlan?.effects || {}, [], { boostAffinity: false });
   applyEffects(counselor.effects || {}, [], { boostAffinity: false });
+  const legacySchool = background?.id === "legacy" ? assignLegacySchoolForRun() : null;
+  if (background?.id !== "legacy") {
+    state.legacySchoolId = null;
+    state.legacySchoolName = null;
+  }
   ensureStatKeys();
   state.cash = getStartingCash(background, state.stats.finance);
+  if (state.legacyBoosts?.cash) {
+    state.cash += Number(state.legacyBoosts.cash || 0);
+  }
+  applyEffects(
+    {
+      awards: Number(state.legacyBoosts?.awards || 0),
+      essayTrack: Number(state.legacyBoosts?.essayTrack || 0),
+      leadership: Number(state.legacyBoosts?.leadership || 0),
+    },
+    [],
+    { boostAffinity: false },
+  );
   if ((counselor?.fee || 0) > state.cash) {
     setupNotice.textContent = "资金不足，无法支付该中介的首期费用。";
     return;
@@ -10514,10 +12061,18 @@ function startGame() {
     `难度：${difficulty?.name || "未定"}`,
     `专业方向：${MAJORS.find((m) => m.id === state.majorId)?.name || "未定"}`,
     `中介策略：${counselor.name}`,
+    legacySchool ? `Legacy 院校：${legacySchool.name}（申请该校时有专属加成）` : "",
+    state.legacyProgress?.completedRuns
+      ? `多周目传承：已完成 ${state.legacyProgress.completedRuns} 局 · 开局加成 资金 ${formatUsd(
+          state.legacyBoosts.cash || 0,
+        )} / 奖项 ${state.legacyBoosts.awards || 0} / 文书 ${state.legacyBoosts.essayTrack || 0} / 领导力 ${
+          state.legacyBoosts.leadership || 0
+        }`
+      : "多周目传承：首局无继承加成。",
     `可用资金：${formatUsd(state.cash)}`,
     getWorldStateSummaryLine(),
     getWorldSandboxSummaryLine(),
-  ];
+  ].filter(Boolean);
   state.badges = new Set([profile.affinity, background.badge].filter(Boolean));
   state.tagCounts = {};
   if (profile.affinity) {
@@ -10542,10 +12097,16 @@ function applyEffects(effects, tags = [], options = {}) {
   const boostAffinity = options.boostAffinity !== false;
   const affinityBoost = boostAffinity && tags.includes(profile?.affinity) ? 1.12 : 1;
   const stressScale = typeof options.stressScale === "number" ? clamp(options.stressScale, 0, 1.2) : 1;
+  const majorMatchMultiplier = Number.isFinite(Number(options.majorMatchMultiplier))
+    ? clamp(Number(options.majorMatchMultiplier), 0.45, 1.15)
+    : 1;
 
   Object.entries(effects).forEach(([key, value]) => {
     const numeric = typeof value === "number" ? value : 0;
-    const boosted = numeric > 0 ? numeric * affinityBoost : numeric;
+    let boosted = numeric > 0 ? numeric * affinityBoost : numeric;
+    if (numeric > 0 && majorMatchMultiplier !== 1 && MAJOR_MATCH_SENSITIVE_KEYS.has(key)) {
+      boosted *= majorMatchMultiplier;
+    }
     const adjusted = key === "stress" && boosted > 0 ? boosted * stressScale : boosted;
     const current = state.stats[key] || 0;
     state.stats[key] = current + adjusted;
@@ -10578,6 +12139,108 @@ function ensureStatKeys() {
   });
 }
 
+function getStageRelevantMajorId(stage = "highschool") {
+  if (stage === "masters") {
+    return getValidMajorId(state.mastersMajorId || state.mastersApplyMajorId || state.majorId);
+  }
+  if (stage === "phd") {
+    return getValidMajorId(state.phdMajorId || state.phdApplyMajorId || state.mastersMajorId || state.majorId);
+  }
+  return getValidMajorId(state.majorId);
+}
+
+function createEmptySkillProfile() {
+  return { research: 0, quant: 0, writing: 0, leadership: 0, impact: 0, creative: 0, business: 0 };
+}
+
+function addSkillBoosts(target, boosts = {}, scale = 1) {
+  Object.entries(boosts || {}).forEach(([key, value]) => {
+    if (!Object.prototype.hasOwnProperty.call(target, key)) return;
+    target[key] += Number(value || 0) * scale;
+  });
+}
+
+function computeItemSkillProfile(item = {}) {
+  const profile = createEmptySkillProfile();
+  Object.entries(item.effects || {}).forEach(([key, value]) => {
+    const numeric = Number(value || 0);
+    if (!Number.isFinite(numeric) || numeric <= 0) return;
+    const skill = EVENT_EFFECT_SKILL_MAP[key];
+    if (!skill) return;
+    const normalizer = EVENT_EFFECT_NORMALIZER[key] || 8;
+    profile[skill] += Math.max(0, numeric / normalizer);
+  });
+  (Array.isArray(item.tags) ? item.tags : []).forEach((tag) => {
+    addSkillBoosts(profile, TAG_SKILL_BOOST_MAP[tag] || {}, 0.4);
+  });
+  if (item.projectId) {
+    addSkillBoosts(profile, PROJECT_SKILL_BOOST_MAP[item.projectId] || {}, 0.55);
+  }
+  return profile;
+}
+
+function getItemMajorAlignmentScore(item = {}, majorId = state.majorId) {
+  const major = MAJORS.find((entry) => entry.id === majorId);
+  if (!major?.weights) return 0.72;
+  const profile = computeItemSkillProfile(item);
+  const total = Object.values(profile).reduce((sum, value) => sum + Number(value || 0), 0);
+  if (total <= 0.001) return 0.72;
+  const peakWeight = Math.max(0.2, ...Object.values(major.weights || {}));
+  let weighted = 0;
+  Object.entries(profile).forEach(([skill, value]) => {
+    const share = Number(value || 0) / total;
+    weighted += share * Number(major.weights?.[skill] || 0.02);
+  });
+  let score = weighted / peakWeight;
+  const tags = Array.isArray(item.tags) ? item.tags : [];
+  const majorTags = Array.isArray(major.tags) ? major.tags : [];
+  if (tags.some((tag) => majorTags.includes(tag))) score += 0.08;
+  if (majorId === "law" && tags.some((tag) => ["法律", "辩论", "写作", "政策"].includes(tag))) score += 0.14;
+  if (/cs_engineering|ee_ce|data_ai|math_stats|me_ie/.test(String(majorId)) && tags.some((tag) => ["科研", "工程", "数据"].includes(tag))) {
+    score += 0.12;
+  }
+  if (/business_mgmt|finance_accounting|economics/.test(String(majorId)) && tags.some((tag) => ["商业", "创业", "实习"].includes(tag))) {
+    score += 0.12;
+  }
+  if (/arts_design|architecture|media/.test(String(majorId)) && tags.includes("艺术")) score += 0.12;
+  return clamp(score, 0.22, 1.08);
+}
+
+function getItemMajorMatchMultiplier(item = {}, majorId = state.majorId) {
+  return clamp(0.5 + getItemMajorAlignmentScore(item, majorId) * 0.55, 0.55, 1.1);
+}
+
+function getTagCountIncrementForItem(item = {}, majorId = state.majorId) {
+  return clamp(0.35 + getItemMajorAlignmentScore(item, majorId) * 0.7, 0.35, 1.1);
+}
+
+function createDefaultMajorActivityAlignment() {
+  return {
+    weightedScore: 0,
+    totalWeight: 0,
+    totalItems: 0,
+    alignedItems: 0,
+  };
+}
+
+function registerMajorActivityAlignment(item = {}, majorId = state.majorId, weight = 1) {
+  if (!state.majorActivityAlignment || typeof state.majorActivityAlignment !== "object") {
+    state.majorActivityAlignment = createDefaultMajorActivityAlignment();
+  }
+  const safeWeight = Math.max(1, Number(weight || 1));
+  const score = getItemMajorAlignmentScore(item, majorId);
+  state.majorActivityAlignment.weightedScore += score * safeWeight;
+  state.majorActivityAlignment.totalWeight += safeWeight;
+  state.majorActivityAlignment.totalItems += 1;
+  if (score >= 0.78) state.majorActivityAlignment.alignedItems += 1;
+}
+
+function getPortfolioMajorAlignmentScore() {
+  const ledger = state.majorActivityAlignment || createDefaultMajorActivityAlignment();
+  if (!Number(ledger.totalWeight || 0)) return 0.68;
+  return clamp(Number(ledger.weightedScore || 0) / Number(ledger.totalWeight || 1), 0.25, 1.05);
+}
+
 function getProjectBonus(projectId, streak) {
   if (streak < 2) return null;
   const level = Math.min(streak - 1, 3);
@@ -10591,6 +12254,36 @@ function getProjectBonus(projectId, streak) {
   return bonusMap[projectId] || null;
 }
 
+function scoreEventForCurrentBuild(event, stage = "highschool") {
+  if (!event) return -999;
+  const routeBias = addRouteScores(getMajorRouteBias(state.majorId), getWorldRouteBias());
+  const routeDelta = getRouteDeltaForItem(event);
+  const dominant = getDominantRouteProfile();
+  const majorId = getStageRelevantMajorId(stage);
+  const alignmentScore = getItemMajorAlignmentScore(event, majorId);
+  const tags = Array.isArray(event.tags) ? event.tags : [];
+  let score = 0;
+  ROUTE_KEYS.forEach((key) => {
+    score += Number(routeDelta[key] || 0) * (0.45 + Number(routeBias[key] || 0) * 0.08);
+    if (dominant.id && dominant.id === key) {
+      score += Number(routeDelta[key] || 0) * 0.18;
+    }
+  });
+  if (tags.includes("公益")) score += 0.35;
+  if (tags.includes("法律") && state.majorId === "law") score += 0.55;
+  if (tags.includes("艺术") && /arts|media|architecture/.test(String(state.majorId || ""))) score += 0.45;
+  if (event.projectId && (state.projectStreaks[event.projectId] || 0) > 0) score += 0.55;
+  if (stage !== "highschool") {
+    const termState = getHigherEdStageTermState(stage);
+    if (event.projectId && (termState.projectStreaks?.[event.projectId] || 0) > 0) score += 0.55;
+  }
+  score += (alignmentScore - 0.62) * 1.15;
+  score -= getEventTime(event) * 0.1;
+  const costPenaltyScale = stage === "highschool" ? 22000 : 15000;
+  score -= (Number(event.cost || event.rawCost || 0) / costPenaltyScale) * (state.cash < 12000 ? 1.15 : 0.8);
+  return score;
+}
+
 function getEventCostTier(event) {
   const cost = getEventCost(event);
   if (cost <= 500) return "low";
@@ -10600,7 +12293,10 @@ function getEventCostTier(event) {
 
 function pickDiversifiedEvents(eligible, count) {
   if (!eligible.length) return [];
-  const shuffled = shuffle(eligible);
+  const shuffled = eligible
+    .map((event) => ({ event, score: scoreEventForCurrentBuild(event, "highschool") + Math.random() * 0.2 }))
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.event);
   const low = shuffled.filter((event) => getEventCostTier(event) === "low");
   const mid = shuffled.filter((event) => getEventCostTier(event) === "mid");
   const high = shuffled.filter((event) => getEventCostTier(event) === "high");
@@ -10650,6 +12346,7 @@ function drawEvents() {
   state.currentEvents = pickDiversifiedEvents(pool, EVENT_OPTIONS_PER_TERM);
   state.selectedEventIds = new Set();
   state.selectedMiniIds = new Set();
+  state.customProjectUsedThisTerm = false;
   state.timeBudget = getTermTimeBudget();
   state.timeUsed = 0;
   state.loanUsedThisTerm = false;
@@ -10747,6 +12444,29 @@ function buildExtraYearFocusDecision() {
   };
 }
 
+function resolveInlineDecisionAction(action = null) {
+  if (!action || typeof action !== "object") return false;
+  if (action.type === "start-approved-masters") {
+    return !!startApprovedMastersPath(action.schoolId);
+  }
+  if (action.type === "prepare-masters-application") {
+    prepareMastersApplicationPath();
+    return true;
+  }
+  if (action.type === "start-approved-phd") {
+    return !!startApprovedPhdPath(action.track);
+  }
+  if (action.type === "prepare-phd-application") {
+    preparePhdApplicationPath();
+    return true;
+  }
+  if (action.type === "prepare-job-path") {
+    prepareJobPath();
+    return true;
+  }
+  return false;
+}
+
 function resolveDecision(decision, option) {
   if (decision && !decision.advanceStage && !decision.transient) {
     state.usedDecisionIds.add(decision.id);
@@ -10773,7 +12493,7 @@ function resolveDecision(decision, option) {
     }
     if (option.log) {
       state.log.unshift(option.log);
-    } else if (decision) {
+    } else if (decision && !decision.silentLog) {
       state.log.unshift(`决策：${decision.title}`);
     }
     if (option.relationshipEffects) {
@@ -10799,6 +12519,7 @@ function resolveDecision(decision, option) {
     if (cost !== 0) {
       state.log.unshift(cost > 0 ? `决策支出：${formatUsd(cost)}` : `决策收入：${formatUsd(Math.abs(cost))}`);
     }
+    resolveInlineDecisionAction(option.decisionAction);
   } else if (decision) {
     state.log.unshift(`决策：${decision.title}（暂缓处理）`);
   }
@@ -10832,6 +12553,7 @@ function formatDecisionRelationshipEffects(relationshipEffects = {}) {
     if (roleId === "counselor") return "中介";
     if (roleId === "family") return "家人";
     if (roleId === "peer") return "同学";
+    if (roleId === "teacher") return "老师";
     if (isInterviewerRole(roleId)) {
       const app = state.jobOutcome?.applications?.find((item) => `interviewer-${item.companyId}` === roleId);
       return app ? `${app.company} 面试官` : "面试官";
@@ -10997,19 +12719,38 @@ function confirmTerm() {
     }
   });
   chosen.forEach((event) => {
-    applyEffects(event.effects, event.tags || [], { stressScale: PROJECT_STRESS_EFFECT_SCALE });
+    const matchMultiplier = getItemMajorMatchMultiplier(event, state.majorId);
+    applyEffects(event.effects, event.tags || [], {
+      stressScale: PROJECT_STRESS_EFFECT_SCALE,
+      majorMatchMultiplier: matchMultiplier,
+    });
+    registerMajorActivityAlignment(event, state.majorId, getEventTime(event) || 1);
     if (!event.repeatable) {
       state.usedEvents.add(event.id);
     }
     if (event.tags) {
+      const tagIncrement = getTagCountIncrementForItem(event, state.majorId);
       event.tags.forEach((tag) => {
         state.badges.add(tag);
-        state.tagCounts[tag] = (state.tagCounts[tag] || 0) + 1;
+        state.tagCounts[tag] = (state.tagCounts[tag] || 0) + tagIncrement;
       });
     }
   });
   chosenMini.forEach((action) => {
-    applyEffects(action.effects || {}, [], { boostAffinity: false, stressScale: PROJECT_STRESS_EFFECT_SCALE });
+    const matchMultiplier = getItemMajorMatchMultiplier(action, state.majorId);
+    applyEffects(action.effects || {}, action.tags || [], {
+      boostAffinity: false,
+      stressScale: PROJECT_STRESS_EFFECT_SCALE,
+      majorMatchMultiplier: matchMultiplier,
+    });
+    registerMajorActivityAlignment(action, state.majorId, Number(action.time || 1));
+    if (action.tags?.length) {
+      const tagIncrement = getTagCountIncrementForItem(action, state.majorId);
+      action.tags.forEach((tag) => {
+        state.badges.add(tag);
+        state.tagCounts[tag] = (state.tagCounts[tag] || 0) + tagIncrement;
+      });
+    }
     state.log.unshift(`小行动：${action.name}`);
   });
 
@@ -11052,10 +12793,17 @@ function confirmTerm() {
     const bonus = getProjectBonus(projectId, state.projectStreaks[projectId]);
     if (bonus) {
       applyEffects(bonus, projectEvent?.tags || []);
-      state.log.unshift(`长期项目加成：${projectEvent?.title || "项目"} 连续 ${state.projectStreaks[projectId]} 学期`);
+        state.log.unshift(`长期项目加成：${projectEvent?.title || "项目"} 连续 ${state.projectStreaks[projectId]} 学期`);
     }
   });
-  updateAchievements();
+  if (projectIds.length) {
+    const activeProjectId = projectIds[0];
+    state.activeProjectId = activeProjectId;
+    state.activeProjectStreak = Number(state.projectStreaks[activeProjectId] || 0);
+  } else {
+    state.activeProjectId = null;
+    state.activeProjectStreak = 0;
+  }
 
   const eventSummary = chosen.map((event) => event.title).join(" + ");
   const miniSummary = chosenMini.map((action) => action.name).join(" + ");
@@ -11064,8 +12812,42 @@ function confirmTerm() {
       ? `${eventSummary} + 小行动：${miniSummary}`
       : eventSummary || (miniSummary ? `小行动：${miniSummary}` : "休整与调整");
 
+  const routeRecord = buildStageHistoryRecord("highschool", summary, chosen, chosenMini, []);
+  applyRouteProgress(routeRecord.routeDelta, summary);
+  const chainReactions = detectChainReactions("highschool", chosen, chosenMini);
+  const chainBonusEffects = {};
+  if (chainReactions.length) {
+    chainReactions.forEach((combo) => {
+      if (combo.route) {
+        applyRouteProgress({ [combo.route]: 1.6 }, combo.label);
+      }
+      const bonus = getChainReactionEffects("highschool", combo.id);
+      if (bonus) {
+        applyEffects(bonus, [], { boostAffinity: false });
+        Object.entries(bonus).forEach(([key, value]) => {
+          if (!Number.isFinite(Number(value))) return;
+          chainBonusEffects[key] = (chainBonusEffects[key] || 0) + Number(value);
+        });
+      }
+      state.log.unshift(`连锁反应：${combo.label}`);
+      state.comboHistory = [
+        {
+          id: combo.id,
+          label: combo.label,
+          stage: "highschool",
+          term: Number(state.termIndex || 0) + 1,
+          summary,
+          ts: Date.now(),
+        },
+        ...(state.comboHistory || []),
+      ].slice(0, 20);
+    });
+    routeRecord.comboIds = chainReactions.map((item) => item.id);
+  }
+  state.highschoolHistory = [...(state.highschoolHistory || []), routeRecord].slice(-12);
+
   const combinedEffects = {};
-  [...chosen, ...chosenMini].forEach((item) => {
+  [...chosen, ...chosenMini, { effects: chainBonusEffects }].forEach((item) => {
     Object.entries(item.effects || {}).forEach(([key, value]) => {
       if (typeof value !== "number") return;
       combinedEffects[key] = (combinedEffects[key] || 0) + value;
@@ -11088,9 +12870,26 @@ function confirmTerm() {
       `因果记录：提升 ${topPositive.join("、") || "无"}；代价 ${topNegative.join("、") || "可控"}`,
     );
   }
+  const routeProfile = getDominantRouteProfile();
+  const feedbackLines = [
+    `主路线：${routeProfile.label}`,
+    chainReactions.length ? `连锁反应：${chainReactions.map((item) => item.label).join("、")}` : "连锁反应：本学期未触发",
+    topPositive.length ? `本学期最强增益：${topPositive.join("、")}` : "本学期最强增益：暂无",
+    topNegative.length ? `本学期代价：${topNegative.join("、")}` : "本学期代价：可控",
+  ];
+  recordFeedbackEntry({
+    stage: "highschool",
+    term: Number(state.termIndex || 0) + 1,
+    title: TERMS[state.termIndex]?.name || `高中第${Number(state.termIndex || 0) + 1}学期`,
+    summary,
+    lines: feedbackLines,
+    dominantRoute: routeProfile.id,
+    ts: Date.now(),
+  });
   if (eventCost + termFee + livingCost + miniCost > 0) {
     state.log.unshift(`学期支出：${formatUsd(eventCost + termFee + livingCost + miniCost)}`);
   }
+  updateAchievements();
 
   const incident = rollIncident();
   if (incident) {
@@ -11275,6 +13074,14 @@ function applyAppAction(action) {
 
 function toggleSchool(schoolId) {
   const stage = getApplicationStage();
+  if (stage === APPLICATION_STAGES.RD_APPLY) {
+    const appliedInEd = new Set(state.results.filter((item) => item.batch === "ed").map((item) => item.id));
+    if (appliedInEd.has(schoolId)) {
+      const schoolName = UNIVERSITIES.find((item) => item.id === schoolId)?.name || schoolId;
+      appNotice.textContent = `${schoolName} 已在 ED 提交，RD 不能重复申请。`;
+      return;
+    }
+  }
   if (state.selectedSchools.has(schoolId)) {
     state.selectedSchools.delete(schoolId);
   } else {
@@ -11472,6 +13279,7 @@ function buildApplicationResultForSchool(school, roundChoice, structureProfile =
     selectivityScore: evaluation.selectivity,
     scoreGap: evaluation.score - evaluation.selectivity,
     stressPenaltyScore: evaluation.stressPenalty,
+    worldModifier: evaluation.worldModifier,
     status,
     roundChoice,
     aidPercent,
@@ -11493,6 +13301,170 @@ function buildApplicationResultForSchool(school, roundChoice, structureProfile =
     email: emailInfo.email,
     emailNote: emailInfo.note,
   };
+}
+
+function getApplicationOutcomeLevel(status) {
+  if (status === "录取") return 2;
+  if (status === "候补") return 1;
+  return 0;
+}
+
+function getResultEvaluationSnapshot(result) {
+  const selectivity = Number(result.selectivityScore ?? getSelectivity(getRankIndex(result)));
+  const scoreGap = Number(result.scoreGap ?? 0);
+  return {
+    chance: Number(result.chance ?? 0),
+    fitScore: Number(result.fitScore ?? 0),
+    academic: Number(result.academicScore ?? 0),
+    holistic: Number(result.holisticScore ?? 0),
+    score: selectivity + scoreGap,
+    selectivity,
+    stressPenalty: Number(result.stressPenaltyScore ?? 0),
+    adaptiveAssist: 0,
+    worldModifier: Number.isFinite(Number(result.worldModifier))
+      ? Number(result.worldModifier)
+      : getWorldAdmissionModifier(result, state.majorId),
+    tuning: getDynamicBalanceTuning(),
+  };
+}
+
+function rebuildApplicationResultStatus(result, nextStatus, note = "") {
+  if (!result || result.status === nextStatus) return result;
+  const evaluation = getResultEvaluationSnapshot(result);
+  const structurePenalty = Number(result.structurePenaltyScore || 0);
+  const reasons = getDecisionReasons(result, evaluation, nextStatus, result.roundChoice);
+  if (structurePenalty > 0) {
+    reasons.push(
+      (result.structureTierAtSubmit || "") === "冲刺" || (result.structureTierAtSubmit || "") === "匹配"
+        ? "选校结构偏激进"
+        : "选校结构过于激进",
+    );
+  }
+  let aidPercent = null;
+  let netCost = null;
+  let aidDelay = false;
+  let netCostFirstYear = null;
+  let aidFirstYear = null;
+  let renewalPolicy = null;
+  let estimatedFourYearCost = null;
+  if (nextStatus === "录取") {
+    const aid = calculateAidOffer(result, result.roundChoice);
+    aidPercent = aid.aidPercent;
+    netCost = aid.netCost;
+    const delay = applyAidDelayToOffer(result, aidPercent, netCost);
+    aidDelay = delay.aidDelay;
+    netCostFirstYear = delay.netCostFirstYear;
+    aidFirstYear = delay.aidFirstYear;
+    renewalPolicy = buildRenewalPolicy(result, aidPercent || 0);
+    estimatedFourYearCost = estimateFourYearCost({
+      ...result,
+      status: nextStatus,
+      aidPercent,
+      netCost,
+      aidDelay,
+      netCostFirstYear,
+      renewalPolicy,
+    })?.total;
+  }
+  return {
+    ...result,
+    status: nextStatus,
+    aidPercent,
+    netCost,
+    aidDelay,
+    netCostFirstYear,
+    aidFirstYear,
+    reasons: Array.from(new Set(reasons)).slice(0, 4),
+    tips: getImprovementTips(evaluation),
+    decisionDrivers: buildDecisionDrivers(result, evaluation, result.roundChoice),
+    explainability: buildExplainabilitySummary(evaluation, nextStatus, structurePenalty),
+    renewalPolicy,
+    estimatedFourYearCost,
+    consistencyAdjusted: true,
+    consistencyNote: note || "",
+  };
+}
+
+function harmonizeApplicationBatchResults(results = []) {
+  if (!Array.isArray(results) || results.length < 3) return Array.isArray(results) ? results : [];
+  const originals = results.map((result) => ({ ...result }));
+  const sorted = originals
+    .map((result, index) => ({ result, index, rank: getRankIndex(result), chance: Number(result.chance || 0) }))
+    .sort((a, b) => a.rank - b.rank || a.index - b.index);
+  const thresholds = getTierThresholds();
+
+  sorted.forEach((entry, idx) => {
+    const strongerAdmits = sorted.slice(0, idx).filter((item) => item.result.status === "录取");
+    if (!strongerAdmits.length || entry.result.status !== "拒绝") return;
+    let targetStatus = entry.result.status;
+    strongerAdmits.forEach((admitEntry) => {
+      const rankGap = entry.rank - admitEntry.rank;
+      const chanceGap = entry.chance - Number(admitEntry.result.chance || 0);
+      if (rankGap >= 18 && chanceGap >= 0.08) {
+        targetStatus = getApplicationOutcomeLevel(targetStatus) < 1 ? "候补" : targetStatus;
+      }
+      if (rankGap >= 42 && chanceGap >= 0.16 && entry.chance >= 0.38) {
+        targetStatus = "录取";
+      }
+    });
+    if (targetStatus !== entry.result.status) {
+      entry.result = rebuildApplicationResultStatus(
+        entry.result,
+        targetStatus,
+        "同轮更高难度学校已录取，较低难度学校结果向更合理区间校正。",
+      );
+    }
+  });
+
+  const eliteAdmits = sorted.filter((item) => item.result.status === "录取" && item.rank <= 35);
+  if (eliteAdmits.length >= 2) {
+    const worstEliteRank = Math.max(...eliteAdmits.map((item) => item.rank));
+    const easierPool = sorted.filter(
+      (item) => item.rank >= worstEliteRank + 12 && item.chance >= 0.26,
+    );
+    const currentNonReject = easierPool.filter((item) => item.result.status !== "拒绝").length;
+    const desiredNonReject = Math.min(
+      easierPool.length,
+      Math.max(2, Math.ceil(easierPool.length * 0.45)),
+    );
+    if (currentNonReject < desiredNonReject) {
+      const need = desiredNonReject - currentNonReject;
+      const rejects = easierPool
+        .filter((item) => item.result.status === "拒绝")
+        .sort((a, b) => b.chance - a.chance || a.rank - b.rank);
+      rejects.slice(0, need).forEach((item, idx) => {
+        const targetStatus =
+          idx === 0 && (item.chance >= 0.42 || item.rank >= worstEliteRank + 30) ? "录取" : "候补";
+        item.result = rebuildApplicationResultStatus(
+          item.result,
+          targetStatus,
+          "同批次已出现多所顶尖录取，对更低难度学校结果进行了整体一致性修正。",
+        );
+      });
+    }
+  }
+
+  const safetyPool = sorted.filter((item) => item.chance >= thresholds.safety);
+  if (safetyPool.length && safetyPool.every((item) => item.result.status === "拒绝")) {
+    const [bestSafety, secondSafety] = [...safetyPool].sort((a, b) => b.chance - a.chance || a.rank - b.rank);
+    if (bestSafety) {
+      bestSafety.result = rebuildApplicationResultStatus(
+        bestSafety.result,
+        "录取",
+        "系统检测到保底校全部拒绝，已按更符合真实概率的区间校正结果。",
+      );
+    }
+    if (secondSafety && secondSafety.result.status === "拒绝" && secondSafety.chance >= thresholds.safety + 0.05) {
+      secondSafety.result = rebuildApplicationResultStatus(
+        secondSafety.result,
+        "候补",
+        "系统检测到保底校结果过于反常，已保留更合理的候补缓冲。",
+      );
+    }
+  }
+
+  const map = new Map(sorted.map((item) => [item.index, item.result]));
+  return results.map((result, index) => map.get(index) || result);
 }
 
 function submitApplications() {
@@ -11579,11 +13551,16 @@ function submitApplications() {
   }
 
   const structureProfile = getSelectedSchoolStructureProfile();
-  const rdResults = selectedSchools.map((school) =>
+  const rdResultsRaw = selectedSchools.map((school) =>
     buildApplicationResultForSchool(school, "rd", structureProfile),
   );
+  const rdResults = harmonizeApplicationBatchResults(rdResultsRaw);
   const existingResults = state.results.filter((result) => result.batch !== "rd");
   state.results = [...existingResults, ...rdResults];
+  const edWaitlistSummary = settleWaitlistResults({
+    filter: (result) => result.batch === "ed" && result.status === "候补",
+    revealStage: APPLICATION_STAGES.RD_RELEASE,
+  });
   state.applicationStructurePenalty = structureProfile.penalty;
   state.schoolRounds = selectedSchools.reduce((acc, school) => {
     acc[school.id] = "rd";
@@ -11606,6 +13583,16 @@ function submitApplications() {
     );
   }
   state.log.unshift("RD 提交完成，进入 RD 放榜。");
+  if (edWaitlistSummary.admitNames.length || edWaitlistSummary.rejectNames.length) {
+    state.log.unshift(
+      `ED 候补结果已并入 RD 放榜：${[
+        edWaitlistSummary.admitNames.length ? `转录取 ${edWaitlistSummary.admitNames.join("、")}` : "",
+        edWaitlistSummary.rejectNames.length ? `转拒绝 ${edWaitlistSummary.rejectNames.join("、")}` : "",
+      ]
+        .filter(Boolean)
+        .join("；")}`,
+    );
+  }
   pushReplayNode("提交RD申请");
   updateUI();
 }
@@ -11630,6 +13617,7 @@ function evaluateApplication(school, options = {}) {
   const roundChoiceId = options.roundOverride || getRoundChoiceForSchool(school.id);
   const roundChoice =
     ROUND_CHOICES.find((item) => item.id === roundChoiceId) || null;
+  const legacyBonus = getLegacyAdmissionsBonus(school, roundChoiceId);
   const difficulty =
     DIFFICULTY_LEVELS.find((item) => item.id === state.difficultyId)?.config ||
     DIFFICULTY_LEVELS[0]?.config || {
@@ -11641,6 +13629,8 @@ function evaluateApplication(school, options = {}) {
   const strengthScore = getPositiveStrengthScore();
   const rankIndex = getRankIndex(school);
   const eliteProfile = getEliteSchoolDifficultyProfile(rankIndex);
+  const regionAdmissionProfile = getRegionalAdmissionProfile(school, state.majorId);
+  const majorAdmissionProfile = getMajorAdmissionProfile(state.majorId, school);
   const tuning = getDynamicBalanceTuning();
   const adjustedAssist = adaptiveAssist * eliteProfile.assistMultiplier;
   const gpa = (state.stats.gpa - 2) / 2;
@@ -11654,6 +13644,7 @@ function evaluateApplication(school, options = {}) {
   const recStrength = (state.stats.recStrength ?? 0) / 100;
   const essayQuality = clamp(essay * 0.6 + essayTrack * 0.4, 0, 1);
   const stressPenalty = getStressPenaltyRatio(state.stats.stress);
+  const portfolioAlignment = getPortfolioMajorAlignmentScore();
 
   const academic = gpa * 0.3 + test * 0.22 + english * 0.1;
   const reputation = (state.stats.reputation ?? 0) / 100;
@@ -11664,7 +13655,8 @@ function evaluateApplication(school, options = {}) {
     essayQuality * 0.12 +
     recStrength * 0.08 +
     reputation * 0.05;
-  const fitScore = calculateFitScore(school);
+  const baseFitScore = calculateFitScore(school);
+  const fitScore = clamp(baseFitScore * 0.88 + portfolioAlignment * 0.12, 0, 1);
   const worldModifier = getWorldAdmissionModifier(school, state.majorId);
   const academicComponent = academic * 0.45;
   const holisticComponent = holistic * 0.25;
@@ -11675,6 +13667,12 @@ function evaluateApplication(school, options = {}) {
   score += adjustedAssist * 0.45;
   score += clamp((strengthScore - 0.75) * 0.22, 0, 0.06);
   score += worldModifier * 0.55;
+  score += (portfolioAlignment - 0.62) * 0.16;
+  score += academic * (regionAdmissionProfile.academicBias + majorAdmissionProfile.academicBias);
+  score += holistic * (regionAdmissionProfile.holisticBias + majorAdmissionProfile.holisticBias);
+  score += fitScore * (regionAdmissionProfile.fitBias + majorAdmissionProfile.fitBias);
+  score += essayQuality * (regionAdmissionProfile.essayBias + majorAdmissionProfile.essayBias);
+  score += majorAdmissionProfile.strengthBonus || 0;
 
   const essayChoiceId = getEssayForSchool(school.id);
   const essayChoice = ESSAY_CHOICES.find((item) => item.id === essayChoiceId);
@@ -11690,6 +13688,7 @@ function evaluateApplication(school, options = {}) {
   if (background?.admissionsBonus) {
     score += background.admissionsBonus;
   }
+  score += legacyBonus.scoreBonus;
   const counselor = COUNSELORS.find((item) => item.id === state.counselorId);
   if (counselor?.admitMod) {
     score += counselor.admitMod;
@@ -11707,22 +13706,29 @@ function evaluateApplication(school, options = {}) {
   }
 
   const selectivity = clamp(
-    getSelectivity(rankIndex) + eliteProfile.selectivityBoost - difficulty.selectivityEase + tuning.selectivityShift,
+    getSelectivity(rankIndex) +
+      eliteProfile.selectivityBoost +
+      regionAdmissionProfile.selectivityBoost +
+      majorAdmissionProfile.selectivityBoost -
+      difficulty.selectivityEase +
+      tuning.selectivityShift,
     0.25,
     0.93,
   );
   let chance = 0.15 + (score - selectivity) * 0.94;
   chance += adjustedAssist * 0.85;
   chance += worldModifier;
+  chance += (portfolioAlignment - 0.62) * 0.1;
+  chance += regionAdmissionProfile.chanceShift + majorAdmissionProfile.chanceShift;
   chance -= Math.max(0, eliteProfile.chancePenalty + tuning.elitePenaltyShift);
   chance += tuning.chanceShift;
   chance += rankIndex >= 60 ? clamp((strengthScore - 0.76) * 0.22, 0, 0.06) : 0;
-  if (rankIndex >= 100) {
-    const floor = 0.12 + adaptiveAssist * 1.2 + clamp((strengthScore - 0.84) * 0.24, 0, 0.1);
-    chance = Math.max(chance, floor);
-  }
-  if (rankIndex >= 180 && strengthScore >= 0.92) {
-    chance = Math.max(chance, 0.38 + adaptiveAssist * 0.85);
+  const realisticChanceFloor =
+    getRealisticChanceFloor(rankIndex, strengthScore, fitScore, adaptiveAssist) +
+    (regionAdmissionProfile.floorBoost || 0) +
+    (majorAdmissionProfile.floorBoost || 0);
+  if (realisticChanceFloor > 0) {
+    chance = Math.max(chance, realisticChanceFloor);
   }
 
   if (!preview && counselor?.volatility) {
@@ -11730,14 +13736,26 @@ function evaluateApplication(school, options = {}) {
   }
 
   if (!preview) {
-    const variance = 0.06 + (fitScore - 0.5) * 0.04;
+    const variance = clamp(
+      0.06 +
+        (fitScore - 0.5) * 0.04 +
+        (regionAdmissionProfile.varianceShift || 0) +
+        (majorAdmissionProfile.varianceShift || 0),
+      0.02,
+      0.11,
+    );
     chance += (Math.random() - 0.5) * variance;
   }
 
   chance = clamp(chance, 0.03, eliteProfile.chanceCap);
+  if (legacyBonus.chanceBonus > 0) {
+    chance = clamp(chance + legacyBonus.chanceBonus, 0.03, eliteProfile.chanceCap);
+  }
   return {
     chance,
     fitScore,
+    baseFitScore,
+    portfolioAlignment,
     academic,
     holistic,
     score,
@@ -11747,6 +13765,10 @@ function evaluateApplication(school, options = {}) {
     rawAdaptiveAssist: adaptiveAssist,
     tuning,
     worldModifier,
+    legacyBonusApplied: legacyBonus.chanceBonus > 0 || legacyBonus.scoreBonus > 0,
+    legacyBonusLabel: legacyBonus.label,
+    regionAdmissionProfile,
+    majorAdmissionProfile,
     explainability: {
       academicComponent,
       holisticComponent,
@@ -11768,6 +13790,7 @@ function getDecisionReasons(school, evaluation, status, roundChoice = null) {
   const essayTrackScore = (state.stats.essayTrack ?? 0) / 100;
   const recStrengthScore = (state.stats.recStrength ?? 0) / 100;
   if (evaluation.fitScore >= 0.75) reasons.push("专业匹配度高");
+  if ((evaluation.portfolioAlignment ?? 0.68) >= 0.78) reasons.push("活动方向与申请专业一致");
   if (evaluation.academic >= 0.7) reasons.push("学术表现强");
   if (evaluation.holistic >= 0.65) reasons.push("活动与领导力亮眼");
   if ((state.stats.reputation ?? 0) >= 60) reasons.push("社会评价较高");
@@ -11775,6 +13798,9 @@ function getDecisionReasons(school, evaluation, status, roundChoice = null) {
   if (recStrengthScore >= 0.65) reasons.push("推荐信支持充分");
   if (evaluation.stressPenalty > 0.08) reasons.push("压力指数偏高");
   if (major && school?.strengths?.includes(major.id)) reasons.push("学校专业偏好");
+  if (evaluation.regionAdmissionProfile?.chanceShift >= 0.012 || evaluation.regionAdmissionProfile?.floorBoost >= 0.03) {
+    reasons.push("地区录取风格较为稳定");
+  }
   if (roundChoice === "ed") reasons.push("ED 轮次加成");
   if (state.testPlanId === "test-optional" && school.type === "polytechnic") {
     reasons.push("标化策略偏弱");
@@ -11784,15 +13810,19 @@ function getDecisionReasons(school, evaluation, status, roundChoice = null) {
   if (isLowIncome(BACKGROUNDS.find((item) => item.id === state.backgroundId))) {
     reasons.push("低收入背景加成");
   }
+  if (evaluation.legacyBonusApplied) reasons.push("Legacy 家族校友加成");
 
   if (status === "拒绝") {
     if (rankIndex <= 20) reasons.push("顶尖院校竞争系数高");
     if (evaluation.selectivity - evaluation.score > 0.08) reasons.push("院校录取门槛高");
     if (evaluation.fitScore < 0.6) reasons.push("匹配度不足");
+    if ((evaluation.portfolioAlignment ?? 0.68) < 0.54) reasons.push("活动方向与目标专业匹配不足");
     if (evaluation.academic < 0.55) reasons.push("学术硬指标偏弱");
     if (evaluation.holistic < 0.5) reasons.push("活动深度不足");
     if (essayTrackScore < 0.45) reasons.push("文书迭代不足");
     if (recStrengthScore < 0.4) reasons.push("推荐人支持偏弱");
+    if (evaluation.regionAdmissionProfile?.rejectNote) reasons.push(evaluation.regionAdmissionProfile.rejectNote);
+    if (evaluation.majorAdmissionProfile?.rejectNote) reasons.push(evaluation.majorAdmissionProfile.rejectNote);
   } else if (status === "候补") {
     reasons.push("整体竞争激烈");
   }
@@ -12150,6 +14180,8 @@ function renderEvents() {
     eventCards.appendChild(card);
   });
 
+  appendCustomProjectLauncherCard(eventCards, "highschool");
+
   if (miniActions) {
     miniActions.innerHTML = "";
     const selectedMiniTime = Array.from(state.selectedMiniIds)
@@ -12297,7 +14329,7 @@ function renderTimeline() {
   addNode(
     `硕士 ${Math.max(0, Math.min(MASTERS_TOTAL_TERMS, state.mastersCurrentYear || 0))}/${MASTERS_TOTAL_TERMS}`,
     !!state.mastersGraduated,
-    mainViewStage === "grad" && !!state.mastersStarted && !state.mastersGraduated,
+    mainViewStage === "masters",
   );
   addNode(
     "博士申请",
@@ -12307,7 +14339,7 @@ function renderTimeline() {
   addNode(
     `博士 ${Math.max(0, Math.min(PHD_TOTAL_TERMS, state.phdCurrentYear || 0))}/${PHD_TOTAL_TERMS}`,
     !!state.phdGraduated,
-    mainViewStage === "grad" && !!state.phdStarted && !state.phdGraduated,
+    mainViewStage === "phd",
   );
 
   const chosenJob = !!state.jobOutcome?.chosenOfferCompanyId;
@@ -12470,11 +14502,15 @@ function renderSchoolList() {
   dataNotice.textContent = missingRanks
     ? "提示：QS 真实排名未完整载入，当前为占位模型。"
     : "已载入 QS 2026 榜单数据。";
+  const stage = getApplicationStage();
+  const appliedInEd = new Set(state.results.filter((item) => item.batch === "ed").map((item) => item.id));
 
   UNIVERSITIES.forEach((school) => {
     const card = document.createElement("div");
-    const selected = state.selectedSchools.has(school.id);
-    const qsLabel = Number.isFinite(school.qsRank) ? `QS ${school.qsRank}` : "QS 待补全";
+  const selected = state.selectedSchools.has(school.id);
+  const blockedByEdDuplicate = stage === APPLICATION_STAGES.RD_APPLY && appliedInEd.has(school.id);
+  const legacyTarget = isLegacySchoolForPlayer(school);
+  const qsLabel = Number.isFinite(school.qsRank) ? `QS ${school.qsRank}` : "QS 待补全";
     const typeLabel = SCHOOL_TYPE_LABELS[school.type] || "综合型";
     let tierLabel = "待评估";
     let tierClass = "tier-unknown";
@@ -12485,7 +14521,7 @@ function renderSchoolList() {
       tierLabel = tier.label;
       tierClass = tier.className;
     }
-    card.className = `school-card${selected ? " selected" : ""}`;
+    card.className = `school-card${selected ? " selected" : ""}${blockedByEdDuplicate ? " blocked" : ""}`;
     const essayChoice = getEssayForSchool(school.id);
     const essaySelect =
       state.essayChoices.length > 0
@@ -12516,19 +14552,29 @@ function renderSchoolList() {
           .map((tag) => `<span class="preference-chip">${tag}</span>`)
           .join("")}</div>`
       : "";
+    const legacyLine = legacyTarget
+      ? `<small class="school-legacy-note">你的 Legacy 院校：申请这所学校时有额外加成</small>`
+      : "";
     const roundLabel = ROUND_CHOICES.find((item) => item.id === roundChoice)?.name || "Regular Decision";
+    const blockedLine = blockedByEdDuplicate
+      ? `<small class="disabled-reason">已在 ED 提交，本轮 RD 不可重复申请</small>`
+      : "";
 
     card.innerHTML = `
       <strong>${school.name}</strong>
       <small>${school.country} · ${typeLabel}</small>
       <span class="school-tier ${tierClass}">${tierLabel}</span>
       ${preferenceLine}
+      ${legacyLine}
       <small>当前轮次：${roundLabel}</small>
       ${essaySelect}
       <small>${qsLabel}</small>
       <small>学费 ${formatUsd(getTuition(school))}/年</small>
+      ${blockedLine}
     `;
-    card.addEventListener("click", () => toggleSchool(school.id));
+    if (!blockedByEdDuplicate) {
+      card.addEventListener("click", () => toggleSchool(school.id));
+    }
     const essayEl = card.querySelector(".essay-select");
     if (essayEl) {
       essayEl.addEventListener("click", (event) => event.stopPropagation());
@@ -12547,6 +14593,35 @@ function getStatusKey(status) {
   if (status === "候补") return "waitlist";
   if (status === "撤回") return "withdraw";
   return "reject";
+}
+
+function getAdmissionsAppealChatHint(result, stage = "undergrad") {
+  if (!result || typeof result !== "object") return "";
+  if (result.revealed === false) return "";
+  if (!(result.status === "候补" || result.status === "拒绝")) return "";
+  const appealKey =
+    stage === "grad"
+      ? getAdmissionsAppealKey("grad", result.id, result.programType)
+      : getAdmissionsAppealKey("undergrad", result.id);
+  const appealed =
+    stage === "grad" ? hasAdmissionsAppeal(appealKey) : hasAdmissionsAppeal(appealKey, result.id);
+  if (appealed) return "";
+  return "如需复议，可前往交流室切换到该校招生委员会，通过聊天窗提交申诉。";
+}
+
+function hasAdmissionsAppealChatHint(results, stage = "undergrad") {
+  return Array.isArray(results) && results.some((result) => Boolean(getAdmissionsAppealChatHint(result, stage)));
+}
+
+function maybeLogAppealChatHint(result, stage = "undergrad") {
+  const hint = getAdmissionsAppealChatHint(result, stage);
+  if (!hint) return;
+  const prefix = stage === "grad" ? "研究生放榜提示" : "放榜提示";
+  const programLabel =
+    stage === "grad"
+      ? ` · ${result.programType === "phd" ? "博士" : result.programType === "msphd" ? "硕博连读" : "硕士"}`
+      : "";
+  state.log.unshift(`${prefix}：${result.name}${programLabel} 可前往交流室对应招生委员会聊天窗复议。`);
 }
 
 function getHighlightSummary() {
@@ -12724,6 +14799,7 @@ function buildLetterContent(result) {
   const plusLine = highlights.plus.length ? `加分项：${highlights.plus.join("、")}` : "";
   const minusLine = highlights.minus.length ? `扣分项：${highlights.minus.join("、")}` : "";
   const driverLine = result.decisionDrivers?.line ? `关键驱动：${result.decisionDrivers.line}` : "";
+  const appealLine = getAdmissionsAppealChatHint(result, "undergrad");
 
   const data = {
     name: state.playerName || "同学",
@@ -12762,6 +14838,9 @@ function buildLetterContent(result) {
   }
   if (driverLine) {
     paragraphs.push(driverLine);
+  }
+  if (appealLine) {
+    paragraphs.push(appealLine);
   }
   const closing = fillTemplate(template.closing, data);
 
@@ -12901,6 +14980,7 @@ function openLetter(result) {
 
   if (!result.revealed) {
     result.revealed = true;
+    maybeLogAppealChatHint(result, "undergrad");
     updateUI();
   }
 }
@@ -12913,13 +14993,72 @@ function getUnreleasedResults() {
   return state.results.filter((result) => result.released === false);
 }
 
+function getReleaseDataVisibility() {
+  const currentResults = getStageResultScope();
+  const allReleased = currentResults.length > 0 && currentResults.every((result) => result.released !== false);
+  const allRevealed = currentResults.length > 0 && currentResults.every((result) => result.revealed);
+  const canShowAggregateReview = allReleased && allRevealed;
+  return {
+    currentResults,
+    allReleased,
+    allRevealed,
+    canShowAggregateReview,
+  };
+}
+
+function hasPendingWaitlistFlow() {
+  if (isEdReleaseStage()) return false;
+  return state.results.some((result) => result.status === "候补") && !state.waitlistUpdated;
+}
+
+function canChooseFinalOfferNow() {
+  const visibleResults = getStageResultScope();
+  if (!visibleResults.length) return false;
+  const admitted = visibleResults.filter((result) => result.status === "录取");
+  if (!admitted.length) return false;
+  const allReleased = visibleResults.every((result) => result.released !== false);
+  const allRevealed = visibleResults.every((result) => result.revealed);
+  if (!allReleased || !allRevealed) return false;
+  if (hasPendingWaitlistFlow()) return false;
+  return true;
+}
+
+function maybeAutoSettleEdWaitlistsForRdRelease() {
+  if (getApplicationStage() !== APPLICATION_STAGES.RD_RELEASE) return;
+  const pendingEdWaitlists = state.results.filter((result) => result.batch === "ed" && result.status === "候补");
+  if (!pendingEdWaitlists.length) return;
+  const summary = settleWaitlistResults({
+    filter: (result) => result.batch === "ed" && result.status === "候补",
+    revealStage: APPLICATION_STAGES.RD_RELEASE,
+  });
+  if (summary.admitNames.length || summary.rejectNames.length) {
+    state.log.unshift(
+      `ED 候补结果已并入 RD 放榜：${[
+        summary.admitNames.length ? `转录取 ${summary.admitNames.join("、")}` : "",
+        summary.rejectNames.length ? `转拒绝 ${summary.rejectNames.join("、")}` : "",
+      ]
+        .filter(Boolean)
+        .join("；")}`,
+    );
+  }
+}
+
+function isWaitlistFollowupVisibleInStage(result, stage = getApplicationStage()) {
+  if (!result || typeof result !== "object") return false;
+  const revealStage = String(result.waitlistRevealStage || "").trim();
+  if (!revealStage || revealStage !== stage) return false;
+  return result.status === "录取" || result.status === "拒绝";
+}
+
 function getStageResultScope() {
   const stage = getApplicationStage();
   if (stage === APPLICATION_STAGES.ED_RELEASE) {
     return state.results.filter((result) => result.batch === "ed");
   }
   if (stage === APPLICATION_STAGES.RD_RELEASE) {
-    return state.results.filter((result) => result.batch === "rd");
+    return state.results.filter(
+      (result) => result.batch === "rd" || isWaitlistFollowupVisibleInStage(result, APPLICATION_STAGES.RD_RELEASE),
+    );
   }
   return getVisibleResults();
 }
@@ -12947,15 +15086,20 @@ function releaseNextResultBatch() {
       state.resultReleaseStage = "complete";
       state.finalChoice = edAdmit.id;
       state.combinedDegreeSchoolId = edAdmit.id;
-      state.combinedDegreeEligible = evaluateCombinedDegreeEligibility(edAdmit);
+      state.combinedDegreeEligible = true;
       state.combinedDegreeApplied = false;
       state.combinedDegreeApproved = false;
+      state.combinedDegreeLastWindow = null;
+      state.directPhdApplied = false;
+      state.directPhdApproved = false;
+      state.directPhdSchoolId = null;
+      state.directPhdLastWindow = null;
       resetHigherEducationState();
       state.log.unshift(`ED 录取生效：${edAdmit.name}，RD 申请关闭。`);
       const admitSchool = UNIVERSITIES.find((item) => item.id === edAdmit.id) || null;
-      const canApplyCombinedDoctoral = admitSchool ? canApplyCombinedDoctoralForSchool(admitSchool, edAdmit) : false;
+      const combinedActions = admitSchool ? getAdmissionsQuickActions(`admissions-${edAdmit.id}`, admitSchool) : [];
       queueAdmissionsCombinedPrompt(edAdmit.id);
-      if (state.combinedDegreeEligible || canApplyCombinedDoctoral) {
+      if (combinedActions.length) {
         state.log.unshift("招生官已自动发来连读申请提示：请前往对应学校招生委员会聊天窗口提交。");
       } else {
         state.log.unshift("招生官已自动发来提示：可前往对应学校招生委员会聊天窗口咨询连读申请条件。");
@@ -12971,7 +15115,6 @@ function releaseNextResultBatch() {
     state.resultReleaseStage = "regular";
     state.selectedSchools = new Set();
     state.schoolEssays = {};
-    state.schoolRounds = {};
     state.applicationStructurePenalty = 0;
     state.timeBudget = getApplicationTimeBudget();
     state.timeUsed = 0;
@@ -13044,7 +15187,8 @@ function renderResults() {
     renderFinanceForecast();
     return;
   }
-  const visibleResults = getStageResultScope();
+  const releaseVisibility = getReleaseDataVisibility();
+  const visibleResults = releaseVisibility.currentResults;
   const unreleasedResults = visibleResults.filter((result) => result.released === false);
   const allReleased = unreleasedResults.length === 0;
   if (!visibleResults.length) {
@@ -13068,6 +15212,7 @@ function renderResults() {
   let aidSum = 0;
   let netCostSum = 0;
   const overallWaitlistCount = state.results.filter((item) => item.status === "候补").length;
+  const hasAppealHint = hasAdmissionsAppealChatHint(visibleResults, "undergrad");
 
   visibleResults.forEach((result) => {
     if (result.status === "录取") admitCount += 1;
@@ -13122,10 +15267,13 @@ function renderResults() {
         <span class="sealed-tag">点击查看招生邮件</span>
       `;
     } else {
-      const roundLine = result.roundChoice
-        ? `<small>申请轮次：${
+    const roundLine = result.roundChoice
+      ? `<small>申请轮次：${
             ROUND_CHOICES.find((item) => item.id === result.roundChoice)?.name || result.roundChoice
           }</small>`
+      : "";
+      const waitlistFollowupLine = isWaitlistFollowupVisibleInStage(result)
+        ? `<small>补充邮件：候补结果更新</small>`
         : "";
       const withdrawLine =
         result.status === "撤回" ? `<small class="muted">ED 绑定后撤回其他申请</small>` : "";
@@ -13150,11 +15298,15 @@ function renderResults() {
         result.tips?.length && result.status !== "录取"
           ? `<small>建议：${result.tips.join("；")}</small>`
           : "";
+      const appealLine = getAdmissionsAppealChatHint(result, "undergrad")
+        ? `<small class="muted">${getAdmissionsAppealChatHint(result, "undergrad")}</small>`
+        : "";
       card.innerHTML = `
         <strong>${result.name}</strong>
         <span class="${statusClass}">${result.status}</span>
         <small>${qsLabel}</small>
         ${roundLine}
+        ${waitlistFollowupLine}
         ${withdrawLine}
         <small>命中率约 ${(result.chance * 100).toFixed(1)}%</small>
         <small>学术 ${((result.academicScore ?? 0) * 100).toFixed(0)} · 活动 ${(
@@ -13169,6 +15321,7 @@ function renderResults() {
         ${explainLine}
         ${explainSummaryLine}
         ${tipLine}
+        ${appealLine}
         <small class="muted">点击查看邮件（内含结果因果链）</small>
       `;
     }
@@ -13193,11 +15346,14 @@ function renderResults() {
   } else {
     resultSummary.textContent = `${batchLabel} 已查看 ${revealedCount} / ${visibleResults.length} 封招生邮件。`;
   }
+  if (hasAppealHint) {
+    resultSummary.textContent += " 若对候补/拒绝有异议，可前往交流室切换到对应学校招生委员会，通过聊天窗复议。";
+  }
 
   const admitRate = visibleResults.length ? admitCount / visibleResults.length : 0;
   const admitResults = visibleResults.filter((result) => result.status === "录取");
   const fitBase = admitResults.length ? admitResults : visibleResults;
-  if (!fitBase.length) {
+  if (!fitBase.length || !releaseVisibility.canShowAggregateReview) {
     outcomeMetrics.innerHTML = "";
     updateReleaseControls(visibleResults, allRevealed);
     renderPostAdmitPanel();
@@ -13255,6 +15411,8 @@ function renderResults() {
 
   updateReleaseControls(visibleResults, allRevealed);
   const admitted = visibleResults.filter((result) => result.status === "录取");
+  const canChooseFinalOffer = canChooseFinalOfferNow();
+  const pendingWaitlistFlow = hasPendingWaitlistFlow();
 
   if (isEdReleaseStage()) {
     waitlistNote.textContent = "ED 阶段暂不更新候补，进入 RD 放榜后可处理。";
@@ -13285,9 +15443,12 @@ function renderResults() {
       resolveWaitlistBtn.disabled = true;
     }
 
-    if (admitted.length && !state.finalChoice && allReleased && allRevealed) {
+    if (admitted.length && !state.finalChoice && canChooseFinalOffer) {
       offerNote.textContent = `你有 ${admitted.length} 所录取学校可选择最终去向。`;
       chooseOfferBtn.disabled = false;
+    } else if (pendingWaitlistFlow && !state.finalChoice) {
+      offerNote.textContent = "请先更新并查看完所有候补结果，再选择最终去向。";
+      chooseOfferBtn.disabled = true;
     } else if ((!allReleased || !allRevealed) && !state.finalChoice) {
       offerNote.textContent = "建议先查看完所有邮件后再确定最终去向。";
       chooseOfferBtn.disabled = true;
@@ -13305,16 +15466,13 @@ function renderResults() {
 
   if (extraYearNote && extraYearBtn) {
     const canExtraYear = state.extraYearCount < 1 && !state.undergradStarted;
-    const noAdmissionFree = !isEdReleaseStage() && allReleased && allRevealed && admitted.length === 0;
     extraYearBtn.disabled = !canExtraYear;
     if (state.undergradStarted) {
       extraYearNote.textContent = "已进入本科阶段，无法再选择再读一年。";
     } else if (state.extraYearCount >= 1) {
       extraYearNote.textContent = "已使用过再读一年选项。";
-    } else if (noAdmissionFree) {
-      extraYearNote.textContent = "当前无任何录取，可免费再读一年（无支出）。";
     } else {
-      extraYearNote.textContent = `可选择再读一年（花费 ${formatUsd(EXTRA_YEAR_COST)}，压力 +${EXTRA_YEAR_STRESS}，家庭补贴 ${formatUsd(EXTRA_YEAR_STIPEND)}）。`;
+      extraYearNote.textContent = `可选择再读一年（花费 ${formatUsd(EXTRA_YEAR_COST)}，压力 +${EXTRA_YEAR_STRESS}；若现金不足会自动记入贷款）。`;
     }
   }
   renderPostAdmitPanel();
@@ -13477,7 +15635,8 @@ function getReviewSuggestions() {
 
 function renderReviewPanel() {
   if (!reviewPanel || !reviewRadar || !reviewReplay || !reviewSuggestions) return;
-  if (!state.started || state.termIndex !== 7 || !state.results.length) {
+  const releaseVisibility = getReleaseDataVisibility();
+  if (!state.started || state.termIndex !== 7 || !state.results.length || !releaseVisibility.canShowAggregateReview) {
     reviewPanel.classList.add("hidden");
     reviewRadar.innerHTML = "";
     reviewReplay.innerHTML = "";
@@ -13519,7 +15678,8 @@ function renderReviewPanel() {
 
 function renderFinanceForecast() {
   if (!financePanel || !financeForecast) return;
-  if (!state.started || state.termIndex !== 7 || !state.results.length) {
+  const releaseVisibility = getReleaseDataVisibility();
+  if (!state.started || state.termIndex !== 7 || !state.results.length || !releaseVisibility.canShowAggregateReview) {
     financePanel.classList.add("hidden");
     financeForecast.innerHTML = "";
     return;
@@ -13761,16 +15921,13 @@ function runBalanceCalibration() {
   renderReviewPanel();
 }
 
-function resolveWaitlist() {
-  if (!guardActionByMainStage("resolveWaitlist")) return;
-  if (isEdReleaseStage()) return;
-  if (!state.results.length || state.waitlistUpdated) return;
-  if (getUnreleasedResults().length > 0) return;
+function settleWaitlistResults({ filter = null, revealStage = APPLICATION_STAGES.RD_RELEASE } = {}) {
   let updatedCount = 0;
   const admitNames = [];
   const rejectNames = [];
   state.results = state.results.map((result) => {
-    if (result.status !== "候补") return result;
+    const shouldProcess = typeof filter === "function" ? filter(result) : result.status === "候补";
+    if (!shouldProcess) return result;
     const evaluation = evaluateApplication(result);
     const upgradeChance = clamp(evaluation.chance * 0.6 + evaluation.fitScore * 0.15, 0.05, 0.6);
     const roll = Math.random();
@@ -13814,6 +15971,7 @@ function resolveWaitlist() {
         explainability,
         renewalPolicy,
         estimatedFourYearCost: estimated ? estimated.total : null,
+        waitlistRevealStage: revealStage,
         revealed: false,
       };
     }
@@ -13843,21 +16001,29 @@ function resolveWaitlist() {
       explainability,
       renewalPolicy: null,
       estimatedFourYearCost: null,
+      waitlistRevealStage: revealStage,
       revealed: false,
     };
   });
+  return { updatedCount, admitNames, rejectNames };
+}
 
+function resolveWaitlist() {
+  if (!guardActionByMainStage("resolveWaitlist")) return;
+  if (isEdReleaseStage()) return;
+  if (!state.results.length || state.waitlistUpdated) return;
+  if (getUnreleasedResults().length > 0) return;
+  const summary = settleWaitlistResults({
+    filter: (result) => result.status === "候补",
+    revealStage: APPLICATION_STAGES.RD_RELEASE,
+  });
   state.waitlistUpdated = true;
-  state.log.unshift(
-    updatedCount > 0
-      ? `候补更新：新增录取 ${updatedCount} 所。`
-      : "候补更新：未获得额外录取。",
-  );
-  if (admitNames.length) {
-    state.log.unshift(`候补转录取：${admitNames.join("、")}`);
+  state.log.unshift(summary.updatedCount > 0 ? `候补更新：新增录取 ${summary.updatedCount} 所。` : "候补更新：未获得额外录取。");
+  if (summary.admitNames.length) {
+    state.log.unshift(`候补转录取：${summary.admitNames.join("、")}`);
   }
-  if (rejectNames.length) {
-    state.log.unshift(`候补转拒绝：${rejectNames.join("、")}`);
+  if (summary.rejectNames.length) {
+    state.log.unshift(`候补转拒绝：${summary.rejectNames.join("、")}`);
   }
   pushReplayNode("候补结果更新");
   updateAchievements();
@@ -13896,6 +16062,14 @@ function updateAchievements() {
 function openOfferDialog() {
   if (!guardActionByMainStage("openOfferDialog")) return;
   if (!offerDialog) return;
+  if (!canChooseFinalOfferNow()) {
+    if (offerNote) {
+      offerNote.textContent = hasPendingWaitlistFlow()
+        ? "请先更新并查看完所有候补结果，再选择最终去向。"
+        : "请先查看完所有录取结果后再选择最终去向。";
+    }
+    return;
+  }
   const admitted = state.results.filter((result) => result.status === "录取");
   if (!admitted.length) return;
   offerOptions.innerHTML = "";
@@ -13925,6 +16099,14 @@ function openOfferDialog() {
 }
 
 function chooseOffer(schoolId) {
+  if (!canChooseFinalOfferNow()) {
+    if (offerNote) {
+      offerNote.textContent = hasPendingWaitlistFlow()
+        ? "请先更新并查看完所有候补结果，再选择最终去向。"
+        : "请先查看完所有录取结果后再选择最终去向。";
+    }
+    return;
+  }
   state.finalChoice = schoolId;
   if (state.termIndex === 7 && (isEdReleaseStage() || isRdReleaseStage())) {
     state.applicationStage = APPLICATION_STAGES.COMPLETE;
@@ -13934,13 +16116,18 @@ function chooseOffer(schoolId) {
   if (chosen) {
     state.log.unshift(`最终去向：${chosen.name}`);
     state.combinedDegreeSchoolId = chosen.id;
-    state.combinedDegreeEligible = evaluateCombinedDegreeEligibility(chosen);
+    state.combinedDegreeEligible = true;
     state.combinedDegreeApplied = false;
     state.combinedDegreeApproved = false;
+    state.combinedDegreeLastWindow = null;
+    state.directPhdApplied = false;
+    state.directPhdApproved = false;
+    state.directPhdSchoolId = null;
+    state.directPhdLastWindow = null;
     const school = UNIVERSITIES.find((item) => item.id === chosen.id) || null;
-    const canApplyCombinedDoctoral = school ? canApplyCombinedDoctoralForSchool(school, chosen) : false;
+    const combinedActions = school ? getAdmissionsQuickActions(`admissions-${chosen.id}`, school) : [];
     queueAdmissionsCombinedPrompt(chosen.id);
-    if (state.combinedDegreeEligible || canApplyCombinedDoctoral) {
+    if (combinedActions.length) {
       state.log.unshift("招生官已自动发来连读申请提示：请前往对应学校招生委员会聊天窗口提交。");
     } else {
       state.log.unshift("招生官已自动发来提示：可前往对应学校招生委员会聊天窗口咨询连读申请条件。");
@@ -13950,6 +16137,11 @@ function chooseOffer(schoolId) {
     state.combinedDegreeEligible = false;
     state.combinedDegreeApplied = false;
     state.combinedDegreeApproved = false;
+    state.combinedDegreeLastWindow = null;
+    state.directPhdApplied = false;
+    state.directPhdApproved = false;
+    state.directPhdSchoolId = null;
+    state.directPhdLastWindow = null;
   }
   resetHigherEducationState();
   pushReplayNode("确定最终去向");
@@ -14111,12 +16303,57 @@ function evaluateCombinedDegreeEligibility(result) {
   return composite >= 0.72 && fit >= 0.72 && academic >= 0.66;
 }
 
+function getUndergradCombinedWindowKey(schoolId = state.finalChoice) {
+  if (!schoolId || !state.finalChoice || state.finalChoice !== schoolId) return null;
+  if (!state.undergradStarted) return "pre_undergrad";
+  if (state.undergradGraduated) return null;
+  return getCurrentUndergradTerm() >= UNDERGRAD_TOTAL_TERMS - 1 ? "late_undergrad" : null;
+}
+
+function getMastersCombinedWindowKey(schoolId = state.mastersSchoolId || state.selectedGradOfferId) {
+  if (!schoolId) return null;
+  if (!state.mastersStarted) {
+    const gradResult = getAdmissionsGradResult(schoolId);
+    const preMastersEligible =
+      gradResult &&
+      gradResult.status === "录取" &&
+      gradResult.revealed !== false &&
+      gradResult.programType !== "phd" &&
+      state.postGradPath === POSTGRAD_PATHS.MASTERS;
+    return preMastersEligible ? "pre_masters" : null;
+  }
+  if (!state.mastersGraduated && state.mastersSchoolId === schoolId && getCurrentMastersTerm() === 1) {
+    return "pre_masters";
+  }
+  if (state.mastersGraduated || state.mastersSchoolId !== schoolId) return null;
+  return getCurrentMastersTerm() >= MASTERS_TOTAL_TERMS - 1 ? "late_masters" : null;
+}
+
+function getCombinedWindowLabel(windowKey) {
+  if (windowKey === "pre_undergrad") return "本科第一学期前";
+  if (windowKey === "late_undergrad") return "本科最后两个学期";
+  if (windowKey === "pre_masters") return "硕士入学前/第一学期";
+  if (windowKey === "late_masters") return "硕士最后两个学期";
+  return "当前时间窗口";
+}
+
+function hasUnusedCombinedWindow(lastWindowKey, currentWindowKey, approved) {
+  if (approved) return false;
+  if (!currentWindowKey) return false;
+  return lastWindowKey !== currentWindowKey;
+}
+
 function canApplyCombinedDegreeForSchool(school, result) {
   if (!school || !result || result.status !== "录取") return false;
   if (!state.finalChoice || state.finalChoice !== school.id) return false;
   if (state.mastersStarted || state.phdStarted) return false;
+  const windowKey = getUndergradCombinedWindowKey(school.id);
+  if (!windowKey) return false;
+  if (windowKey === "pre_undergrad") {
+    return true;
+  }
 
-  if (state.undergradStarted || state.undergradGraduated) {
+  if (windowKey === "late_undergrad") {
     const profile = state.undergradProfile || getDefaultUndergradProfile();
     const gpa = clamp(((profile.gpa || 2.8) - 2.2) / 1.8, 0, 1);
     const research = clamp((profile.research || 0) / 100, 0, 1);
@@ -14204,7 +16441,7 @@ function startUndergradJourney() {
   state.jobOutcome = null;
   const sameCombinedSchool = state.combinedDegreeSchoolId === chosen.id;
   state.combinedDegreeSchoolId = chosen.id;
-  state.combinedDegreeEligible = evaluateCombinedDegreeEligibility(chosen);
+  state.combinedDegreeEligible = false;
   if (!sameCombinedSchool) {
     state.combinedDegreeApplied = false;
     state.combinedDegreeApproved = false;
@@ -14213,8 +16450,6 @@ function startUndergradJourney() {
   state.log.unshift(`本科阶段启动：${chosen.name}`);
   if (state.combinedDegreeApproved) {
     state.log.unshift("本硕连读资格已生效：本科阶段将获得额外科研支持。");
-  } else if (state.combinedDegreeEligible) {
-    state.log.unshift("你符合本硕连读申请资格，可在招生委员会对话中申请。");
   }
   pushReplayNode("本科阶段开始");
   updateAchievements();
@@ -14274,6 +16509,169 @@ function applyUndergradYearAction(actionId) {
   updateUI();
 }
 
+function resetJobPathState() {
+  state.jobOutcome = null;
+  state.jobSelectedCompanies = [];
+  if (state.chatContext) state.chatContext.interviewSession = null;
+}
+
+function prepareMastersApplicationPath() {
+  state.postGradPath = POSTGRAD_PATHS.MASTERS;
+  state.gradApplicationType = "masters";
+  state.gradSelectedSchools = [];
+  state.gradResults = [];
+  state.selectedGradOfferId = null;
+  state.higherEdTermState.masters = createHigherEdStageTermState();
+  state.msPhdApplied = false;
+  state.msPhdApproved = false;
+  state.msPhdSchoolId = null;
+  resetJobPathState();
+  state.gradProgramMode = "masters";
+  state.mastersApplyMajorId = getValidMajorId(state.mastersApplyMajorId || state.majorId);
+  state.log.unshift("毕业去向：选择硕士申请");
+  if (postGradNote) {
+    postGradNote.textContent = "请选择硕士目标学校并提交申请。";
+  }
+}
+
+function startApprovedMastersPath(schoolId) {
+  const school = UNIVERSITIES.find((item) => item.id === schoolId);
+  if (!school) return false;
+  state.postGradPath = POSTGRAD_PATHS.MASTERS;
+  state.gradApplicationType = null;
+  state.gradSelectedSchools = [];
+  state.gradResults = [];
+  state.selectedGradOfferId = null;
+  state.gradProgramMode = "masters";
+  resetJobPathState();
+  state.mastersApplyMajorId = getValidMajorId(state.mastersApplyMajorId || state.majorId);
+  startMastersJourney({
+    id: school.id,
+    name: school.name,
+    programType: "masters",
+    majorId: state.mastersApplyMajorId,
+    fromCombinedTrack: true,
+  });
+  state.log.unshift("连读通道生效：跳过硕士申请，直接进入硕士培养。");
+  if (postGradNote) {
+    postGradNote.textContent = `连读通道生效：已直入 ${school.name} 硕士阶段。`;
+  }
+  return true;
+}
+
+function preparePhdApplicationPath() {
+  state.postGradPath = POSTGRAD_PATHS.PHD;
+  resetJobPathState();
+  state.gradApplicationType = "phd";
+  state.gradSelectedSchools = [];
+  state.gradResults = [];
+  state.selectedGradOfferId = null;
+  state.higherEdTermState.phd = createHigherEdStageTermState();
+  state.phdApplyMajorId = getValidMajorId(state.phdApplyMajorId || state.mastersMajorId || state.majorId);
+  state.log.unshift("毕业去向：选择博士申请");
+  if (postGradNote) postGradNote.textContent = "请选择博士目标学校并提交申请。";
+}
+
+function startApprovedPhdPath(track) {
+  if (track === "msphd" && state.mastersGraduated && state.msPhdApproved && state.msPhdSchoolId === state.mastersSchoolId) {
+    startPhdJourney({
+      id: state.msPhdSchoolId,
+      name: state.mastersSchoolName,
+      track: "msphd",
+      majorId: state.phdApplyMajorId || state.mastersMajorId || state.majorId,
+    });
+    if (postGradNote) postGradNote.textContent = "硕博连读通道生效，博士阶段已启动。";
+    return true;
+  }
+  if (
+    track === "direct" &&
+    state.mastersGraduated &&
+    state.directPhdApproved &&
+    state.directPhdSchoolId &&
+    state.directPhdSchoolId === state.mastersSchoolId
+  ) {
+    startPhdJourney({
+      id: state.directPhdSchoolId,
+      name: state.mastersSchoolName,
+      track: "direct",
+      majorId: state.phdApplyMajorId || state.mastersMajorId || state.majorId,
+    });
+    if (postGradNote) postGradNote.textContent = "本硕博连读通道生效，博士阶段已启动。";
+    return true;
+  }
+  return false;
+}
+
+function prepareJobPath() {
+  state.postGradPath = POSTGRAD_PATHS.JOB;
+  state.gradApplicationType = null;
+  state.gradSelectedSchools = [];
+  state.gradResults = [];
+  state.selectedGradOfferId = null;
+  resetJobPathState();
+  state.log.unshift("毕业去向：选择直接就业");
+  if (postGradNote) {
+    postGradNote.textContent = `请选择目标公司（至少 ${JOB_SELECTION_MIN} 家，最多 ${JOB_SELECTION_MAX} 家）后提交投递。`;
+  }
+}
+
+function buildCombinedTrackChoiceDecision(stage, trackMeta = {}) {
+  const schoolName = trackMeta.schoolName || "当前学校";
+  if (stage === "masters") {
+    const trackLabel = trackMeta.track === "direct" ? "本硕博连读" : "本硕连读";
+    return {
+      id: `combined-track-masters-${trackMeta.schoolId || "school"}`,
+      title: `${trackLabel}选择`,
+      desc: `${schoolName} 已给你 ${trackLabel}通道。你现在可以直接入读硕士，也可以改走常规硕士申请，或者先去找工作，不会被强制锁死在连读路线里。`,
+      transient: true,
+      silentLog: true,
+      options: [
+        {
+          label: "直接入读硕士",
+          desc: `使用 ${trackLabel}通道，直接进入 ${schoolName} 硕士阶段。`,
+          decisionAction: { type: "start-approved-masters", schoolId: trackMeta.schoolId },
+        },
+        {
+          label: "改走常规硕士申请",
+          desc: "放弃本次直入机会，重新自行选校申请硕士。",
+          decisionAction: { type: "prepare-masters-application" },
+        },
+        {
+          label: "直接找工作",
+          desc: "保留你拿到过连读资格这段经历，但当前回合切换到就业路线。",
+          decisionAction: { type: "prepare-job-path" },
+        },
+      ],
+    };
+  }
+
+  const trackLabel = trackMeta.track === "direct" ? "本硕博连读" : "硕博连读";
+  return {
+    id: `combined-track-phd-${trackMeta.schoolId || "school"}-${trackMeta.track || "track"}`,
+    title: `${trackLabel}选择`,
+    desc: `${schoolName} 已给你 ${trackLabel}通道。你现在可以直接进入博士，也可以改走常规博士申请，或者先去找工作。`,
+    transient: true,
+    silentLog: true,
+    options: [
+      {
+        label: "直接进入博士",
+        desc: `使用 ${trackLabel}通道，直接开启 ${schoolName} 博士阶段。`,
+        decisionAction: { type: "start-approved-phd", track: trackMeta.track },
+      },
+      {
+        label: "改走常规博士申请",
+        desc: "放弃本次直升机会，重新自行选校申请博士。",
+        decisionAction: { type: "prepare-phd-application" },
+      },
+      {
+        label: "直接找工作",
+        desc: "保留连读资格记录，但当前回合先转去就业路线。",
+        decisionAction: { type: "prepare-job-path" },
+      },
+    ],
+  };
+}
+
 function choosePostGradPath(path) {
   if (!guardActionByMainStage("choosePostGradPath")) return;
   if (!state.undergradGraduated) {
@@ -14300,49 +16698,16 @@ function choosePostGradPath(path) {
       null;
     if (directMastersSchoolId) {
       const school = UNIVERSITIES.find((item) => item.id === directMastersSchoolId);
-      if (school) {
-        state.postGradPath = POSTGRAD_PATHS.MASTERS;
-        state.gradApplicationType = null;
-        state.gradSelectedSchools = [];
-        state.gradResults = [];
-        state.selectedGradOfferId = null;
-        state.jobOutcome = null;
-        state.jobSelectedCompanies = [];
-        if (state.chatContext) state.chatContext.interviewSession = null;
-        state.mastersApplyMajorId = getValidMajorId(state.mastersApplyMajorId || state.majorId);
-        startMastersJourney({
-          id: school.id,
-          name: school.name,
-          programType: "masters",
-          majorId: state.mastersApplyMajorId,
-          fromCombinedTrack: true,
-        });
-        state.log.unshift("连读通道生效：跳过硕士申请，直接进入硕士培养。");
-        if (postGradNote) {
-          postGradNote.textContent = `连读通道生效：已直入 ${school.name} 硕士阶段。`;
-        }
-        updateUI();
-        return;
-      }
+      openDecision(
+        buildCombinedTrackChoiceDecision("masters", {
+          schoolId: directMastersSchoolId,
+          schoolName: school?.name || state.mastersSchoolName || "目标学校",
+          track: state.directPhdApproved && state.directPhdSchoolId === directMastersSchoolId ? "direct" : "combined",
+        }),
+      );
+      return;
     }
-    state.postGradPath = POSTGRAD_PATHS.MASTERS;
-    state.gradApplicationType = "masters";
-    state.gradSelectedSchools = [];
-    state.gradResults = [];
-    state.selectedGradOfferId = null;
-    state.higherEdTermState.masters = createHigherEdStageTermState();
-    state.msPhdApplied = false;
-    state.msPhdApproved = false;
-    state.msPhdSchoolId = null;
-    state.jobOutcome = null;
-    state.jobSelectedCompanies = [];
-    if (state.chatContext) state.chatContext.interviewSession = null;
-    state.gradProgramMode = "masters";
-    state.mastersApplyMajorId = getValidMajorId(state.mastersApplyMajorId || state.majorId);
-    state.log.unshift("毕业去向：选择硕士申请");
-    if (postGradNote) {
-      postGradNote.textContent = "请选择硕士目标学校并提交申请。";
-    }
+    prepareMastersApplicationPath();
     updateAchievements();
     updateUI();
     return;
@@ -14357,47 +16722,27 @@ function choosePostGradPath(path) {
       if (postGradNote) postGradNote.textContent = state.phdGraduated ? "你已完成博士阶段，可直接就业。" : "博士培养已进行中。";
       return;
     }
-    state.postGradPath = POSTGRAD_PATHS.PHD;
-    state.jobOutcome = null;
-    state.jobSelectedCompanies = [];
-    if (state.chatContext) state.chatContext.interviewSession = null;
-
-    if (state.mastersGraduated && state.msPhdApproved && state.msPhdSchoolId && state.msPhdSchoolId === state.mastersSchoolId) {
-      startPhdJourney({
-        id: state.msPhdSchoolId,
-        name: state.mastersSchoolName,
-        track: "msphd",
-        majorId: state.phdApplyMajorId || state.mastersMajorId || state.majorId,
-      });
-      if (postGradNote) postGradNote.textContent = "硕博连读通道生效，博士阶段已启动。";
-      updateUI();
-      return;
-    }
-    if (
-      state.mastersGraduated &&
-      state.directPhdApproved &&
-      state.directPhdSchoolId &&
-      state.directPhdSchoolId === state.mastersSchoolId
-    ) {
-      startPhdJourney({
-        id: state.directPhdSchoolId,
-        name: state.mastersSchoolName,
-        track: "direct",
-        majorId: state.phdApplyMajorId || state.mastersMajorId || state.majorId,
-      });
-      if (postGradNote) postGradNote.textContent = "本硕博连读通道生效，博士阶段已启动。";
-      updateUI();
+    const directTrack =
+      state.mastersGraduated && state.msPhdApproved && state.msPhdSchoolId && state.msPhdSchoolId === state.mastersSchoolId
+        ? "msphd"
+        : state.mastersGraduated &&
+            state.directPhdApproved &&
+            state.directPhdSchoolId &&
+            state.directPhdSchoolId === state.mastersSchoolId
+          ? "direct"
+          : null;
+    if (directTrack) {
+      openDecision(
+        buildCombinedTrackChoiceDecision("phd", {
+          schoolId: state.mastersSchoolId,
+          schoolName: state.mastersSchoolName || "当前学校",
+          track: directTrack,
+        }),
+      );
       return;
     }
 
-    state.gradApplicationType = "phd";
-    state.gradSelectedSchools = [];
-    state.gradResults = [];
-    state.selectedGradOfferId = null;
-    state.higherEdTermState.phd = createHigherEdStageTermState();
-    state.phdApplyMajorId = getValidMajorId(state.phdApplyMajorId || state.mastersMajorId || state.majorId);
-    state.log.unshift("毕业去向：选择博士申请");
-    if (postGradNote) postGradNote.textContent = "请选择博士目标学校并提交申请。";
+    preparePhdApplicationPath();
     updateAchievements();
     updateUI();
     return;
@@ -14407,18 +16752,7 @@ function choosePostGradPath(path) {
     if (postGradNote) postGradNote.textContent = "当前学位培养未完成，暂不能切换为就业。";
     return;
   }
-  state.postGradPath = POSTGRAD_PATHS.JOB;
-  state.gradApplicationType = null;
-  state.gradSelectedSchools = [];
-  state.gradResults = [];
-  state.selectedGradOfferId = null;
-  state.jobOutcome = null;
-  state.jobSelectedCompanies = [];
-  if (state.chatContext) state.chatContext.interviewSession = null;
-  state.log.unshift("毕业去向：选择直接就业");
-  if (postGradNote) {
-    postGradNote.textContent = `请选择目标公司（至少 ${JOB_SELECTION_MIN} 家，最多 ${JOB_SELECTION_MAX} 家）后提交投递。`;
-  }
+  prepareJobPath();
   updateAchievements();
   updateUI();
 }
@@ -14586,6 +16920,7 @@ function revealNextGradResult() {
   }
   next.revealed = true;
   state.log.unshift(`研究生拆信：${next.name} · ${next.programType === "phd" ? "博士" : next.programType === "msphd" ? "硕博连读" : "硕士"} · ${next.status}`);
+  maybeLogAppealChatHint(next, "grad");
   if (state.gradResults.every((item) => item.revealed)) {
     state.log.unshift("研究生结果邮件已全部拆完。");
   }
@@ -15345,8 +17680,35 @@ function formatHiringStageReason(stage) {
   return HIRING_PIPELINE_STAGE_REASON[stage] || "流程评估";
 }
 
+function getCompanyRouteFit(company) {
+  const dominant = getDominantRouteProfile();
+  if (!company || !dominant.id) return 0.6;
+  const text = `${company.name || ""} ${company.role || ""}`.toLowerCase();
+  if (dominant.id === "research") {
+    if (/research|scientist|lab|r&d|quant/.test(text)) return 0.88;
+    if (/engineer|data/.test(text)) return 0.74;
+  }
+  if (dominant.id === "career") {
+    if (/engineer|product|consult|analyst|manager|investment|strategy|operations/.test(text)) return 0.88;
+  }
+  if (dominant.id === "impact") {
+    if (/policy|ngo|public|global|social|government/.test(text)) return 0.88;
+  }
+  if (dominant.id === "leadership") {
+    if (/manager|lead|operations|program/.test(text)) return 0.84;
+  }
+  if (dominant.id === "creative") {
+    if (/design|media|content|brand|creative/.test(text)) return 0.88;
+  }
+  if (dominant.id === "law") {
+    if (/legal|compliance|policy|regulatory/.test(text)) return 0.9;
+  }
+  return 0.64;
+}
+
 function evaluateCompanyApplication(company, candidateSignal, universitySignal, options = {}) {
   const majorFit = getJobMajorFit(company);
+  const routeFit = getCompanyRouteFit(company);
   const marketPhase = getMarketPhaseById(state.marketCycle?.phaseId || "");
   const marketDifficultyShift = Number(marketPhase?.difficultyShift || 0);
   const marketSalaryMultiplier = Number(marketPhase?.salaryMultiplier || 1);
@@ -15360,7 +17722,8 @@ function evaluateCompanyApplication(company, candidateSignal, universitySignal, 
     0.08 +
     candidateSignal * 0.52 +
     universitySignal * 0.24 +
-    majorFit * 0.14 +
+    majorFit * 0.11 +
+    routeFit * 0.05 +
     combinedBonus +
     firstGenBonus +
     degreeBonus +
@@ -15376,7 +17739,8 @@ function evaluateCompanyApplication(company, candidateSignal, universitySignal, 
   const overqualifiedSignal =
     candidateSignal * 0.56 +
     universitySignal * 0.24 +
-    majorFit * 0.2 -
+    majorFit * 0.15 +
+    routeFit * 0.05 -
     effectiveDifficulty * 0.78 +
     degreeBonus * 0.2;
   const directHireEligible =
@@ -15416,6 +17780,7 @@ function evaluateCompanyApplication(company, candidateSignal, universitySignal, 
   if (majorFit >= 0.95) reasonParts.push("专业高度匹配");
   else if (majorFit >= 0.8) reasonParts.push("专业方向匹配");
   else reasonParts.push("专业匹配一般");
+  reasonParts.push(routeFit >= 0.82 ? "路线叙事和岗位风格贴合" : routeFit <= 0.6 ? "成长路线和岗位风格略有偏差" : "成长路线与岗位基本相容");
   if (options.educationLabel) reasonParts.push(options.educationLabel);
   reasonParts.push(`候选表现分 ${(candidateSignal * 100).toFixed(0)}`);
   reasonParts.push(`院校信号 ${(universitySignal * 100).toFixed(0)}`);
@@ -15641,12 +18006,18 @@ function chooseFinalJobOffer(companyId) {
   updateUI();
 }
 
+function buildPendingInterviewHoldNotice(pendingCount, revealedOfferCount = 0) {
+  const offerPrefix = revealedOfferCount > 0 ? `你当前已有 ${revealedOfferCount} 个已拆封 Offer，` : "";
+  return `${offerPrefix}但还有 ${pendingCount} 家面试未完成，暂不能选择最终工作。若不想继续，请到交流室切换对应公司面试官并发送“放弃”。`;
+}
+
 function openJobOfferDialog() {
   if (!guardActionByMainStage("chooseFinalJobOffer")) return;
   if (!jobOfferDialog || !jobOfferOptions || !state.jobOutcome || !Array.isArray(state.jobOutcome.applications)) return;
   const pendingInterviews = state.jobOutcome.applications.filter((item) => item.status === "面试中").length;
   if (pendingInterviews > 0) {
-    if (careerReleaseNote) careerReleaseNote.textContent = `仍有 ${pendingInterviews} 家待面试，请先完成或放弃后再选择最终工作。`;
+    const revealedOfferCount = state.jobOutcome.applications.filter((item) => item.status === "录用" && item.revealed !== false).length;
+    if (careerReleaseNote) careerReleaseNote.textContent = buildPendingInterviewHoldNotice(pendingInterviews, revealedOfferCount);
     return;
   }
   const offerList = state.jobOutcome.applications.filter((item) => item.status === "录用" && item.revealed !== false);
@@ -15783,6 +18154,10 @@ function buildCareerSettlementTimelineLines(limit = 28) {
 
 function buildCareerSettlementCausalLines(limit = 10) {
   const lines = [];
+  const dominantRoute = getDominantRouteProfile();
+  if (dominantRoute.id) {
+    lines.push(`路线因果：主路线为${dominantRoute.label}，这决定了你更容易放大的机会类型。`);
+  }
   const finalSchool = getFinalChoiceResult();
   if (finalSchool?.decisionDrivers?.line) {
     lines.push(`本科录取驱动：${finalSchool.decisionDrivers.line}`);
@@ -15801,6 +18176,10 @@ function buildCareerSettlementCausalLines(limit = 10) {
   marketHistory.forEach((item) => {
     lines.push(`市场因果：${item.label || item.phaseId}（${item.stage || "career"} 第${item.term || 1}学期）`);
   });
+  const combos = (state.comboHistory || []).slice(0, 2);
+  combos.forEach((item) => {
+    lines.push(`组合技因果：${item.label}（${item.stage === "highschool" ? "高中" : getHigherEdStageLabel(item.stage)}）`);
+  });
   const apps = Array.isArray(state.jobOutcome?.applications) ? state.jobOutcome.applications : [];
   const chosen =
     state.jobOutcome?.chosenOfferCompanyId &&
@@ -15814,6 +18193,10 @@ function buildCareerSettlementCausalLines(limit = 10) {
 
 function buildCareerSettlementMissedLines(limit = 8) {
   const lines = [];
+  const headwinds = getCurrentWorldHeadwinds(2);
+  headwinds.forEach((item) => {
+    lines.push(`外部逆风：${item}`);
+  });
   const apps = Array.isArray(state.jobOutcome?.applications) ? state.jobOutcome.applications : [];
   const rejected = apps.filter((item) => item.status === "拒绝");
   rejected.slice(0, 3).forEach((item) => {
@@ -15873,6 +18256,8 @@ function renderCareerSettlement() {
   const season = state.seasonRun || {};
   const seasonRank = season.leaderboardRank ? `#${season.leaderboardRank}` : "--";
   const seasonChallenges = Array.isArray(season.completedChallenges) ? season.completedChallenges : [];
+  const dominantRoute = getDominantRouteProfile();
+  const legacy = state.legacyProgress || createDefaultLegacyProgress();
 
   careerSettlementSummary.textContent = `已确认最终工作：${chosenOffer.company} · ${chosenOffer.role}（${formatUsd(
     chosenOffer.salaryLow,
@@ -15924,6 +18309,16 @@ function renderCareerSettlement() {
       <small>市场周期</small>
       <strong>${getMarketPhaseById(state.marketCycle?.phaseId || "").label || "常态"}</strong>
       <small class="muted">薪资系数 x${Number(state.marketCycle?.salaryMultiplier || 1).toFixed(2)}</small>
+    </div>
+    <div class="outcome-card">
+      <small>人生路线</small>
+      <strong>${dominantRoute.label}</strong>
+      <small class="muted">最近组合技 ${(state.comboHistory || [])[0]?.label || "暂无"}</small>
+    </div>
+    <div class="outcome-card">
+      <small>多周目</small>
+      <strong>${legacy.completedRuns || 0} 局</strong>
+      <small class="muted">历史最佳 ${legacy.bestScore || 0} 分</small>
     </div>
   `;
 
@@ -16103,7 +18498,9 @@ function renderUndergradPanel() {
       chooseFinalJobBtn.classList.add("hidden");
     }
     if (postGradPanel) postGradPanel.classList.add("hidden");
+    if (mastersArea) mastersArea.classList.add("hidden");
     if (mastersPanel) mastersPanel.classList.add("hidden");
+    if (phdArea) phdArea.classList.add("hidden");
     if (phdPanel) phdPanel.classList.add("hidden");
     if (gradSchoolSelector) gradSchoolSelector.classList.add("hidden");
     if (jobCompanySelector) jobCompanySelector.classList.add("hidden");
@@ -16179,12 +18576,12 @@ function renderUndergradPanel() {
     startUndergradBtn.disabled = true;
     startUndergradBtn.textContent = "等待确认去向";
   } else if (!state.undergradStarted) {
-    const canApplyCombinedDoctoral =
-      (chosen.status === "录取" && canApplyCombinedDoctoralForSchool(chosen, chosen)) || false;
-    const combinedHint =
-      state.combinedDegreeEligible || canApplyCombinedDoctoral
-        ? "已解锁连读申请：先去交流室切换到该校招生委员会，可直接点击申请按钮。"
-        : "";
+    const combinedActions = getAdmissionsQuickActions(`admissions-${chosen.id}`, chosen);
+    const combinedHint = combinedActions.length
+      ? `已解锁连读申请：先去交流室切换到该校招生委员会，可直接点击 ${combinedActions
+          .map((action) => action.label)
+          .join(" / ")}。`
+      : "";
     undergradNote.textContent = `已确认本科去向：${chosen.name}。可继续模拟本科四年发展。`;
     if (undergradAiNote) undergradAiNote.textContent = "";
     if (undergradLoanNote) undergradLoanNote.textContent = "";
@@ -16250,6 +18647,16 @@ function renderUndergradPanel() {
   if (!postGradPanel || !postGradNote || !gradSchoolSelector || !postGradResults) return;
   postGradPanel.classList.toggle("hidden", !state.undergradGraduated);
   if (!state.undergradGraduated) return;
+  const inMastersStudy = state.mastersStarted && !state.mastersGraduated;
+  const inPhdStudy = state.phdStarted && !state.phdGraduated;
+  const showGradPlanning = !inMastersStudy && !inPhdStudy;
+  const showGradMailbox = !inMastersStudy && !inPhdStudy;
+  if (gradApplicationPanel) {
+    gradApplicationPanel.classList.toggle("hidden", !showGradPlanning);
+  }
+  if (gradResultsPanel) {
+    gradResultsPanel.classList.toggle("hidden", !showGradMailbox);
+  }
   if (chooseMastersBtn) chooseMastersBtn.disabled = state.mastersStarted || state.mastersGraduated || state.phdStarted;
   if (choosePhdBtn) choosePhdBtn.disabled = state.phdStarted || !state.mastersGraduated;
   if (chooseJobBtn) chooseJobBtn.disabled = (state.mastersStarted && !state.mastersGraduated) || (state.phdStarted && !state.phdGraduated);
@@ -16354,6 +18761,9 @@ function renderUndergradPanel() {
       state.postGradPath === POSTGRAD_PATHS.PHD
         ? "提交博士申请"
         : "提交硕士申请";
+  }
+  if (!showGradPlanning) {
+    gradSchoolSelector.classList.add("hidden");
   }
 
   if (jobCompanySelector && jobCompanyList && jobCompanyCount && submitJobAppsBtn) {
@@ -16543,6 +18953,9 @@ function renderUndergradPanel() {
       } else {
         gradReleaseNote.textContent = "研究生结果邮件已全部拆完，可选择录取去向。";
       }
+      if (hasAdmissionsAppealChatHint(gradResults, "grad")) {
+        gradReleaseNote.textContent += " 若对候补/拒绝有异议，可前往交流室切换到对应学校招生委员会，通过聊天窗复议。";
+      }
     }
     if (gradRevealNextBtn) {
       gradRevealNextBtn.disabled = !gradResults.length || allRevealed;
@@ -16559,6 +18972,7 @@ function renderUndergradPanel() {
           result.status === "录取"
             ? buildScholarshipSummaryLine(result.aidPercent, result.netCost, result.tuition)
             : "";
+        const appealLine = getAdmissionsAppealChatHint(result, "grad");
         card.className = `result-card ${result.revealed ? `revealed ${statusClass}` : "sealed"}`;
         card.innerHTML = result.revealed
           ? `<strong>${result.name}</strong><span class="${statusClass}">${result.status}</span><small>${qs}</small><small>${
@@ -16567,11 +18981,12 @@ function renderUndergradPanel() {
               scholarshipLine ? ` · ${scholarshipLine}` : ""
             }</small><small>${
               result.reason || "评审说明待生成"
-            }</small>`
+            }</small>${appealLine ? `<small class="muted">${appealLine}</small>` : ""}`
           : `<strong>${result.name}</strong><small>${qs}</small><span class="sealed-tag">点击查看研究生邮件</span>`;
         card.addEventListener("click", () => {
           if (!result.revealed) {
             result.revealed = true;
+            maybeLogAppealChatHint(result, "grad");
             updateUI();
           }
         });
@@ -16596,11 +19011,12 @@ function renderUndergradPanel() {
           result.status === "录取"
             ? ` · ${buildScholarshipSummaryLine(result.aidPercent, result.netCost, result.tuition)}`
             : "";
+        const appealLine = getAdmissionsAppealChatHint(result, "grad");
         li.textContent = `${result.name}（${qs}）· ${result.status} · ${result.programType === "msphd" ? "硕博连读" : result.programType === "phd" ? "博士" : "硕士"} · 概率 ${(
           result.chance * 100
         ).toFixed(1)}% · 专业 ${result.majorName || getMajorName(result.majorId || state.majorId)}${scholarshipLine} · ${
           result.reason || "评审说明待生成"
-        }`;
+        }${appealLine ? ` · ${appealLine}` : ""}`;
         if (
           allRevealed &&
           result.status === "录取" &&
@@ -16641,12 +19057,18 @@ function renderUndergradPanel() {
         careerReleaseNote.textContent = "请选择目标公司并点击“提交公司投递”。";
       } else if (chosenOffer) {
         careerReleaseNote.textContent = `已确认最终工作：${chosenOffer.company} · ${chosenOffer.role}。`;
+      } else if (pendingInterviewCount > 0 && revealedOfferCount > 0) {
+        careerReleaseNote.textContent = buildPendingInterviewHoldNotice(pendingInterviewCount, revealedOfferCount);
       } else if (revealedOfferCount > 0 && pendingInterviewCount <= 0) {
         careerReleaseNote.textContent = `已有 ${revealedOfferCount} 个已拆封 Offer，可点击“选择最终工作”。`;
       } else if (!allRevealed) {
-        careerReleaseNote.textContent = `请继续拆求职结果邮件：已查看 ${revealedCount} / ${apps.length}。`;
+        const baseLine = `请继续拆求职结果邮件：已查看 ${revealedCount} / ${apps.length}。`;
+        careerReleaseNote.textContent =
+          pendingInterviewCount > 0
+            ? `${baseLine} 若不想继续剩余面试，请到交流室对对应公司面试官发送“放弃”。`
+            : baseLine;
       } else if (offerCount <= 0) {
-        careerReleaseNote.textContent = "求职结果邮件已全部拆完，当前无可确认 Offer。";
+        careerReleaseNote.textContent = "求职结果邮件已全部拆完，当前无可确认 Offer。你可以选择再等一年继续求职。";
       } else {
         careerReleaseNote.textContent = `求职结果邮件已全部拆完，你有 ${offerCount} 个 Offer，请选择最终工作。`;
       }
@@ -16659,6 +19081,10 @@ function renderUndergradPanel() {
       chooseFinalJobBtn.disabled = !canChoose;
       chooseFinalJobBtn.textContent = chosenOffer ? "已确认最终工作" : "选择最终工作";
       chooseFinalJobBtn.classList.toggle("hidden", !apps.length);
+      chooseFinalJobBtn.title =
+        !canChoose && pendingInterviewCount > 0
+          ? buildPendingInterviewHoldNotice(pendingInterviewCount, revealedOfferCount)
+          : "";
     }
     if (careerResultList) {
       careerResultList.innerHTML = "";
@@ -16741,13 +19167,7 @@ function renderUndergradPanel() {
         });
       }
     }
-    if (state.phdGraduated) {
-      appendRepeatYearAction("phd", "博士");
-    } else if (state.mastersGraduated) {
-      appendRepeatYearAction("masters", "硕士");
-    } else if (state.undergradGraduated) {
-      appendRepeatYearAction("undergrad", "本科");
-    }
+    appendRepeatYearAction("career", "求职");
   } else {
     if (chooseFinalJobBtn) {
       chooseFinalJobBtn.disabled = true;
@@ -16782,22 +19202,9 @@ function takeExtraYear() {
     }
     return;
   }
-  const results = getVisibleResults();
-  const noAdmissionFree =
-    !isEdReleaseStage() &&
-    results.length > 0 &&
-    results.every((item) => item.revealed) &&
-    !results.some((item) => item.status === "录取");
-  const yearCost = noAdmissionFree ? 0 : EXTRA_YEAR_COST;
-  const yearStipend = noAdmissionFree ? 0 : EXTRA_YEAR_STIPEND;
-  if (state.cash < yearCost) {
-    if (extraYearNote) {
-      extraYearNote.textContent = `资金不足，无法选择再读一年（需要 ${formatUsd(yearCost)}）。`;
-    }
-    return;
-  }
-  state.cash -= yearCost;
-  state.cash += yearStipend;
+  const yearCost = EXTRA_YEAR_COST;
+  const yearStipend = 0;
+  payRepeatYearCost(yearCost, "高中复读");
   applyEffects({ stress: EXTRA_YEAR_STRESS }, [], { boostAffinity: false });
   state.extraYearCount += 1;
   state.extraYearFocusId = null;
@@ -16850,11 +19257,7 @@ function takeExtraYear() {
   state.timeBudget = getTermTimeBudget();
   state.timeUsed = 0;
   state.overworkDebt = Math.max(0, (state.overworkDebt || 0) - 1);
-  state.log.unshift(
-    noAdmissionFree
-      ? `再读一年：免费重开申请，压力 +${EXTRA_YEAR_STRESS}`
-      : `再读一年：支出 ${formatUsd(yearCost)}，压力 +${EXTRA_YEAR_STRESS}`,
-  );
+  state.log.unshift(`再读一年：支出 ${formatUsd(yearCost)}，压力 +${EXTRA_YEAR_STRESS}`);
   updateAchievements();
   drawEvents();
   pushReplayNode("再读一年");
@@ -16876,50 +19279,23 @@ function hasNoPositiveJobResults() {
   return !apps.some((item) => item.status === "录用");
 }
 
-function canTakeStageRepeatYear(stage) {
-  if (!stage || !state.started || state.termIndex !== 7) return false;
-  const used = Number(state.stageRepeatCounts?.[stage] || 0);
-  if (used >= 1) return false;
-  if (stage === "undergrad") {
-    if (!state.undergradGraduated || state.mastersStarted || state.phdStarted) return false;
-    return hasNoPositiveGraduateResults() || hasNoPositiveJobResults();
+function payRepeatYearCost(cost, label) {
+  const normalizedCost = Math.max(0, Math.round(Number(cost || 0)));
+  if (normalizedCost <= 0) {
+    return { paidCash: 0, loanAdded: 0 };
   }
-  if (stage === "masters") {
-    if (!state.mastersGraduated || state.phdStarted) return false;
-    return hasNoPositiveGraduateResults() || hasNoPositiveJobResults();
+  const paidCash = Math.min(state.cash, normalizedCost);
+  state.cash = Math.max(0, state.cash - paidCash);
+  const loanAdded = Math.max(0, normalizedCost - paidCash);
+  if (loanAdded > 0) {
+    state.loanBalance += loanAdded;
+    state.log.unshift(`${label}资金不足：已自动追加贷款 ${formatUsd(loanAdded)}。`);
   }
-  if (stage === "phd") {
-    if (!state.phdGraduated) return false;
-    return hasNoPositiveJobResults();
-  }
-  return false;
+  return { paidCash, loanAdded };
 }
 
-function appendRepeatYearAction(stage, label) {
-  if (!postGradResults || !canTakeStageRepeatYear(stage)) return;
-  const li = document.createElement("li");
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "ghost";
-  btn.textContent = `${label}免费复读一年`;
-  btn.addEventListener("click", () => takeStageRepeatYear(stage));
-  li.textContent = `当前阶段无录取/录用，可选择${label}免费复读一年。`;
-  li.appendChild(btn);
-  postGradResults.appendChild(li);
-}
-
-function takeStageRepeatYear(stage) {
-  if (!canTakeStageRepeatYear(stage)) {
-    if (postGradNote) postGradNote.textContent = `${getHigherEdStageLabel(stage)}当前不满足免费复读条件。`;
-    return;
-  }
-  state.stageRepeatCounts[stage] = Number(state.stageRepeatCounts[stage] || 0) + 1;
+function clearDownstreamStateForRepeat(stage) {
   if (stage === "undergrad") {
-    state.undergradStarted = true;
-    state.undergradGraduated = false;
-    state.undergradCurrentYear = Math.max(1, UNDERGRAD_TOTAL_TERMS - (STAGE_REPEAT_YEAR_SPAN - 1));
-    state.higherEdTermState.undergrad = createHigherEdStageTermState();
-    drawHigherEdEvents("undergrad");
     state.postGradPath = null;
     state.gradApplicationType = null;
     state.gradSelectedSchools = [];
@@ -16934,6 +19310,7 @@ function takeStageRepeatYear(stage) {
     state.mastersProgramType = null;
     state.mastersMajorId = null;
     state.mastersProfile = getDefaultMastersProfile();
+    state.mastersWorkflow = createDefaultGraduateWorkflow("masters");
     state.phdStarted = false;
     state.phdGraduated = false;
     state.phdCurrentYear = 0;
@@ -16943,17 +19320,12 @@ function takeStageRepeatYear(stage) {
     state.phdEntryTrack = null;
     state.phdMajorId = null;
     state.phdProfile = getDefaultPhdProfile();
+    state.phdWorkflow = createDefaultGraduateWorkflow("phd");
     state.jobSelectedCompanies = [];
     state.jobOutcome = null;
-    applyHigherEdEffectsToProfile("undergrad", { stress: 8 }, { randomize: false, multiplier: 1 });
-    state.log.unshift("本科免费复读一年：重开最后两学期，已清空后续申请/求职结果。");
-    pushReplayNode("本科免费复读一年");
-  } else if (stage === "masters") {
-    state.mastersStarted = true;
-    state.mastersGraduated = false;
-    state.mastersCurrentYear = Math.max(1, MASTERS_TOTAL_TERMS - (STAGE_REPEAT_YEAR_SPAN - 1));
-    state.higherEdTermState.masters = createHigherEdStageTermState();
-    drawHigherEdEvents("masters");
+    return;
+  }
+  if (stage === "masters") {
     state.postGradPath = POSTGRAD_PATHS.MASTERS;
     state.gradApplicationType = null;
     state.gradSelectedSchools = [];
@@ -16968,23 +19340,225 @@ function takeStageRepeatYear(stage) {
     state.phdEntryTrack = null;
     state.phdMajorId = null;
     state.phdProfile = getDefaultPhdProfile();
+    state.phdWorkflow = createDefaultGraduateWorkflow("phd");
     state.jobSelectedCompanies = [];
     state.jobOutcome = null;
-    applyHigherEdEffectsToProfile("masters", { stress: 8 }, { randomize: false, multiplier: 1 });
-    state.log.unshift("硕士免费复读一年：重开最后两学期，已清空后续申博/求职结果。");
-    pushReplayNode("硕士免费复读一年");
-  } else if (stage === "phd") {
-    state.phdStarted = true;
-    state.phdGraduated = false;
-    state.phdCurrentYear = Math.max(1, PHD_TOTAL_TERMS - (STAGE_REPEAT_YEAR_SPAN - 1));
-    state.higherEdTermState.phd = createHigherEdStageTermState();
-    drawHigherEdEvents("phd");
+    return;
+  }
+  if (stage === "phd") {
     state.postGradPath = POSTGRAD_PATHS.PHD;
     state.jobSelectedCompanies = [];
     state.jobOutcome = null;
-    applyHigherEdEffectsToProfile("phd", { stress: 8 }, { randomize: false, multiplier: 1 });
-    state.log.unshift("博士免费复读一年：重开最后两学期，已清空求职结果。");
-    pushReplayNode("博士免费复读一年");
+  }
+}
+
+function softenProfileForRepeat(stage, stressDelta, academicFailure = false) {
+  if (stage === "undergrad") {
+    applyHigherEdEffectsToProfile("undergrad", { stress: stressDelta }, { randomize: false, multiplier: 1 });
+    if (academicFailure && state.undergradProfile) {
+      state.undergradProfile.gpa = Number(clamp((state.undergradProfile.gpa || 0) - 0.08, 2, 4).toFixed(2));
+    }
+    return;
+  }
+  if (stage === "masters") {
+    applyHigherEdEffectsToProfile("masters", { stress: stressDelta }, { randomize: false, multiplier: 1 });
+    if (academicFailure && state.mastersProfile) {
+      state.mastersProfile.gpa = Number(clamp((state.mastersProfile.gpa || 0) - 0.08, 2, 4).toFixed(2));
+      state.mastersProfile.thesis = Math.round(clamp((state.mastersProfile.thesis || 0) - 6, 0, 100));
+    }
+    return;
+  }
+  applyHigherEdEffectsToProfile("phd", { stress: stressDelta }, { randomize: false, multiplier: 1 });
+  if (academicFailure && state.phdProfile) {
+    state.phdProfile.publication = Math.round(clamp((state.phdProfile.publication || 0) - 6, 0, 100));
+  }
+}
+
+function resetWorkflowForAcademicRepeat(stage) {
+  if (stage === "masters") {
+    state.mastersWorkflow = {
+      ...createDefaultGraduateWorkflow("masters"),
+      advisorMatched: true,
+      advisorTerm: Math.max(1, Number(state.mastersWorkflow?.advisorTerm || 1)),
+      proposalPassed: true,
+      proposalTerm: Math.max(2, Number(state.mastersWorkflow?.proposalTerm || 2)),
+      defensePassed: false,
+      defenseTerm: 0,
+    };
+    return;
+  }
+  if (stage === "phd") {
+    state.phdWorkflow = {
+      ...createDefaultGraduateWorkflow("phd"),
+      advisorMatched: true,
+      advisorTerm: Math.max(1, Number(state.phdWorkflow?.advisorTerm || 1)),
+      candidacyPassed: true,
+      candidacyTerm: Math.max(3, Number(state.phdWorkflow?.candidacyTerm || 3)),
+      defensePassed: false,
+      defenseTerm: 0,
+    };
+  }
+}
+
+function applyCareerRepeatSupport(effects = {}) {
+  if (state.phdGraduated) {
+    applyHigherEdEffectsToProfile("phd", effects, { randomize: false, multiplier: 1 });
+    return;
+  }
+  if (state.mastersGraduated) {
+    applyHigherEdEffectsToProfile("masters", effects, { randomize: false, multiplier: 1 });
+    return;
+  }
+  applyHigherEdEffectsToProfile("undergrad", effects, { randomize: false, multiplier: 1 });
+}
+
+function restartHigherEdStage(stage, options = {}) {
+  const config = STAGE_REPEAT_CONFIG[stage];
+  if (!config) return;
+  const academicFailure = options.academicFailure === true;
+  payRepeatYearCost(options.cost ?? config.cost, `${config.label}复读`);
+  state[`${stage}Started`] = true;
+  state[`${stage}Graduated`] = false;
+  state[`${stage}CurrentYear`] = Math.max(1, Number(options.restartTerm || config.restartTerm));
+  state.higherEdTermState[stage] = createHigherEdStageTermState();
+  drawHigherEdEvents(stage);
+  clearDownstreamStateForRepeat(stage);
+  softenProfileForRepeat(stage, options.stress ?? config.stress, academicFailure);
+  if (academicFailure) {
+    state.academicRepeatCounts[stage] = Number(state.academicRepeatCounts?.[stage] || 0) + 1;
+    resetWorkflowForAcademicRepeat(stage);
+  }
+  if (typeof options.afterReset === "function") {
+    options.afterReset();
+  }
+}
+
+function evaluateAcademicRepeatRisk(stage) {
+  if (stage === "undergrad") {
+    const profile = state.undergradProfile || getDefaultUndergradProfile();
+    const gpa = Number(profile.gpa || 0);
+    const stress = Number(profile.stress || 0);
+    const research = Number(profile.research || 0);
+    const internship = Number(profile.internship || 0);
+    let failChance = 0;
+    if (gpa <= 2.2) failChance += 0.76;
+    else if (gpa < 2.35) failChance += 0.44;
+    else if (gpa < 2.55) failChance += 0.22;
+    else if (gpa < 2.75) failChance += 0.1;
+    if (stress >= 92) failChance += 0.18;
+    else if (stress >= 84) failChance += 0.1;
+    if (research < 18 && internship < 18) failChance += 0.08;
+    const mandatory = gpa <= 2.2 || (gpa < 2.3 && stress >= 94);
+    return {
+      mustRepeat: mandatory || Math.random() < clamp(failChance, 0.04, 0.86),
+      reason: `学业审核未过：本科 GPA ${gpa.toFixed(2)}，压力 ${Math.round(stress)}，需复读最后一年补齐毕业要求。`,
+    };
+  }
+  if (stage === "masters") {
+    const profile = state.mastersProfile || getDefaultMastersProfile();
+    const gpa = Number(profile.gpa || 0);
+    const thesis = Number(profile.thesis || 0);
+    const research = Number(profile.research || 0);
+    const stress = Number(profile.stress || 0);
+    let failChance = 0;
+    if (gpa <= 2.4) failChance += 0.56;
+    else if (gpa < 2.55) failChance += 0.3;
+    else if (gpa < 2.75) failChance += 0.14;
+    if (thesis < 28) failChance += 0.28;
+    else if (thesis < 40) failChance += 0.14;
+    if (research < 26) failChance += 0.1;
+    if (stress >= 90) failChance += 0.12;
+    const mandatory = thesis < 18 || gpa <= 2.4;
+    return {
+      mustRepeat: mandatory || Math.random() < clamp(failChance, 0.05, 0.88),
+      reason: `学业审核未过：硕士 GPA ${gpa.toFixed(2)}，论文进度 ${Math.round(thesis)}，需复读最后一年补齐毕业要求。`,
+    };
+  }
+  const profile = state.phdProfile || getDefaultPhdProfile();
+  const research = Number(profile.research || 0);
+  const publication = Number(profile.publication || 0);
+  const teaching = Number(profile.teaching || 0);
+  const stress = Number(profile.stress || 0);
+  let failChance = 0;
+  if (publication < 22) failChance += 0.42;
+  else if (publication < 36) failChance += 0.2;
+  if (research < 30) failChance += 0.2;
+  else if (research < 42) failChance += 0.1;
+  if (teaching < 18) failChance += 0.06;
+  if (stress >= 92) failChance += 0.12;
+  const mandatory = publication < 16 || research < 24;
+  return {
+    mustRepeat: mandatory || Math.random() < clamp(failChance, 0.05, 0.84),
+    reason: `学业审核未过：博士科研 ${Math.round(research)}，发表 ${Math.round(publication)}，需复读最后一年补齐毕业要求。`,
+  };
+}
+
+function canTakeStageRepeatYear(stage) {
+  if (!stage || !state.started || state.termIndex !== 7) return false;
+  const used = Number(state.stageRepeatCounts?.[stage] || 0);
+  if (used >= 1) return false;
+  if (stage === "undergrad") {
+    if (!state.undergradGraduated || state.mastersStarted || state.phdStarted) return false;
+    return hasNoPositiveGraduateResults();
+  }
+  if (stage === "masters") {
+    if (!state.mastersGraduated || state.phdStarted) return false;
+    return hasNoPositiveGraduateResults();
+  }
+  if (stage === "phd") {
+    return false;
+  }
+  if (stage === "career") {
+    if (state.postGradPath !== POSTGRAD_PATHS.JOB) return false;
+    if (!state.jobOutcome || state.jobOutcome.chosenOfferCompanyId) return false;
+    return hasNoPositiveJobResults();
+  }
+  return false;
+}
+
+function appendRepeatYearAction(stage, label) {
+  if (!postGradResults || !canTakeStageRepeatYear(stage)) return;
+  const config = STAGE_REPEAT_CONFIG[stage];
+  const li = document.createElement("li");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "ghost";
+  btn.textContent = stage === "career" ? "再等一年继续求职" : `${label}复读一年`;
+  btn.addEventListener("click", () => takeStageRepeatYear(stage));
+  li.textContent =
+    stage === "career"
+      ? `当前阶段无 Offer，可选择再等一年继续求职（花费 ${formatUsd(config?.cost || EXTRA_YEAR_COST)}，压力 +${config?.stress || EXTRA_YEAR_STRESS}）。`
+      : `当前阶段无录取/录用，可选择${label}复读一年（花费 ${formatUsd(config?.cost || EXTRA_YEAR_COST)}，压力 +${config?.stress || EXTRA_YEAR_STRESS}）。`;
+  li.appendChild(btn);
+  postGradResults.appendChild(li);
+}
+
+function takeStageRepeatYear(stage) {
+  if (!canTakeStageRepeatYear(stage)) {
+    if (postGradNote) postGradNote.textContent = `${getHigherEdStageLabel(stage)}当前不满足复读条件。`;
+    return;
+  }
+  state.stageRepeatCounts[stage] = Number(state.stageRepeatCounts[stage] || 0) + 1;
+  const config = STAGE_REPEAT_CONFIG[stage];
+  if (stage === "career") {
+    payRepeatYearCost(config?.cost, "求职等待一年");
+    resetJobPathState();
+    state.postGradPath = POSTGRAD_PATHS.JOB;
+    applyCareerRepeatSupport({ internship: 3, leadership: 2, stress: config?.stress || EXTRA_YEAR_STRESS });
+    state.log.unshift(`求职再等一年：支出 ${formatUsd(config?.cost || EXTRA_YEAR_COST)}，压力 +${config?.stress || EXTRA_YEAR_STRESS}，可重新投递下一轮岗位。`);
+    pushReplayNode("求职再等一年");
+  } else if (stage === "undergrad") {
+    restartHigherEdStage(stage, { cost: config?.cost, stress: config?.stress });
+    state.log.unshift(`本科复读一年：支出 ${formatUsd(config?.cost || EXTRA_YEAR_COST)}，压力 +${config?.stress || EXTRA_YEAR_STRESS}，已清空后续申请/求职结果。`);
+    pushReplayNode("本科复读一年");
+  } else if (stage === "masters") {
+    restartHigherEdStage(stage, { cost: config?.cost, stress: config?.stress });
+    state.log.unshift(`硕士复读一年：支出 ${formatUsd(config?.cost || EXTRA_YEAR_COST)}，压力 +${config?.stress || EXTRA_YEAR_STRESS}，已清空后续申博/求职结果。`);
+    pushReplayNode("硕士复读一年");
+  } else if (stage === "phd") {
+    restartHigherEdStage(stage, { cost: config?.cost, stress: config?.stress });
+    state.log.unshift(`博士复读一年：支出 ${formatUsd(config?.cost || EXTRA_YEAR_COST)}，压力 +${config?.stress || EXTRA_YEAR_STRESS}，已清空求职结果。`);
+    pushReplayNode("博士复读一年");
   }
   updateAchievements();
   updateUI();
@@ -17021,6 +19595,7 @@ function formatQualityLabel(quality) {
 function scoreEventForCounselor(event, major, profile) {
   if (!event) return 0;
   const weights = major?.weights || {};
+  const alignmentScore = getItemMajorAlignmentScore(event, major?.id || state.majorId);
   let score = 0;
   Object.entries(event.effects || {}).forEach(([key, value]) => {
     if (typeof value !== "number" || value === 0) return;
@@ -17050,6 +19625,7 @@ function scoreEventForCounselor(event, major, profile) {
     score += 0.1;
   }
 
+  score += (alignmentScore - 0.62) * 0.42;
   score -= (event.cost || 0) / 20000 * 0.12;
   score -= (getEventTime(event) || 0) / 6 * 0.05;
   return score;
@@ -17109,6 +19685,7 @@ function getAdvisorInsights() {
   }
 
   const major = MAJORS.find((item) => item.id === state.majorId);
+  const routeProfile = getDominantRouteProfile();
   const skills = computeSkillScores();
   const gaps = Object.entries(major?.weights || {})
     .map(([key, weight]) => ({ key, gap: weight - (skills[key] || 0) }))
@@ -17119,6 +19696,9 @@ function getAdvisorInsights() {
   const gapLine = gaps.length
     ? `优先补强：${gaps.join("、")}`
     : "当前能力结构均衡。";
+  const routeLine = routeProfile.id
+    ? `当前主路线：${routeProfile.label}。${ROUTE_DEFINITIONS[routeProfile.id]?.hint || ""}`
+    : "当前主路线：尚未成型，可先连续两学期压一条主线。";
 
   const counselor = COUNSELORS.find((item) => item.id === state.counselorId);
   const recommendation = getCounselorEventRecommendation();
@@ -17194,6 +19774,7 @@ function getAdvisorInsights() {
         }/${SEASON_CHALLENGES.length}，排名 ${state.seasonRun.leaderboardRank ? `#${state.seasonRun.leaderboardRank}` : "--"}。`
       : "赛季挑战：终局后自动结算分数与排行榜。";
   return [
+    routeLine,
     gapLine,
     eventLine,
     counselorLine,
@@ -17213,6 +19794,45 @@ function getAdvisorInsights() {
   ];
 }
 
+function renderRouteFeedback() {
+  if (!routeFeedbackList || !routeHeadline) return;
+  routeFeedbackList.innerHTML = "";
+  if (!state.started) {
+    routeHeadline.textContent = "旅程开始后会显示主路线、当前顺逆风和组合技。";
+    if (routeSummaryTag) routeSummaryTag.textContent = "透明提示";
+    const item = document.createElement("li");
+    item.textContent = "先选定背景、专业与中介，系统会开始追踪你的成长路线。";
+    routeFeedbackList.appendChild(item);
+    return;
+  }
+  const sorted = getSortedRouteEntries();
+  const dominant = getDominantRouteProfile();
+  const weakest = sorted[sorted.length - 1];
+  const latestFeedback = (state.feedbackLedger || [])[0] || null;
+  const tailwinds = getCurrentWorldTailwinds(2);
+  const headwinds = getCurrentWorldHeadwinds(2);
+  const latestCombo = (state.comboHistory || [])[0];
+  routeHeadline.textContent = dominant.id
+    ? `主路线：${dominant.label}${dominant.second ? ` · 次路线：${dominant.second.label}` : ""}`
+    : "主路线：尚未成型，建议连续推进一条长期主线。";
+  if (routeSummaryTag) {
+    routeSummaryTag.textContent = dominant.id ? dominant.short : "未成型";
+  }
+  const lines = [
+    sorted[0] ? `路线强度：${sorted.slice(0, 3).map((item) => `${item.short} ${Math.round(item.value)}`).join(" / ")}` : "路线强度：暂无",
+    weakest ? `当前最薄弱：${weakest.label}，如果想补齐短板，优先选对应标签项目。` : "当前最薄弱：暂无",
+    latestCombo ? `最近组合技：${latestCombo.label}（${latestCombo.stage === "highschool" ? "高中" : getHigherEdStageLabel(latestCombo.stage)}）` : "最近组合技：尚未触发",
+    latestFeedback?.summary ? `最近结算：${latestFeedback.summary}` : "最近结算：暂无",
+    tailwinds.length ? `顺风：${tailwinds.join("；")}` : "顺风：当前没有明显外部加成。",
+    headwinds.length ? `逆风：${headwinds.join("；")}` : "逆风：当前没有明显外部压力。",
+  ];
+  lines.forEach((text) => {
+    const item = document.createElement("li");
+    item.textContent = text;
+    routeFeedbackList.appendChild(item);
+  });
+}
+
 function renderAdvisor() {
   advisorList.innerHTML = "";
   const insights = getAdvisorInsights();
@@ -17220,6 +19840,45 @@ function renderAdvisor() {
     const item = document.createElement("li");
     item.textContent = text;
     advisorList.appendChild(item);
+  });
+}
+
+function renderLegacyPanel() {
+  if (!legacySummary || !legacyList) return;
+  legacyList.innerHTML = "";
+  const progress = state.legacyProgress || createDefaultLegacyProgress();
+  const boosts = state.legacyBoosts || createDefaultLegacyBoosts();
+  if (!progress.completedRuns) {
+    legacySummary.textContent = "首局暂时没有继承加成；完成一局后会自动解锁轻量传承。";
+    const item = document.createElement("li");
+    item.textContent = "可继承内容：历史最佳成绩、代表路线、顶尖录取/高薪经历带来的开局微加成。";
+    legacyList.appendChild(item);
+    return;
+  }
+  const routeWinId = getTopRouteWinKey(progress.routeWins);
+  legacySummary.textContent = `已完成 ${progress.completedRuns} 局 · 最佳赛季 ${progress.bestScore} 分 · 当前自动加成：资金 ${formatUsd(
+    boosts.cash || 0,
+  )} / 奖项 ${boosts.awards || 0} / 文书 ${boosts.essayTrack || 0} / 领导力 ${boosts.leadership || 0}${
+    boosts.highschoolTime ? ` / 时间点 +${boosts.highschoolTime}` : ""
+  }`;
+  const lines = [
+    progress.bestSchoolRank && Number.isFinite(Number(progress.bestSchoolRank))
+      ? `最佳录取排名：QS ${progress.bestSchoolRank}`
+      : "最佳录取排名：暂无",
+    progress.bestSalary ? `历史最高薪资：${formatUsd(progress.bestSalary)}` : "历史最高薪资：暂无",
+    routeWinId ? `最常打出的路线：${getRouteProfileLabel(routeWinId)}（${Math.round(progress.routeWins[routeWinId] || 0)} 次）` : "最常打出的路线：暂无",
+  ];
+  if (progress.lastRun) {
+    lines.push(
+      `上一局：${progress.lastRun.finalSchool || "未定学校"}${progress.lastRun.chosenJob ? ` → ${progress.lastRun.chosenJob}` : ""} · ${
+        progress.lastRun.dominantRouteLabel || "综合路线"
+      }`,
+    );
+  }
+  lines.forEach((text) => {
+    const item = document.createElement("li");
+    item.textContent = text;
+    legacyList.appendChild(item);
   });
 }
 
@@ -17245,6 +19904,7 @@ function getDefaultRelationship(roleId) {
   if (roleId === "counselor") return 60;
   if (roleId === "family") return 55;
   if (roleId === "peer") return 45;
+  if (roleId === "teacher") return 58;
   if (isInterviewerRole(roleId)) return 50;
   if (roleId?.startsWith("admissions-")) return 40;
   return 50;
@@ -17523,7 +20183,7 @@ function renderChat() {
     const empty = document.createElement("div");
     empty.className = "chat-bubble ai";
     empty.textContent =
-      "这里可以和中介、家人、同学交流；申请季/放榜季可与招生委员会沟通；求职阶段会出现各公司面试官联系人并进行问答评估（离线模拟）。";
+      "这里可以和中介、家人、同学、老师交流；申请季/放榜季可与招生委员会沟通；求职阶段会出现各公司面试官联系人并进行问答评估。";
     chatMessages.appendChild(empty);
     renderChatRoleMemoryCard();
     return;
@@ -18125,6 +20785,18 @@ function runDevRegressionChecks() {
   }
 }
 
+function cloneDevDataArray(items) {
+  return Array.isArray(items)
+    ? items.map((item) => JSON.parse(JSON.stringify(item)))
+    : [];
+}
+
+function cloneDevTermActionMap(map) {
+  return Object.fromEntries(
+    Object.entries(map || {}).map(([term, items]) => [term, cloneDevDataArray(items)]),
+  );
+}
+
 function getDevDataPatchTemplate() {
   return {
     universities: [
@@ -18172,6 +20844,162 @@ function getDevDataPatchTemplate() {
         cost: 0,
         chance: 0.06,
         minTerm: 1,
+      },
+    ],
+    undergradActions: [
+      {
+        id: "demo-ug-action",
+        name: "Demo 本科重点项目",
+        desc: "示例：新增本科重点项目",
+        effects: { gpa: 0.05, research: 8, internship: 5, leadership: 4, stress: 3, cost: 2600 },
+      },
+    ],
+    mastersActions: [
+      {
+        id: "demo-ms-action",
+        name: "Demo 硕士重点项目",
+        desc: "示例：新增硕士重点项目",
+        effects: { gpa: 0.06, research: 10, internship: 3, leadership: 3, stress: 4, cost: 3200, thesis: 6 },
+      },
+    ],
+    phdActions: [
+      {
+        id: "demo-phd-action",
+        name: "Demo 博士重点项目",
+        desc: "示例：新增博士重点项目",
+        effects: { research: 9, internship: 2, leadership: 4, stress: 4, cost: 3400, publication: 5, teaching: 3 },
+      },
+    ],
+    undergradMiniActions: [
+      {
+        id: "demo-ug-mini",
+        name: "Demo 本科小行动",
+        desc: "示例：补齐本科阶段细节",
+        cost: 180,
+        effects: { gpa: 0.01, research: 1, internship: 1, leadership: 1, stress: -1 },
+      },
+    ],
+    mastersMiniActions: [
+      {
+        id: "demo-ms-mini",
+        name: "Demo 硕士小行动",
+        desc: "示例：补齐硕士阶段细节",
+        cost: 220,
+        effects: { gpa: 0.01, research: 1, internship: 1, leadership: 1, stress: -1, thesis: 1 },
+      },
+    ],
+    phdMiniActions: [
+      {
+        id: "demo-phd-mini",
+        name: "Demo 博士小行动",
+        desc: "示例：补齐博士阶段细节",
+        cost: 260,
+        effects: { research: 1, internship: 1, leadership: 1, stress: -1, publication: 1, teaching: 1 },
+      },
+    ],
+    undergradExtraActions: [
+      {
+        id: "demo-ug-extra",
+        name: "Demo 本科终极项目",
+        desc: "示例：新增本科高投入项目",
+        projectId: "research",
+        effects: { gpa: 0.08, research: 12, internship: 4, leadership: 4, stress: 6, cost: 6800 },
+      },
+    ],
+    mastersExtraActions: [
+      {
+        id: "demo-ms-extra",
+        name: "Demo 硕士终极项目",
+        desc: "示例：新增硕士高投入项目",
+        projectId: "research",
+        effects: { gpa: 0.07, research: 14, internship: 4, leadership: 4, stress: 6, cost: 7600, thesis: 8 },
+      },
+    ],
+    phdExtraActions: [
+      {
+        id: "demo-phd-extra",
+        name: "Demo 博士终极项目",
+        desc: "示例：新增博士高投入项目",
+        projectId: "research",
+        effects: { research: 13, internship: 3, leadership: 5, stress: 6, cost: 8200, publication: 8, teaching: 4 },
+      },
+    ],
+    undergradTermActions: {
+      1: [
+        {
+          id: "demo-ug-term",
+          name: "Demo 本科学期项目",
+          desc: "示例：覆盖本科第 1 学期项目池",
+          effects: { gpa: 0.05, research: 6, internship: 2, leadership: 3, stress: 3, cost: 2400 },
+        },
+      ],
+    },
+    mastersTermActions: {
+      1: [
+        {
+          id: "demo-ms-term",
+          name: "Demo 硕士学期项目",
+          desc: "示例：覆盖硕士第 1 学期项目池",
+          effects: { gpa: 0.06, research: 8, internship: 2, leadership: 2, stress: 3, cost: 2800, thesis: 4 },
+        },
+      ],
+    },
+    phdTermActions: {
+      1: [
+        {
+          id: "demo-phd-term",
+          name: "Demo 博士学期项目",
+          desc: "示例：覆盖博士第 1 学期项目池",
+          effects: { research: 7, internship: 1, leadership: 2, stress: 3, cost: 2600, publication: 3, teaching: 2 },
+        },
+      ],
+    },
+    undergradIncidents: [
+      {
+        id: "demo-ug-incident",
+        type: "危机",
+        title: "Demo 本科意外事件",
+        desc: "示例：新增本科阶段随机事件",
+        chance: 0.08,
+        minTerm: 1,
+        options: [
+          {
+            label: "立即补救",
+            effects: { cash: -600, stress: 4, research: 2 },
+          },
+        ],
+      },
+    ],
+    mastersIncidents: [
+      {
+        id: "demo-ms-incident",
+        type: "惊喜",
+        title: "Demo 硕士意外事件",
+        desc: "示例：新增硕士阶段随机事件",
+        chance: 0.07,
+        minTerm: 1,
+        options: [
+          {
+            label: "抓住机会",
+            effects: { research: 4, thesis: 3, stress: 2 },
+          },
+        ],
+      },
+    ],
+    phdIncidents: [
+      {
+        id: "demo-phd-incident",
+        type: "危机",
+        title: "Demo 博士意外事件",
+        desc: "示例：新增博士阶段随机事件",
+        chance: 0.06,
+        minTerm: 1,
+        options: [
+          {
+            label: "重排实验计划",
+            effects: { publication: -1, research: 2, stress: 3 },
+          },
+        ],
       },
     ],
     interviewQuestions: [
@@ -18228,6 +21056,21 @@ function buildDevDataSnapshot() {
       chance: item.chance,
       minTerm: item.minTerm,
     })),
+    undergradActions: cloneDevDataArray(UNDERGRAD_YEAR_ACTIONS),
+    mastersActions: cloneDevDataArray(MASTERS_YEAR_ACTIONS),
+    phdActions: cloneDevDataArray(PHD_YEAR_ACTIONS),
+    undergradMiniActions: cloneDevDataArray(UNDERGRAD_MINI_ACTIONS),
+    mastersMiniActions: cloneDevDataArray(MASTERS_MINI_ACTIONS),
+    phdMiniActions: cloneDevDataArray(PHD_MINI_ACTIONS),
+    undergradExtraActions: cloneDevDataArray(HIGHER_ED_EXTRA_ACTIONS.undergrad),
+    mastersExtraActions: cloneDevDataArray(HIGHER_ED_EXTRA_ACTIONS.masters),
+    phdExtraActions: cloneDevDataArray(HIGHER_ED_EXTRA_ACTIONS.phd),
+    undergradTermActions: cloneDevTermActionMap(UNDERGRAD_TERM_ACTIONS),
+    mastersTermActions: cloneDevTermActionMap(MASTERS_TERM_ACTIONS),
+    phdTermActions: cloneDevTermActionMap(PHD_TERM_ACTIONS),
+    undergradIncidents: cloneDevDataArray(HIGHER_ED_INCIDENTS.undergrad),
+    mastersIncidents: cloneDevDataArray(HIGHER_ED_INCIDENTS.masters),
+    phdIncidents: cloneDevDataArray(HIGHER_ED_INCIDENTS.phd),
     interviewQuestions: INTERVIEW_QUESTION_BANK.map((item) => ({
       id: item.id,
       type: item.type,
@@ -18265,12 +21108,21 @@ function renderDevPanel() {
   if (devRegressionPanel) devRegressionPanel.classList.toggle("hidden", !state.devMode);
   if (devTuningPanel) devTuningPanel.classList.toggle("hidden", !state.devMode);
   if (devDataPanel) devDataPanel.classList.toggle("hidden", !state.devMode);
+  if (CHAT_PUBLIC_RELEASE && !state.devMode && chatAiSettings.apiKey) {
+    chatAiSettings = normalizeChatAiSettings({
+      ...chatAiSettings,
+      mode: "mimo",
+      apiKey: "",
+    });
+    saveChatAiSettings();
+  }
   if (state.devMode && devTextarea && !devTextarea.value) {
     devTextarea.value = serializeStateForDev({ includeFlowTemplates: true });
   }
   if (state.devMode) {
     fillDevTuneInputsFromState();
   }
+  applyChatAiUiMode();
 }
 
 function initChatRoles() {
@@ -18507,9 +21359,14 @@ function canApplyCombinedDoctoralForSchool(school, result) {
   if (!school || !result || result.status !== "录取") return false;
   if (!state.finalChoice || state.finalChoice !== school.id) return false;
   if (state.mastersStarted || state.phdStarted) return false;
+  const windowKey = getUndergradCombinedWindowKey(school.id);
+  if (!windowKey) return false;
+  if (windowKey === "pre_undergrad") {
+    return true;
+  }
   const academic = clamp(result.academicScore ?? 0, 0, 1);
   const fit = clamp(result.fitScore ?? 0, 0, 1);
-  if (state.undergradStarted || state.undergradGraduated) {
+  if (windowKey === "late_undergrad") {
     const profile = state.undergradProfile || getDefaultUndergradProfile();
     const ugGpa = clamp(((profile.gpa || 2.9) - 2.2) / 1.8, 0, 1);
     const ugResearch = clamp((profile.research || 0) / 100, 0, 1);
@@ -18528,10 +21385,11 @@ function canApplyCombinedDoctoralForSchool(school, result) {
 
 function canApplyMsPhdForSchool(school, gradResult = null) {
   if (!school) return false;
-  if (state.msPhdApplied && !state.msPhdApproved) return false;
   if (state.msPhdApproved && state.msPhdSchoolId === school.id) return false;
-  if (state.mastersStarted && state.mastersSchoolId === school.id && !state.phdStarted) {
-    if (state.msPhdApplied && !state.msPhdApproved) return false;
+  const windowKey = getMastersCombinedWindowKey(school.id);
+  if (!windowKey) return false;
+  if (windowKey === "late_masters") {
+    if (!(state.mastersStarted && state.mastersSchoolId === school.id && !state.phdStarted)) return false;
     const profile = state.mastersProfile || getDefaultMastersProfile();
     const gpa = clamp((profile.gpa - 2.4) / 1.6, 0, 1);
     const research = clamp((profile.research || 0) / 100, 0, 1);
@@ -18545,8 +21403,96 @@ function canApplyMsPhdForSchool(school, gradResult = null) {
   if (gradResult.programType === "phd") return false;
   if (state.selectedGradOfferId && state.selectedGradOfferId !== school.id) return false;
   if (state.postGradPath !== POSTGRAD_PATHS.MASTERS && !state.mastersStarted) return false;
+  if (windowKey === "pre_masters") {
+    return true;
+  }
   const chance = evaluateMastersChance(school, { programMode: "msphd" });
   return chance >= 0.1;
+}
+
+function getPendingCombinedAnnouncements() {
+  if (!Array.isArray(state.pendingCombinedAnnouncements)) {
+    state.pendingCombinedAnnouncements = [];
+  }
+  return state.pendingCombinedAnnouncements;
+}
+
+function queueCombinedDecisionAnnouncement({ type, school, passed, windowKey, appliedTerm = 0 }) {
+  if (!school?.id || !type || !windowKey) return;
+  const queue = getPendingCombinedAnnouncements();
+  const existingIndex = queue.findIndex((item) => item && item.type === type && item.schoolId === school.id && item.windowKey === windowKey && !item.announced);
+  const payload = {
+    type,
+    schoolId: school.id,
+    schoolName: school.name || "",
+    roleId: `admissions-${school.id}`,
+    passed: !!passed,
+    windowKey,
+    appliedTerm: Math.max(0, Number(appliedTerm || 0)),
+    announced: false,
+  };
+  if (existingIndex >= 0) {
+    queue.splice(existingIndex, 1, payload);
+  } else {
+    queue.push(payload);
+  }
+}
+
+function isCombinedAnnouncementDue(entry) {
+  if (!entry || entry.announced) return false;
+  const windowKey = String(entry.windowKey || "");
+  const appliedTerm = Math.max(0, Number(entry.appliedTerm || 0));
+  if (windowKey === "pre_undergrad") {
+    return !!state.undergradStarted || !!state.undergradGraduated;
+  }
+  if (windowKey === "late_undergrad") {
+    if (state.undergradGraduated) return true;
+    if (!state.undergradStarted) return false;
+    return getHigherEdCurrentTermNumber("undergrad") > appliedTerm;
+  }
+  if (windowKey === "pre_masters") {
+    return !!state.mastersStarted || !!state.mastersGraduated;
+  }
+  if (windowKey === "late_masters") {
+    if (state.mastersGraduated) return true;
+    if (!state.mastersStarted) return false;
+    return getHigherEdCurrentTermNumber("masters") > appliedTerm;
+  }
+  return false;
+}
+
+function buildCombinedAnnouncementMessage(entry) {
+  const schoolName = entry.schoolName || "当前学校";
+  if (entry.type === "bsms") {
+    return entry.passed
+      ? `${schoolName} 已自动公布连读结果：你通过了本硕连读预审。后续在本科毕业选择去向时，可直接选择直入硕士。`
+      : `${schoolName} 已自动公布连读结果：你本轮未通过本硕连读预审，后续仍可按常规硕士申请推进。`;
+  }
+  if (entry.type === "bsmsphd") {
+    return entry.passed
+      ? `${schoolName} 已自动公布连读结果：你通过了本硕博连读预审。后续在本科毕业时可选择直入连读通道。`
+      : `${schoolName} 已自动公布连读结果：你本轮未通过本硕博连读预审，后续仍可按常规硕士/博士路径推进。`;
+  }
+  return entry.passed
+    ? `${schoolName} 已自动公布连读结果：你通过了硕博连读评估。后续在硕士毕业时可直接进入博士阶段。`
+    : `${schoolName} 已自动公布连读结果：你本轮未通过硕博连读评估，后续仍可按常规申博推进。`;
+}
+
+function flushPendingCombinedAnnouncements() {
+  const queue = getPendingCombinedAnnouncements();
+  if (!queue.length) return;
+  let changed = false;
+  queue.forEach((entry) => {
+    if (!isCombinedAnnouncementDue(entry)) return;
+    const message = buildCombinedAnnouncementMessage(entry);
+    addChatMessage("ai", message, { targetRole: entry.roleId || `admissions-${entry.schoolId}` });
+    state.log.unshift(message);
+    entry.announced = true;
+    changed = true;
+  });
+  if (changed) {
+    state.pendingCombinedAnnouncements = queue.filter((entry) => entry && !entry.announced);
+  }
 }
 
 function getAdmissionsQuickActions(roleId, school) {
@@ -18554,13 +21500,19 @@ function getAdmissionsQuickActions(roleId, school) {
   const actions = [];
   const ugResult = getAdmissionsUndergradResult(school.id);
   const gradResult = getAdmissionsGradResult(school.id);
+  const undergradWindowKey = getUndergradCombinedWindowKey(school.id);
+  const mastersWindowKey = getMastersCombinedWindowKey(school.id);
   const showCombinedWindow =
     ugResult &&
     ugResult.status === "录取" &&
     state.finalChoice === school.id &&
     !state.mastersStarted &&
     !state.phdStarted;
-  if (showCombinedWindow && canApplyCombinedDegreeForSchool(school, ugResult) && !state.combinedDegreeApplied) {
+  if (
+    showCombinedWindow &&
+    canApplyCombinedDegreeForSchool(school, ugResult) &&
+    hasUnusedCombinedWindow(state.combinedDegreeLastWindow, undergradWindowKey, state.combinedDegreeApproved)
+  ) {
     actions.push({
       id: `apply-bsms-${school.id}`,
       label: "申请本硕连读",
@@ -18570,7 +21522,7 @@ function getAdmissionsQuickActions(roleId, school) {
   }
   if (
     showCombinedWindow &&
-    !state.directPhdApplied &&
+    hasUnusedCombinedWindow(state.directPhdLastWindow, undergradWindowKey, state.directPhdApproved) &&
     canApplyCombinedDoctoralForSchool(school, ugResult)
   ) {
     actions.push({
@@ -18580,7 +21532,10 @@ function getAdmissionsQuickActions(roleId, school) {
       prompt: "申请本硕博连读",
     });
   }
-  if (canApplyMsPhdForSchool(school, gradResult)) {
+  if (
+    canApplyMsPhdForSchool(school, gradResult) &&
+    hasUnusedCombinedWindow(state.msPhdLastWindow, mastersWindowKey, state.msPhdApproved)
+  ) {
     actions.push({
       id: `apply-msphd-${school.id}`,
       label: "申请硕博连读",
@@ -18616,8 +21571,8 @@ function triggerPendingAdmissionsCombinedPrompt() {
   }
   if (!session.combinedPromptShown) {
     const content = actions.length
-      ? `你已被录取。连读申请在本科在读期间也可发起，请在本窗口直接点击：${actions.map((action) => action.label).join(" / ")}。`
-      : "你已被录取。你可以在本窗口咨询连读申请条件；满足标准后会自动出现申请按钮，本科在读期间同样可申请。";
+      ? `你已被录取。当前窗口已开放连读申请，可直接点击：${actions.map((action) => action.label).join(" / ")}。`
+      : "你已被录取。你可以在本窗口咨询连读申请条件；满足规则的开放窗口会自动出现申请按钮。";
     addChatMessage("ai", content, {
       targetRole: pendingRoleId,
     });
@@ -18647,16 +21602,1562 @@ function renderChatActionPanel(actions = []) {
   chatActionPanel.classList.add("visible");
 }
 
+function normalizeChatAiSettings(input) {
+  const source = input && typeof input === "object" ? input : {};
+  const allowDeveloperConfig = CHAT_PUBLIC_RELEASE && !!state?.devMode;
+  const mode =
+    CHAT_PUBLIC_RELEASE && !allowDeveloperConfig
+      ? "mimo"
+      : CHAT_AI_ALLOWED_MODES.has(source.mode)
+        ? source.mode
+        : CHAT_AI_DEFAULTS.mode;
+  const rawModel = typeof source.model === "string" ? source.model : CHAT_AI_DEFAULTS.model;
+  const normalizedRawModel = rawModel.trim();
+  const modelRaw =
+    normalizedRawModel === "mimo-1" || normalizedRawModel === "mimo-v2.5-pro"
+      ? CHAT_AI_DEFAULTS.model
+      : normalizedRawModel;
+  const baseRaw = typeof source.baseUrl === "string" ? source.baseUrl : CHAT_AI_DEFAULTS.baseUrl;
+  const keyRaw = typeof source.apiKey === "string" ? source.apiKey : CHAT_AI_DEFAULTS.apiKey;
+  return {
+    mode,
+    model: modelRaw.trim() || CHAT_AI_DEFAULTS.model,
+    baseUrl: baseRaw.trim() || CHAT_AI_DEFAULTS.baseUrl,
+    apiKey: CHAT_PUBLIC_RELEASE && !allowDeveloperConfig ? "" : keyRaw.trim(),
+  };
+}
+
+function getEffectiveChatAiApiKey(inputKey = "") {
+  const explicitKey = String(inputKey || "").trim();
+  if (explicitKey) return explicitKey;
+  const sessionKey = String(chatAiSettings?.apiKey || "").trim();
+  if (sessionKey) return sessionKey;
+  return CHAT_AI_AUTO_KEY;
+}
+
+function saveChatAiSettings() {
+  try {
+    const payload =
+      CHAT_PUBLIC_RELEASE
+        ? {
+            mode: state?.devMode ? chatAiSettings.mode : "mimo",
+            model: chatAiSettings.model,
+            baseUrl: chatAiSettings.baseUrl,
+            apiKey: "",
+          }
+        : chatAiSettings;
+    localStorage.setItem(CHAT_AI_SETTINGS_STORAGE_KEY, JSON.stringify(payload));
+  } catch (error) {
+    // ignore storage failures (private mode / quota)
+  }
+}
+
+function loadChatAiSettings() {
+  try {
+    const raw = localStorage.getItem(CHAT_AI_SETTINGS_STORAGE_KEY);
+    if (!raw) {
+      chatAiSettings = normalizeChatAiSettings(CHAT_AI_DEFAULTS);
+      return;
+    }
+    const parsed = JSON.parse(raw);
+    chatAiSettings = normalizeChatAiSettings(parsed);
+  } catch (error) {
+    chatAiSettings = normalizeChatAiSettings(CHAT_AI_DEFAULTS);
+  }
+}
+
+function renderChatAiSettings() {
+  if (chatAiMode) chatAiMode.value = chatAiSettings.mode;
+  if (chatAiModel) chatAiModel.value = chatAiSettings.model;
+  if (chatAiBaseUrl) chatAiBaseUrl.value = chatAiSettings.baseUrl;
+  if (chatAiKey) chatAiKey.value = chatAiSettings.apiKey;
+}
+
+function applyChatAiUiMode() {
+  const allowDeveloperConfig = CHAT_PUBLIC_RELEASE && !!state?.devMode;
+  const showSettings = CHAT_AI_SHOW_SETTINGS || allowDeveloperConfig;
+  if (chatAiPanelTitle) {
+    chatAiPanelTitle.textContent = CHAT_PUBLIC_RELEASE ? (allowDeveloperConfig ? "开发者 AI 设置" : "AI 驱动") : "AI 设置";
+  }
+  if (chatAiPanelTag) {
+    chatAiPanelTag.textContent = CHAT_PUBLIC_RELEASE ? (allowDeveloperConfig ? "开发者模式" : "公开版") : "本地保存";
+  }
+  if (chatAiConfigControls) {
+    chatAiConfigControls.classList.toggle("hidden", !showSettings);
+  }
+  if (chatAiPublicNote) {
+    chatAiPublicNote.classList.toggle("hidden", showSettings);
+    if (CHAT_PUBLIC_RELEASE && allowDeveloperConfig) {
+      chatAiPublicNote.textContent = "开发者模式下可临时填写你自己的 API Key；留空则自动沿用内置 AI。你的自定义 Key 仅本次会话使用，不会保存到公开版。";
+    } else {
+      chatAiPublicNote.textContent = "公开版默认由内置 AI 驱动；包含静态文件打开方式。若服务暂不可用，会自动切换为离线规则。";
+    }
+  }
+  if (chatAiPanel) {
+    chatAiPanel.classList.toggle("public-mode", CHAT_PUBLIC_RELEASE);
+  }
+  renderChatAiSettings();
+  refreshChatAiStatus();
+}
+
+function setChatAiStatus(message) {
+  if (!chatAiStatus) return;
+  chatAiStatus.textContent = message;
+}
+
+function refreshChatAiStatus() {
+  const allowDeveloperConfig = CHAT_PUBLIC_RELEASE && !!state?.devMode;
+  if (CHAT_PUBLIC_RELEASE && !allowDeveloperConfig && chatAiSettings.mode === "mimo") {
+    setChatAiStatus(`公开版默认使用内置 AI：${chatAiSettings.model} · 任意打开方式可用 · 异常时自动切离线`);
+    return;
+  }
+  if (chatAiSettings.mode !== "mimo") {
+    setChatAiStatus("当前使用离线规则引擎。");
+    return;
+  }
+  const keyState = chatAiSettings.apiKey ? "已自动配置 API Key" : "未配置 API Key";
+  if (CHAT_PUBLIC_RELEASE && allowDeveloperConfig) {
+    const userKeyState = chatAiSettings.apiKey
+      ? "已填写你的 API Key（仅本次）"
+      : "未填写你的 API Key（将自动使用内置 API）";
+    setChatAiStatus(`开发者模式：${chatAiSettings.model} · ${userKeyState}`);
+    return;
+  }
+  setChatAiStatus(`当前使用 MiMo：${chatAiSettings.model} · ${keyState}`);
+}
+
+function isStaticFileMode() {
+  return typeof window !== "undefined" && String(window.location?.protocol || "") === "file:";
+}
+
+function getStaticModeLaunchCommand() {
+  if (typeof window === "undefined") return "npm start";
+  const rawPath = decodeURIComponent(String(window.location?.pathname || ""));
+  const projectDir = rawPath.replace(/\/[^/]*$/, "") || ".";
+  return `cd "${projectDir}" && npm start`;
+}
+
+function renderFileModeBanner() {
+  if (!fileModeBanner) return;
+  const show = CHAT_PUBLIC_RELEASE && isStaticFileMode() && !fileModeBannerDismissed && !canUseDirectChatRoute();
+  fileModeBanner.classList.toggle("hidden", !show);
+  if (!show) return;
+  if (fileModeCommand) {
+    fileModeCommand.textContent = getStaticModeLaunchCommand();
+  }
+  if (fileModeBannerText) {
+    fileModeBannerText.textContent =
+      state.devMode
+        ? "当前通过 file:// 打开。公开版内置 AI 无法直接调用；你可以在开发者模式里填写自己的 API Key，或改用本地服务 / 线上版测试内置 AI。"
+        : "当前通过 file:// 打开。公开版内置 AI 会自动切换为离线规则；如需测试内置 AI，请改用本地服务或线上发布地址打开。";
+  }
+}
+
+const CUSTOM_PROJECT_STAGE_CONFIG = {
+  highschool: {
+    label: "高中阶段",
+    effectLimits: {
+      gpa: { min: -0.02, max: 0.09, digits: 2 },
+      test: { min: -20, max: 60, digits: 0 },
+      english: { min: -4, max: 8, digits: 0 },
+      activities: { min: -3, max: 14, digits: 0 },
+      awards: { min: -3, max: 14, digits: 0 },
+      leadership: { min: -3, max: 14, digits: 0 },
+      research: { min: -3, max: 16, digits: 0 },
+      internship: { min: -3, max: 14, digits: 0 },
+      essay: { min: -2, max: 10, digits: 0 },
+      essayTrack: { min: -2, max: 12, digits: 0 },
+      recStrength: { min: -2, max: 10, digits: 0 },
+      reputation: { min: -2, max: 10, digits: 0 },
+      stress: { min: -10, max: 10, digits: 0 },
+    },
+    trackOptions: ["research-track", "writing-archive", "art-portfolio", "startup-track", "impact-project"],
+    maxTime: 4,
+    maxCost: 22000,
+  },
+  undergrad: {
+    label: "本科阶段",
+    effectLimits: {
+      gpa: { min: -0.02, max: 0.08, digits: 2 },
+      research: { min: -3, max: 16, digits: 0 },
+      internship: { min: -3, max: 16, digits: 0 },
+      leadership: { min: -3, max: 16, digits: 0 },
+      stress: { min: -10, max: 10, digits: 0 },
+    },
+    trackOptions: ["research", "career", "leadership", "impact", "balance"],
+    maxTime: 4,
+    maxCost: 18000,
+  },
+  masters: {
+    label: "硕士阶段",
+    effectLimits: {
+      gpa: { min: -0.02, max: 0.07, digits: 2 },
+      research: { min: -3, max: 16, digits: 0 },
+      internship: { min: -3, max: 14, digits: 0 },
+      leadership: { min: -3, max: 14, digits: 0 },
+      thesis: { min: -3, max: 16, digits: 0 },
+      stress: { min: -10, max: 10, digits: 0 },
+    },
+    trackOptions: ["research", "career", "leadership", "impact", "balance"],
+    maxTime: 4,
+    maxCost: 20000,
+  },
+  phd: {
+    label: "博士阶段",
+    effectLimits: {
+      research: { min: -3, max: 16, digits: 0 },
+      internship: { min: -3, max: 12, digits: 0 },
+      leadership: { min: -3, max: 12, digits: 0 },
+      publication: { min: -3, max: 14, digits: 0 },
+      teaching: { min: -3, max: 14, digits: 0 },
+      stress: { min: -10, max: 10, digits: 0 },
+    },
+    trackOptions: ["research", "career", "leadership", "impact", "balance"],
+    maxTime: 4,
+    maxCost: 22000,
+  },
+};
+
+const CUSTOM_PROJECT_TAG_OPTIONS = [
+  "科研",
+  "工程",
+  "数据",
+  "商业",
+  "创业",
+  "公益",
+  "政策",
+  "人文",
+  "艺术",
+  "法律",
+  "辩论",
+  "写作",
+  "论文",
+  "实习",
+  "领导力",
+];
+
+function isCustomProjectAiAvailable() {
+  return chatAiSettings.mode === "mimo";
+}
+
+function getCustomProjectStageConfig(stage = "highschool") {
+  return CUSTOM_PROJECT_STAGE_CONFIG[stage] || CUSTOM_PROJECT_STAGE_CONFIG.highschool;
+}
+
+function getCustomProjectTimeState(stage = "highschool") {
+  if (stage === "highschool") {
+    const selectedEvents = Array.from(state.selectedEventIds || [])
+      .map((id) => (state.currentEvents || []).find((item) => item.id === id))
+      .filter(Boolean);
+    const selectedMini = Array.from(state.selectedMiniIds || [])
+      .map((id) => MINI_ACTIONS.find((item) => item.id === id))
+      .filter(Boolean);
+    const used =
+      selectedEvents.reduce((sum, event) => sum + getEventTime(event), 0) +
+      selectedMini.reduce((sum, item) => sum + Number(item.time || 0), 0);
+    return {
+      budget: Number(state.timeBudget || 0),
+      used,
+      left: Math.max(0, Number(state.timeBudget || 0) - used),
+    };
+  }
+  const termState = getHigherEdStageTermState(stage);
+  const selectedEvents = (termState.currentEvents || []).filter((item) => (termState.selectedEventIds || []).includes(item.id));
+  const selectedMini = getHigherEdMiniActions(stage).filter((item) => (termState.selectedMiniIds || []).includes(item.id));
+  const used =
+    selectedEvents.reduce((sum, event) => sum + getHigherEdEventTime(stage, event), 0) +
+    selectedMini.reduce((sum, item) => sum + Number(item.time || 0), 0);
+  return {
+    budget: Number(termState.timeBudget || 0),
+    used,
+    left: Math.max(0, Number(termState.timeBudget || 0) - used),
+  };
+}
+
+function getCustomProjectExistingEvent(stage = "highschool") {
+  const pool = stage === "highschool" ? state.currentEvents || [] : getHigherEdStageTermState(stage).currentEvents || [];
+  return pool.find((item) => item?.aiCustom);
+}
+
+function isCustomProjectUsedThisTerm(stage = "highschool") {
+  if (stage === "highschool") return state.customProjectUsedThisTerm === true;
+  return getHigherEdStageTermState(stage).customProjectUsed === true;
+}
+
+function setCustomProjectUsedThisTerm(stage = "highschool", used = true) {
+  if (stage === "highschool") {
+    state.customProjectUsedThisTerm = !!used;
+    return;
+  }
+  const termState = getHigherEdStageTermState(stage);
+  termState.customProjectUsed = !!used;
+}
+
+function getCustomProjectLockedReason(stage = "highschool") {
+  const existing = getCustomProjectExistingEvent(stage);
+  if (existing) {
+    return `本学期已锁定 AI 自定义项目：${existing.title || existing.name}。`;
+  }
+  return "本学期已使用过 AI 自定义项目机会。";
+}
+
+function setCustomProjectStageNotice(stage = "highschool", message = "") {
+  if (stage === "highschool") {
+    if (eventNotice) eventNotice.textContent = message;
+    return;
+  }
+  const termState = getHigherEdStageTermState(stage);
+  termState.eventNotice = message;
+}
+
+function rerenderCustomProjectStage(stage = "highschool") {
+  if (stage === "highschool") {
+    updateEventCount();
+    renderEvents();
+    return;
+  }
+  renderHigherEdTermCards(stage);
+}
+
+function getCustomProjectCurrentTermLabel(stage = "highschool") {
+  if (stage === "highschool") return TERMS[state.termIndex]?.name || "当前学期";
+  return `${getHigherEdStageLabel(stage)}第 ${getHigherEdCurrentTermNumber(stage)} 学期`;
+}
+
+function fitCustomProjectIntoSelection({
+  event,
+  selectedEventIds = [],
+  selectedMiniIds = [],
+  currentEvents = [],
+  miniPool = [],
+  timeBudget = 0,
+  getEventTime = () => 0,
+  enforceSingleLongTerm = false,
+}) {
+  const eventMap = new Map((currentEvents || []).map((item) => [item.id, item]));
+  const miniMap = new Map((miniPool || []).map((item) => [item.id, item]));
+  const nextEventIds = Array.from(new Set(selectedEventIds)).filter((id) => id !== event.id && eventMap.has(id));
+  const nextMiniIds = Array.from(new Set(selectedMiniIds)).filter((id) => miniMap.has(id));
+  const removedEvents = [];
+  const removedMini = [];
+
+  if (enforceSingleLongTerm && event.projectId) {
+    nextEventIds.slice().forEach((id) => {
+      const item = eventMap.get(id);
+      if (!item?.projectId || item.projectId === event.projectId) return;
+      removedEvents.push(item.title || item.name || "其他项目");
+      const index = nextEventIds.indexOf(id);
+      if (index >= 0) nextEventIds.splice(index, 1);
+    });
+  }
+
+  nextEventIds.push(event.id);
+
+  const totalEventTime = (ids) =>
+    ids
+      .map((id) => (id === event.id ? event : eventMap.get(id)))
+      .filter(Boolean)
+      .reduce((sum, item) => sum + Number(getEventTime(item) || 0), 0);
+  const totalMiniTime = (ids) =>
+    ids
+      .map((id) => miniMap.get(id))
+      .filter(Boolean)
+      .reduce((sum, item) => sum + Number(item.time || 0), 0);
+  const getTotalTime = () => totalEventTime(nextEventIds) + totalMiniTime(nextMiniIds);
+
+  while (getTotalTime() > timeBudget && nextMiniIds.length) {
+    const removedId = nextMiniIds.pop();
+    const item = miniMap.get(removedId);
+    if (item) removedMini.push(item.name || item.title || "小行动");
+  }
+
+  while (getTotalTime() > timeBudget) {
+    const removable = nextEventIds
+      .filter((id) => id !== event.id)
+      .map((id) => ({ id, item: eventMap.get(id) }))
+      .filter((entry) => entry.item);
+    if (!removable.length) break;
+    removable.sort((a, b) => Number(getEventTime(b.item) || 0) - Number(getEventTime(a.item) || 0));
+    const target = removable[0];
+    const index = nextEventIds.indexOf(target.id);
+    if (index < 0) break;
+    nextEventIds.splice(index, 1);
+    removedEvents.push(target.item.title || target.item.name || "其他项目");
+  }
+
+  return {
+    selectedEventIds: nextEventIds,
+    selectedMiniIds: nextMiniIds,
+    removedEvents,
+    removedMini,
+  };
+}
+
+function buildCustomProjectAutoJoinNotice(event, adjustments = {}) {
+  const pieces = [`已锁定 AI 自定义项目：${event.title || event.name}`];
+  if (adjustments.removedEvents?.length) {
+    pieces.push(`已移除项目：${adjustments.removedEvents.join("、")}`);
+  }
+  if (adjustments.removedMini?.length) {
+    pieces.push(`已取消小行动：${adjustments.removedMini.join("、")}`);
+  }
+  return `${pieces.join("；")}。`;
+}
+
+function inferCustomProjectTrack(stage, effects = {}, tags = []) {
+  const tagSet = new Set((Array.isArray(tags) ? tags : []).map((item) => String(item || "").trim()));
+  if (stage === "highschool") {
+    if (tagSet.has("科研") || Number(effects.research || 0) >= 6) return "research-track";
+    if (tagSet.has("艺术")) return "art-portfolio";
+    if (tagSet.has("写作") || tagSet.has("法律") || Number(effects.essayTrack || 0) >= 5) return "writing-archive";
+    if (tagSet.has("创业") || tagSet.has("商业") || Number(effects.internship || 0) >= 5) return "startup-track";
+    return "impact-project";
+  }
+  if (Number(effects.research || 0) + Number(effects.thesis || 0) + Number(effects.publication || 0) >= 10) return "research";
+  if (Number(effects.internship || 0) >= 6) return "career";
+  if (Number(effects.leadership || 0) >= 6) return "leadership";
+  if (tagSet.has("公益") || tagSet.has("政策") || tagSet.has("法律")) return "impact";
+  return "balance";
+}
+
+function inferFallbackCustomProjectEffects(stage, idea = "", tags = []) {
+  const text = `${idea} ${(Array.isArray(tags) ? tags.join(" ") : "")}`.toLowerCase();
+  if (stage === "highschool") {
+    if (/research|科研|实验|论文|lab|data|数据/.test(text)) return { research: 6, awards: 3, stress: 2 };
+    if (/law|政策|辩论|写作|播客|媒体|表达/.test(text)) return { essayTrack: 5, leadership: 3, reputation: 3, stress: 2 };
+    if (/startup|创业|商业|产品|社群|组织/.test(text)) return { leadership: 5, internship: 4, activities: 4, stress: 3 };
+    return { activities: 5, leadership: 4, reputation: 3, stress: 2 };
+  }
+  if (stage === "undergrad") {
+    if (/research|科研|lab|paper|数据/.test(text)) return { research: 7, gpa: 0.03, stress: 2 };
+    if (/intern|实习|创业|产品|商业/.test(text)) return { internship: 7, leadership: 3, stress: 2 };
+    return { leadership: 5, research: 3, stress: 2 };
+  }
+  if (stage === "masters") {
+    if (/research|论文|thesis|lab|paper/.test(text)) return { research: 7, thesis: 6, stress: 2 };
+    if (/intern|咨询|产品|商业|industry/.test(text)) return { internship: 6, leadership: 3, thesis: 2, stress: 2 };
+    return { leadership: 4, thesis: 5, stress: 2 };
+  }
+  if (/teach|教学|课程|助教/.test(text)) return { teaching: 7, leadership: 3, stress: 2 };
+  if (/paper|publication|论文|research|科研/.test(text)) return { research: 7, publication: 5, stress: 2 };
+  return { research: 5, leadership: 3, publication: 3, stress: 2 };
+}
+
+function sanitizeCustomProjectEffects(stage, rawEffects = {}, idea = "", tags = []) {
+  const config = getCustomProjectStageConfig(stage);
+  const sanitized = {};
+  Object.entries(config.effectLimits || {}).forEach(([key, limit]) => {
+    if (rawEffects[key] === undefined || rawEffects[key] === null || rawEffects[key] === "") return;
+    const numeric = Number(rawEffects[key]);
+    if (!Number.isFinite(numeric)) return;
+    const clamped = clamp(numeric, Number(limit.min), Number(limit.max));
+    sanitized[key] = limit.digits > 0 ? Number(clamped.toFixed(limit.digits)) : Math.round(clamped);
+  });
+  if (!Object.keys(sanitized).length) {
+    return inferFallbackCustomProjectEffects(stage, idea, tags);
+  }
+  return sanitized;
+}
+
+function sanitizeCustomProjectPayload(stage, idea, payload = {}) {
+  const config = getCustomProjectStageConfig(stage);
+  const rawName = String(payload.name || payload.title || "").trim();
+  const name = rawName || `AI 自定义${config.label}项目`;
+  const desc = String(payload.desc || payload.description || `${name}：由 AI 根据你的想法估算生成。`).trim();
+  const time = clamp(Math.round(Number(payload.time || 2) || 2), 1, config.maxTime);
+  const cost = clamp(Math.round(Number(payload.cost || 0) || 0), 0, config.maxCost);
+  const tags = Array.from(
+    new Set(
+      (Array.isArray(payload.tags) ? payload.tags : [])
+        .map((item) => String(item || "").trim())
+        .filter((item) => CUSTOM_PROJECT_TAG_OPTIONS.includes(item)),
+    ),
+  ).slice(0, 3);
+  const effects = sanitizeCustomProjectEffects(stage, payload.effects || {}, idea, tags);
+  const isLongTerm = Boolean(payload.isLongTerm || payload.longTerm);
+  const rawTrack = String(payload.track || payload.projectId || "").trim();
+  const inferredTrack = inferCustomProjectTrack(stage, effects, tags);
+  const projectId = isLongTerm
+    ? config.trackOptions.includes(rawTrack)
+      ? rawTrack
+      : inferredTrack
+    : null;
+  const reason = String(payload.reason || payload.estimateReason || "").trim();
+  const trackLabel =
+    stage === "highschool"
+      ? projectId
+        ? "长期主线"
+        : "短期项目"
+      : projectId
+        ? HIGHER_ED_PROJECT_LABELS[projectId] || "长期主线"
+        : "短期项目";
+  return {
+    id: `ai-custom-${stage}-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+    name,
+    title: name,
+    desc,
+    effects,
+    tags,
+    time,
+    cost,
+    projectId,
+    isLongTerm: Boolean(projectId),
+    aiCustom: true,
+    aiCustomStage: stage,
+    aiReason: reason,
+    aiIdea: idea,
+    projectLabel: trackLabel,
+  };
+}
+
+function extractJsonFromReply(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return null;
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fenced?.[1]?.trim() || raw;
+  try {
+    return JSON.parse(candidate);
+  } catch (error) {
+    const first = candidate.indexOf("{");
+    const last = candidate.lastIndexOf("}");
+    if (first >= 0 && last > first) {
+      try {
+        return JSON.parse(candidate.slice(first, last + 1));
+      } catch (innerError) {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+
+function extractCustomProjectTagsFromIdea(idea = "") {
+  const raw = String(idea || "");
+  return CUSTOM_PROJECT_TAG_OPTIONS.filter((tag) => raw.includes(tag)).slice(0, 3);
+}
+
+function buildFallbackCustomProjectPayload(stage, idea = "", reason = "") {
+  const config = getCustomProjectStageConfig(stage);
+  const tags = extractCustomProjectTagsFromIdea(idea);
+  const effects = sanitizeCustomProjectEffects(stage, {}, idea, tags);
+  const longTermCue = /长期|连续|社团|组织|平台|播客|社区|栏目|计划|项目/.test(String(idea || ""));
+  const projectId = longTermCue ? inferCustomProjectTrack(stage, effects, tags) : null;
+  const ideaText = String(idea || "").trim();
+  const shortName = ideaText.length > 18 ? `${ideaText.slice(0, 18)}...` : ideaText;
+  const time =
+    /竞赛|比赛|冲刺|hackathon|黑客松/i.test(ideaText) ? 1 : /研究|平台|播客|组织|课程|产品|实验/i.test(ideaText) ? 3 : 2;
+  const baseCost =
+    stage === "highschool"
+      ? /实验|设备|硬件|旅行|实地/.test(ideaText)
+        ? 2800
+        : 1200
+      : /实验|设备|硬件|部署|数据/.test(ideaText)
+        ? 3200
+        : 1800;
+  return sanitizeCustomProjectPayload(stage, idea, {
+    name: shortName || `AI 自定义${config.label}项目`,
+    desc: shortName
+      ? `基于你的想法“${shortName}”生成的一版规则估算草案，可直接作为本学期项目。`
+      : `基于你的想法生成的一版规则估算草案，可直接作为本学期项目。`,
+    time: clamp(time, 1, config.maxTime),
+    cost: clamp(baseCost, 0, config.maxCost),
+    tags,
+    isLongTerm: Boolean(projectId),
+    track: projectId || "",
+    effects,
+    reason: reason || "AI 输出不稳定，已按规则模板生成可用草案。",
+  });
+}
+
+function buildCustomProjectAiMessages(stage, idea) {
+  const config = getCustomProjectStageConfig(stage);
+  const timeState = getCustomProjectTimeState(stage);
+  const major = MAJORS.find((item) => item.id === state.majorId)?.name || state.majorId || "未定";
+  const profile =
+    stage === "highschool"
+      ? {
+          gpa: roundChatAiNumber(state.stats.gpa, 2),
+          activities: roundChatAiNumber(state.stats.activities, 0),
+          awards: roundChatAiNumber(state.stats.awards, 0),
+          leadership: roundChatAiNumber(state.stats.leadership, 0),
+          research: roundChatAiNumber(state.stats.research, 0),
+          internship: roundChatAiNumber(state.stats.internship, 0),
+          essayTrack: roundChatAiNumber(state.stats.essayTrack, 0),
+          stress: roundChatAiNumber(state.stats.stress, 0),
+        }
+      : pickChatAiMetrics(getHigherEdProfile(stage), Object.keys(config.effectLimits || {}).map((key) => ({ key, digits: key === "gpa" ? 2 : 0 })));
+  const schema = {
+    name: "项目名称",
+    desc: "1-2句项目简介",
+    time: `1-${config.maxTime} 的整数`,
+    cost: `0-${config.maxCost} 的整数，单位 USD`,
+    tags: CUSTOM_PROJECT_TAG_OPTIONS.slice(0, 12),
+    isLongTerm: "true/false",
+    track: `若 isLongTerm=true，则只能输出以下其中一个字符串：${config.trackOptions.join(" / ")}；否则输出空字符串`,
+    effects: Object.fromEntries(
+      Object.entries(config.effectLimits || {}).map(([key, limit]) => [
+        key,
+        `${limit.min} 到 ${limit.max}`,
+      ]),
+    ),
+    reason: "一句话解释为什么这样估算",
+  };
+  return [
+    {
+      role: "system",
+      content:
+        "你是升学模拟器中的项目策划器。根据用户想法，把它转换成一个适合当前阶段的游戏项目。必须只返回单个 JSON 对象，不要解释、不要 markdown、不要代码块、不要额外文字。估算要克制真实，不要给夸张效果。",
+    },
+    {
+      role: "user",
+      content: [
+        `阶段：${config.label}`,
+        `当前学期：${getCustomProjectCurrentTermLabel(stage)}`,
+        `意向专业：${major}`,
+        `可用资金：${formatUsd(state.cash)}`,
+        `本学期时间预算：${timeState.used} / ${timeState.budget}（剩余 ${timeState.left}）`,
+        `当前阶段核心数据：${JSON.stringify(profile)}`,
+        `用户想法：${idea}`,
+        `可选标签：${CUSTOM_PROJECT_TAG_OPTIONS.join("、")}`,
+        `若适合作为长期主线，isLongTerm 设为 true，并从 track 里选择一个；否则 isLongTerm 设为 false，track 留空字符串。`,
+        `只允许输出这个 JSON 结构：${JSON.stringify(schema)}`,
+      ].join("\n"),
+    },
+  ];
+}
+
+function renderCustomProjectPreview() {
+  if (!customProjectPreview || !applyCustomProjectBtn) return;
+  if (!customProjectDraft?.event) {
+    customProjectPreview.classList.add("hidden");
+    customProjectPreview.innerHTML = "";
+    applyCustomProjectBtn.disabled = true;
+    applyCustomProjectBtn.textContent = "生成后自动加入";
+    return;
+  }
+  const event = customProjectDraft.event;
+  const effectLine = Object.entries(event.effects || {})
+    .map(([key, value]) => `${EFFECT_LABELS[key] || key} ${formatEffect(Number(value) || 0)}`)
+    .join(" · ");
+  const tags = (event.tags || []).map((tag) => `<span class="tag">${tag}</span>`).join("");
+  const projectTag = event.isLongTerm
+    ? `<span class="tag project">${event.projectLabel || "长期主线"}</span>`
+    : '<span class="tag">短期项目</span>';
+  customProjectPreview.innerHTML = `
+    <div>
+      <h4>${event.title || event.name}</h4>
+      <p>${event.desc || ""}</p>
+    </div>
+    <div class="tag-row">${tags}${projectTag}<span class="tag recommend">AI估算</span></div>
+    ${effectLine ? `<p>${effectLine}</p>` : ""}
+    <p>费用 -${formatUsd(Number(event.cost || 0))} · 时间点数 -${Number(event.time || 0)}</p>
+    ${event.aiReason ? `<p class="note">估算说明：${event.aiReason}</p>` : ""}
+  `;
+  customProjectPreview.classList.remove("hidden");
+  applyCustomProjectBtn.textContent = isCustomProjectUsedThisTerm(customProjectDraft.stage || "highschool")
+    ? "已自动加入本学期"
+    : "生成后自动加入";
+  applyCustomProjectBtn.disabled = true;
+}
+
+function setCustomProjectBusy(nextBusy) {
+  customProjectBusy = !!nextBusy;
+  const stage = customProjectDraft?.stage || "highschool";
+  const locked = isCustomProjectUsedThisTerm(stage);
+  if (generateCustomProjectBtn) {
+    generateCustomProjectBtn.disabled = customProjectBusy || locked;
+    generateCustomProjectBtn.textContent = customProjectBusy ? "AI 估算中..." : locked ? "本学期已锁定" : "AI 估算并生成";
+  }
+  if (applyCustomProjectBtn) {
+    applyCustomProjectBtn.disabled = true;
+    applyCustomProjectBtn.textContent =
+      locked && customProjectDraft?.event ? "已自动加入本学期" : "生成后自动加入";
+  }
+  if (resetCustomProjectBtn) {
+    resetCustomProjectBtn.disabled = customProjectBusy;
+  }
+}
+
+function resetCustomProjectDialog(options = {}) {
+  const keepIdea = options.keepIdea === true;
+  customProjectDraft = keepIdea ? { ...customProjectDraft, event: null } : null;
+  if (customProjectIdea && !keepIdea) {
+    customProjectIdea.value = "";
+  }
+  if (customProjectNote) {
+    customProjectNote.textContent = "";
+  }
+  renderCustomProjectPreview();
+}
+
+function openCustomProjectDialog(stage = "highschool") {
+  if (isCustomProjectUsedThisTerm(stage)) {
+    setCustomProjectStageNotice(stage, getCustomProjectLockedReason(stage));
+    rerenderCustomProjectStage(stage);
+    return;
+  }
+  if (!customProjectDialog) return;
+  customProjectDraft = { stage, event: null };
+  if (customProjectDialogTitle) {
+    customProjectDialogTitle.textContent = `${getCustomProjectStageConfig(stage).label} · AI 自定义项目`;
+  }
+  if (customProjectDialogHint) {
+    const timeState = getCustomProjectTimeState(stage);
+    customProjectDialogHint.textContent = `输入你自己想到的项目/活动想法，AI 会结合当前阶段估算时间、费用和效果。当前剩余时间点：${timeState.left}。`;
+  }
+  if (customProjectNote) customProjectNote.textContent = "";
+  renderCustomProjectPreview();
+  setCustomProjectBusy(false);
+  if (typeof customProjectDialog.showModal === "function") {
+    customProjectDialog.showModal();
+  } else {
+    customProjectDialog.setAttribute("open", "true");
+  }
+  if (customProjectIdea) {
+    customProjectIdea.focus();
+  }
+}
+
+function closeCustomProjectDialogPanel() {
+  if (!customProjectDialog) return;
+  if (typeof customProjectDialog.close === "function") {
+    customProjectDialog.close();
+  } else {
+    customProjectDialog.removeAttribute("open");
+  }
+}
+
+async function generateCustomProjectEstimate() {
+  const stage = customProjectDraft?.stage || "highschool";
+  const idea = String(customProjectIdea?.value || "").trim();
+  if (!idea) {
+    if (customProjectNote) customProjectNote.textContent = "先写下你想做的项目想法。";
+    return;
+  }
+  if (isCustomProjectUsedThisTerm(stage)) {
+    if (customProjectNote) customProjectNote.textContent = getCustomProjectLockedReason(stage);
+    setCustomProjectBusy(false);
+    return;
+  }
+  if (!isCustomProjectAiAvailable()) {
+    const event = buildFallbackCustomProjectPayload(stage, idea, "AI 当前不可用，已按规则模板估算。");
+    customProjectDraft = { stage, event, raw: null };
+    renderCustomProjectPreview();
+    applyCustomProjectToStage(stage, event);
+    if (customProjectNote) {
+      customProjectNote.textContent = "AI 当前不可用，已按规则估算并自动加入本学期，本学期不可再次生成。";
+    }
+    setCustomProjectBusy(false);
+    return;
+  }
+  setCustomProjectBusy(true);
+  if (customProjectNote) customProjectNote.textContent = "AI 正在估算项目...";
+  try {
+    const payload = {
+      model: chatAiSettings.model,
+      baseUrl: chatAiSettings.baseUrl,
+      apiKey: chatAiSettings.apiKey,
+      temperature: 0.15,
+      response_format: { type: "json_object" },
+      messages: buildCustomProjectAiMessages(stage, idea),
+    };
+    const { reply } = await requestMimoByBestRoute(payload);
+    const parsed = extractJsonFromReply(reply);
+    if (!parsed || typeof parsed !== "object") {
+      const event = buildFallbackCustomProjectPayload(stage, idea, "AI 回复格式不稳定，已按规则估算生成草案。");
+      customProjectDraft = { stage, event, raw: null };
+      renderCustomProjectPreview();
+      applyCustomProjectToStage(stage, event);
+      if (customProjectNote) {
+        customProjectNote.textContent = "AI 回复格式不稳定，已按规则估算并自动加入本学期，本学期不可再次生成。";
+      }
+      return;
+    }
+    const event = sanitizeCustomProjectPayload(stage, idea, parsed);
+    customProjectDraft = { stage, event, raw: parsed };
+    renderCustomProjectPreview();
+    applyCustomProjectToStage(stage, event);
+    if (customProjectNote) {
+      customProjectNote.textContent = "AI 已完成估算，并已自动加入本学期，本学期不可再次生成。";
+    }
+  } catch (error) {
+    const event = buildFallbackCustomProjectPayload(stage, idea, "AI 请求失败，已按规则估算生成草案。");
+    customProjectDraft = { stage, event, raw: null };
+    renderCustomProjectPreview();
+    applyCustomProjectToStage(stage, event);
+    if (customProjectNote) {
+      customProjectNote.textContent = `AI 估算异常，已按规则估算并自动加入本学期：${error.message || "未知错误"}`;
+    }
+  } finally {
+    setCustomProjectBusy(false);
+  }
+}
+
+function applyCustomProjectToStage(stage, event) {
+  if (!event) return false;
+  if (stage === "highschool") {
+    const existing = getCustomProjectExistingEvent(stage);
+    const selected = new Set(state.selectedEventIds || []);
+    if (existing) {
+      selected.delete(existing.id);
+      state.currentEvents = (state.currentEvents || []).filter((item) => item.id !== existing.id);
+    }
+    state.currentEvents = [...(state.currentEvents || []), event];
+    const adjustments = fitCustomProjectIntoSelection({
+      event,
+      selectedEventIds: Array.from(selected),
+      selectedMiniIds: Array.from(state.selectedMiniIds || []),
+      currentEvents: state.currentEvents || [],
+      miniPool: MINI_ACTIONS,
+      timeBudget: Number(state.timeBudget || 0),
+      getEventTime,
+      enforceSingleLongTerm: true,
+    });
+    state.selectedEventIds = new Set(adjustments.selectedEventIds);
+    state.selectedMiniIds = new Set(adjustments.selectedMiniIds);
+    setCustomProjectUsedThisTerm(stage, true);
+    setCustomProjectStageNotice(stage, buildCustomProjectAutoJoinNotice(event, adjustments));
+    rerenderCustomProjectStage(stage);
+    return state.selectedEventIds.has(event.id);
+  }
+  const termState = getHigherEdStageTermState(stage);
+  const selected = new Set(termState.selectedEventIds || []);
+  const existing = getCustomProjectExistingEvent(stage);
+  if (existing) {
+    selected.delete(existing.id);
+    termState.currentEvents = (termState.currentEvents || []).filter((item) => item.id !== existing.id);
+  }
+  termState.currentEvents = [...(termState.currentEvents || []), event];
+  const adjustments = fitCustomProjectIntoSelection({
+    event,
+    selectedEventIds: Array.from(selected),
+    selectedMiniIds: termState.selectedMiniIds || [],
+    currentEvents: termState.currentEvents || [],
+    miniPool: getHigherEdMiniActions(stage),
+    timeBudget: Number(termState.timeBudget || 0),
+    getEventTime: (item) => getHigherEdEventTime(stage, item),
+    enforceSingleLongTerm: event.isLongTerm,
+  });
+  termState.selectedEventIds = adjustments.selectedEventIds;
+  termState.selectedMiniIds = adjustments.selectedMiniIds;
+  setCustomProjectUsedThisTerm(stage, true);
+  setCustomProjectStageNotice(stage, buildCustomProjectAutoJoinNotice(event, adjustments));
+  rerenderCustomProjectStage(stage);
+  return (getHigherEdStageTermState(stage).selectedEventIds || []).includes(event.id);
+}
+
+function applyCustomProjectDraft() {
+  if (!customProjectDraft?.event) {
+    if (customProjectNote) customProjectNote.textContent = "请先让 AI 生成项目。";
+    return;
+  }
+  applyCustomProjectToStage(customProjectDraft.stage || "highschool", customProjectDraft.event);
+  closeCustomProjectDialogPanel();
+}
+
+function appendCustomProjectLauncherCard(container, stage = "highschool") {
+  if (!container) return;
+  const card = document.createElement("div");
+  card.className = "event-card recommended";
+  const existing = getCustomProjectExistingEvent(stage);
+  const locked = isCustomProjectUsedThisTerm(stage);
+  const label = stage === "highschool" ? "AI 自定义项目" : `${getCustomProjectStageConfig(stage).label} · AI 自定义项目`;
+  card.innerHTML = `
+    <div>
+      <h4>${label}</h4>
+      <p>${
+        locked
+          ? getCustomProjectLockedReason(stage)
+          : existing
+            ? `当前已生成：${existing.title || existing.name}。生成后会立刻锁定并加入本学期。`
+            : "把你自己想到的好项目交给 AI，估算时间、费用和对应收益，生成后会立刻锁定并加入本学期。"
+      } </p>
+    </div>
+    <div class="tag-row"><span class="tag recommend">AI生成</span><span class="tag">自定义</span></div>
+    <p>适合有明确想法、想把自己的脑洞转成游戏内项目的时候使用；每学期仅可生成一次。</p>
+    <button class="ghost" type="button">${locked ? "本学期已使用" : existing ? "生成并锁定项目" : "创建并锁定项目"}</button>
+  `;
+  const button = card.querySelector("button");
+  let disableReason = "";
+  if (locked) {
+    disableReason = getCustomProjectLockedReason(stage);
+  }
+  button.disabled = !!disableReason;
+  if (disableReason) {
+    card.classList.add("blocked");
+    const reason = document.createElement("p");
+    reason.className = "disabled-reason";
+    reason.textContent = disableReason;
+    card.insertBefore(reason, button);
+  }
+  button.addEventListener("click", () => openCustomProjectDialog(stage));
+  container.appendChild(card);
+}
+
+function syncChatAiSettingsFromControls() {
+  const allowDeveloperConfig = CHAT_PUBLIC_RELEASE && !!state?.devMode;
+  const next = CHAT_PUBLIC_RELEASE && !allowDeveloperConfig
+    ? {
+        mode: "mimo",
+        model: CHAT_AI_DEFAULTS.model,
+        baseUrl: CHAT_AI_DEFAULTS.baseUrl,
+        apiKey: "",
+      }
+    : {
+        mode: chatAiMode ? chatAiMode.value : chatAiSettings.mode,
+        model: chatAiModel ? chatAiModel.value : chatAiSettings.model,
+        baseUrl: chatAiBaseUrl ? chatAiBaseUrl.value : chatAiSettings.baseUrl,
+        apiKey: chatAiKey ? chatAiKey.value : chatAiSettings.apiKey,
+      };
+  chatAiSettings = normalizeChatAiSettings(next);
+  saveChatAiSettings();
+  refreshChatAiStatus();
+  if (chatAiPingNote) chatAiPingNote.textContent = "";
+}
+
+async function checkChatAiAvailability() {
+  syncChatAiSettingsFromControls();
+  if (!chatAiPingNote) return;
+  if (chatAiSettings.mode !== "mimo") {
+    chatAiPingNote.textContent = "当前为离线模式；切换到 MiMo 后可检测。";
+    return;
+  }
+  const startedAt = Date.now();
+  chatAiPingNote.textContent = "检测中...";
+  if (chatAiPingBtn) chatAiPingBtn.disabled = true;
+  try {
+    const { reply, source } = await requestMimoByBestRoute({
+      model: chatAiSettings.model,
+      baseUrl: chatAiSettings.baseUrl,
+      apiKey: chatAiSettings.apiKey,
+      temperature: 0,
+      max_tokens: 96,
+      messages: [
+        {
+          role: "user",
+          content: "可用性检测：请只回复“OK”。",
+        },
+      ],
+    });
+    const latency = Date.now() - startedAt;
+    const preview = String(reply || "").replace(/\s+/g, " ").slice(0, 80);
+    const routeLabel = source === "direct" ? "直连" : "代理";
+    chatAiPingNote.textContent = `可用（${latency}ms）· ${routeLabel} · 返回：${preview || "OK"}`;
+    setChatAiStatus(`MiMo 可用：${chatAiSettings.model} · ${routeLabel} · ${latency}ms`);
+  } catch (error) {
+    chatAiPingNote.textContent = `不可用：${error.message || "未知错误"}`;
+    setChatAiStatus(`MiMo 不可用，建议检查 Key/模型/Base URL`);
+  } finally {
+    if (chatAiPingBtn) chatAiPingBtn.disabled = false;
+  }
+}
+
+function shouldUseMimoChat(roleId) {
+  if (chatAiSettings.mode !== "mimo") return false;
+  return true;
+}
+
+function setChatSendBusy(nextBusy) {
+  chatSendBusy = !!nextBusy;
+  if (chatSend) {
+    chatSend.disabled = chatSendBusy;
+    chatSend.textContent = chatSendBusy ? "发送中..." : "发送";
+  }
+}
+
+function getChatAiRecentHistory(roleId, limit = 6) {
+  const history = (state.chatLog || []).filter((msg) => msg.targetRole === roleId).slice(-limit);
+  return history.map((item) => ({
+    role: item.role === "user" ? "user" : "assistant",
+    content: String(item.text || ""),
+  }));
+}
+
+function getChatAiPromptForRole(roleId) {
+  if (roleId === "counselor") return CHAT_AI_PROMPTS.counselor;
+  if (roleId === "family") return CHAT_AI_PROMPTS.family;
+  if (roleId === "peer") return CHAT_AI_PROMPTS.peer;
+  if (roleId === "teacher") return CHAT_AI_PROMPTS.teacher;
+  if (isInterviewerRole(roleId)) return CHAT_AI_PROMPTS.interviewer;
+  if (isAdmissionsRole(roleId)) return CHAT_AI_PROMPTS.admissions;
+  return CHAT_AI_PROMPTS.default;
+}
+
+function roundChatAiNumber(value, digits = 2) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  if (digits <= 0) return Math.round(num);
+  return Number(num.toFixed(digits));
+}
+
+function pickChatAiMetrics(source, schema = []) {
+  const obj = {};
+  schema.forEach((item) => {
+    const key = typeof item === "string" ? item : item?.key;
+    const digits = typeof item === "string" ? 1 : Number(item?.digits ?? 1);
+    if (!key || !source || typeof source !== "object") return;
+    const value = roundChatAiNumber(source[key], digits);
+    if (value === null) return;
+    obj[key] = value;
+  });
+  return obj;
+}
+
+function getRecentActionNames(history = [], max = 4) {
+  if (!Array.isArray(history) || !history.length) return [];
+  return history
+    .slice(-max)
+    .map((item) => {
+      if (!item || typeof item !== "object") return "";
+      const term = Number(item.term || 0);
+      const name = String(item.actionName || item.actionId || "").trim();
+      return name ? `T${term}:${name}` : "";
+    })
+    .filter(Boolean);
+}
+
+function summarizeDecisionCounts(results = []) {
+  const list = Array.isArray(results) ? results : [];
+  return {
+    total: list.length,
+    admit: list.filter((item) => item?.status === "录取").length,
+    waitlist: list.filter((item) => item?.status === "候补").length,
+    reject: list.filter((item) => item?.status === "拒绝").length,
+    revealed: list.filter((item) => item?.revealed !== false).length,
+  };
+}
+
+function getReadableSchoolNames(ids = [], max = 8) {
+  const array = Array.isArray(ids) ? ids : Array.from(ids || []);
+  return array
+    .map((id) => UNIVERSITIES.find((school) => school.id === id)?.name || id)
+    .filter(Boolean)
+    .slice(0, max);
+}
+
+function buildRoleSpecificAiContext(roleId) {
+  const dominantRoute = getDominantRouteProfile();
+  const weakestRoute = getSortedRouteEntries().slice(-1)[0] || null;
+  const relationship = Math.round(Number(state.chatRelationships?.[roleId] ?? 50));
+  const memoryCard = ensureRoleMemoryCard(roleId) || {};
+  const shared = {
+    relationship,
+    relationshipBand: relationship >= 75 ? "high" : relationship >= 50 ? "mid" : "low",
+    dominantRoute: dominantRoute.label,
+    weakestRoute: weakestRoute?.label || "",
+    latestCombo: (state.comboHistory || [])[0]?.label || "",
+    latestFeedback: (state.feedbackLedger || [])[0]?.summary || "",
+    tailwinds: getCurrentWorldTailwinds(2),
+    headwinds: getCurrentWorldHeadwinds(2),
+    memoryFocus: memoryCard.focus || "",
+    concern: memoryCard.concern || "",
+    priorities: Array.isArray(memoryCard.priorities) ? memoryCard.priorities.slice(0, 3) : [],
+  };
+  if (isInterviewerRole(roleId)) {
+    const app = getInterviewerApplicationByRole(roleId);
+    if (!app) return shared;
+    return {
+      ...shared,
+      roleType: "interviewer",
+      targetCompany: app.company || "",
+      targetRole: app.role || "",
+      interviewStatus: app.status || "",
+      interviewRound: Number(app.interviewRound || 0),
+      salaryRange: [Number(app.salaryLow || 0), Number(app.salaryHigh || 0)],
+      reason: app.reason || "",
+      transcriptCount: Array.isArray(app.interviewTranscript) ? app.interviewTranscript.length : 0,
+    };
+  }
+  if (isAdmissionsRole(roleId)) {
+    const school = getAdmissionsSchoolByRole(roleId);
+    if (!school) return shared;
+    const ug = getAdmissionsUndergradResult(school.id);
+    const grad = getAdmissionsGradResult(school.id);
+    return {
+      ...shared,
+      roleType: "admissions",
+      targetSchool: school.name,
+      undergradResult: ug
+        ? {
+            status: ug.status,
+            chance: roundChatAiNumber((ug.chance ?? 0) * 100, 1),
+            fit: roundChatAiNumber((ug.fitScore ?? 0) * 100, 1),
+            reasons: Array.isArray(ug.reasons) ? ug.reasons.slice(0, 3) : [],
+          }
+        : null,
+      graduateResult: grad
+        ? {
+            status: grad.status,
+            programType: grad.programType || "",
+            chance: roundChatAiNumber((grad.chance ?? 0) * 100, 1),
+            reason: grad.reason || "",
+          }
+        : null,
+    };
+  }
+  return {
+    ...shared,
+    roleType: roleId,
+    legacyCompletedRuns: Number(state.legacyProgress?.completedRuns || 0),
+  };
+}
+
+function buildChatAiUserSnapshot(roleId) {
+  const profile = PROFILES.find((item) => item.id === state.profileId);
+  const background = BACKGROUNDS.find((item) => item.id === state.backgroundId);
+  const major = MAJORS.find((item) => item.id === state.majorId);
+  const counselor = COUNSELORS.find((item) => item.id === state.counselorId);
+  const selectedEvents = Array.from(state.selectedEventIds || [])
+    .map((id) => (state.currentEvents || []).find((event) => event.id === id))
+    .filter(Boolean)
+    .map((item) => item.title)
+    .slice(0, 4);
+  const selectedMini = Array.from(state.selectedMiniIds || [])
+    .map((id) => MINI_ACTIONS.find((item) => item.id === id))
+    .filter(Boolean)
+    .map((item) => item.name)
+    .slice(0, 3);
+
+  const activeHigherEdStage = getActiveHigherEdStage();
+  let higherEdSelection = {};
+  if (activeHigherEdStage) {
+    const termState = getHigherEdStageTermState(activeHigherEdStage);
+    const stageEvents = (termState.currentEvents || [])
+      .filter((item) => (termState.selectedEventIds || []).includes(item.id))
+      .map((item) => item.name)
+      .slice(0, 4);
+    const stageMini = getHigherEdMiniActions(activeHigherEdStage)
+      .filter((item) => (termState.selectedMiniIds || []).includes(item.id))
+      .map((item) => item.name)
+      .slice(0, 3);
+    higherEdSelection = {
+      stage: activeHigherEdStage,
+      selectedEvents: stageEvents,
+      selectedMiniActions: stageMini,
+      longProjectId: termState.activeProjectId || "",
+    };
+  }
+
+  const jobApps = Array.isArray(state.jobOutcome?.applications) ? state.jobOutcome.applications : [];
+  const topJobApps = jobApps.slice(0, 8).map((item) => ({
+    company: item.company || "",
+    role: item.role || "",
+    status: item.status || "",
+    difficulty: roundChatAiNumber(item.difficulty, 2),
+    chance: roundChatAiNumber((item.chance ?? 0) * 100, 1),
+  }));
+
+  const snapshot = {
+    player: {
+      name: state.playerName || "",
+      profile: profile?.name || "",
+      background: background?.name || "",
+      legacySchool: state.legacySchoolName || "",
+      major: major?.name || "",
+      difficulty: DIFFICULTY_LEVELS.find((item) => item.id === state.difficultyId)?.name || state.difficultyId || "",
+      counselor: counselor?.name || "",
+      region: state.regionId || "",
+    },
+    routeProfile: {
+      dominant: getDominantRouteProfile().label,
+      scores: Object.fromEntries(getSortedRouteEntries().map((item) => [item.id, Math.round(item.value)])),
+      latestCombo: (state.comboHistory || [])[0]?.label || "",
+    },
+    progress: {
+      termIndex: Number(state.termIndex),
+      applicationStage: state.applicationStage || "",
+      journey: buildJourneyDigestLine(),
+      mainView: getMainViewStage(),
+      activeHigherEdStage: activeHigherEdStage || "",
+    },
+    financeAndPressure: {
+      cash: roundChatAiNumber(state.cash, 0),
+      loanBalance: roundChatAiNumber(state.loanBalance, 0),
+      loanCount: Number(state.loanCount || 0),
+      overworkDebt: Number(state.overworkDebt || 0),
+      highschoolStress: roundChatAiNumber(state.stats?.stress, 1),
+      undergradStress: roundChatAiNumber(state.undergradProfile?.stress, 1),
+      mastersStress: roundChatAiNumber(state.mastersProfile?.stress, 1),
+      phdStress: roundChatAiNumber(state.phdProfile?.stress, 1),
+    },
+    metrics: {
+      highschool: pickChatAiMetrics(state.stats, [
+        { key: "gpa", digits: 2 },
+        { key: "test", digits: 1 },
+        { key: "activities", digits: 1 },
+        { key: "leadership", digits: 1 },
+        { key: "essayTrack", digits: 1 },
+        { key: "recStrength", digits: 1 },
+        { key: "awards", digits: 1 },
+        { key: "research", digits: 1 },
+        { key: "internship", digits: 1 },
+      ]),
+      undergrad: pickChatAiMetrics(state.undergradProfile, [
+        { key: "gpa", digits: 2 },
+        { key: "research", digits: 1 },
+        { key: "internship", digits: 1 },
+        { key: "leadership", digits: 1 },
+      ]),
+      masters: pickChatAiMetrics(state.mastersProfile, [
+        { key: "gpa", digits: 2 },
+        { key: "research", digits: 1 },
+        { key: "internship", digits: 1 },
+        { key: "thesis", digits: 1 },
+      ]),
+      phd: pickChatAiMetrics(state.phdProfile, [
+        { key: "research", digits: 1 },
+        { key: "publication", digits: 1 },
+        { key: "teaching", digits: 1 },
+        { key: "leadership", digits: 1 },
+      ]),
+    },
+    activities: {
+      highschoolSelectedEvents: selectedEvents,
+      highschoolSelectedMiniActions: selectedMini,
+      highschoolLongProject: state.activeProjectId || "",
+      higherEdSelection,
+      undergradRecentActions: getRecentActionNames(state.undergradHistory, 4),
+      mastersRecentActions: getRecentActionNames(state.mastersHistory, 4),
+      phdRecentActions: getRecentActionNames(state.phdHistory, 4),
+    },
+    applications: {
+      undergradSelectedSchools: getReadableSchoolNames(state.selectedSchools),
+      undergradResults: summarizeDecisionCounts(state.results),
+      gradSelectedSchools: getReadableSchoolNames(state.gradSelectedSchools),
+      gradResults: summarizeDecisionCounts(state.gradResults),
+      finalChoice: getFinalChoiceResult()?.name || "",
+      selectedGradOfferId: state.selectedGradOfferId || "",
+    },
+    career: {
+      postGradPath: state.postGradPath || "",
+      chosenOfferCompanyId: state.jobOutcome?.chosenOfferCompanyId || "",
+      applications: topJobApps,
+    },
+    legacy: {
+      completedRuns: Number(state.legacyProgress?.completedRuns || 0),
+      boosts: state.legacyBoosts || createDefaultLegacyBoosts(),
+    },
+    recentLog: (state.log || []).slice(0, 6),
+    roleSpecific: buildRoleSpecificAiContext(roleId),
+  };
+  return snapshot;
+}
+
+function buildMimoChatMessages(roleId, userText, localReply) {
+  const roleLabel = getChatRoleLabel(roleId) || roleId || "角色";
+  const digest = buildJourneyDigestLine();
+  const world = getWorldContextSummaryLine();
+  const relation = Math.round(Number(state.chatRelationships?.[roleId] ?? 50));
+  const rolePrompt = getChatAiPromptForRole(roleId);
+  const snapshot = buildChatAiUserSnapshot(roleId);
+  const snapshotJson = JSON.stringify(snapshot).slice(0, 4200);
+  const contextBlock = [
+    `角色：${roleLabel}`,
+    `阶段摘要：${digest}`,
+    `环境：${world}`,
+    `关系值：${relation}/100`,
+    `用户档案JSON：${snapshotJson}`,
+  ].join("\n");
+  const history = getChatAiRecentHistory(roleId, CHAT_AI_HISTORY_LIMIT);
+  const compactLocalReply = String(localReply || "").slice(0, 520);
+  return [
+    {
+      role: "system",
+      content:
+        [
+          "你是留学/求职模拟器中的对话角色。",
+          rolePrompt,
+          "请只用中文回复。",
+          "不要输出思考过程，直接输出最终回答。",
+          "必须严格保留规则引擎给出的关键结论、状态、数字和限制，不能改判定结果。",
+          "不要新增不存在的流程或按钮，不要承诺改变录取/录用结果。",
+          "系统已同步用户基本信息、活动记录和阶段数据；不要再反问用户“你是什么背景/分数/做过什么活动”。",
+          "结合角色关系值、用户当前主路线、最近组合技、顺风逆风来组织语气和建议，让不同角色说话明显不一样。",
+          "默认简短、直接、像真人聊天，优先用 1-2 句说清重点，尽量控制在 40-90 个汉字；只有当用户明确要求详细分析、比较、规划时再自然展开。",
+          "如果用户在追问原因、方案、比较、取舍、准备方向，请直接展开说明，不要只复述一句结论。",
+        ].join(" "),
+    },
+    ...history,
+    {
+      role: "user",
+      content: `${contextBlock}\n\n用户输入：${userText}\n\n规则引擎原始回复（不可改判定）：${compactLocalReply}\n\n任务：在不改变结论的前提下，输出自然、角色化、偏简短的正文。默认先把最关键的话说清楚；只有在用户明显想要更详细解释时，再补充原因、建议、比较逻辑。若更适合分点，就分点回答。如果涉及数值、比例、状态、阶段名，请与原始回复保持一致。不要再追问用户基础档案，直接利用已同步资料回答。`,
+    },
+  ];
+}
+
+function buildMimoRetryMessages(roleId, userText, localReply) {
+  const roleLabel = getChatRoleLabel(roleId) || roleId || "角色";
+  const snapshot = buildChatAiUserSnapshot(roleId);
+  const compactFacts = [
+    `角色：${roleLabel}`,
+    `姓名：${snapshot.player?.name || ""}`,
+    `背景：${snapshot.player?.background || ""}`,
+    `专业：${snapshot.player?.major || ""}`,
+    `阶段：${snapshot.progress?.journey || ""}`,
+    `资金：${snapshot.financeAndPressure?.cash ?? ""}`,
+    `高中活动：${(snapshot.activities?.highschoolSelectedEvents || []).join(" / ")}`,
+    `本科近况：${(snapshot.activities?.undergradRecentActions || []).join(" / ")}`,
+    `硕士近况：${(snapshot.activities?.mastersRecentActions || []).join(" / ")}`,
+    `博士近况：${(snapshot.activities?.phdRecentActions || []).join(" / ")}`,
+    `近期日志：${(snapshot.recentLog || []).slice(0, 3).join(" / ")}`,
+  ]
+    .filter((line) => !line.endsWith("："))
+    .join("\n");
+  return [
+    {
+      role: "system",
+      content: [
+        "你是留学/求职模拟器中的对话角色。",
+        getChatAiPromptForRole(roleId),
+        "请只用中文回复。",
+        "不要输出思考过程，直接输出最终回答。",
+        "不要复述系统规则，不要道歉，不要提及你看不到上下文。",
+        "默认简短一点，优先 1-2 句，先直说重点；只有用户明确要求详细时再展开。",
+        "必须输出可直接显示给用户的完整正文，不能留空。",
+      ].join(" "),
+    },
+    {
+      role: "user",
+      content: `${compactFacts}\n\n用户输入：${userText}\n规则结论：${localReply}\n\n请在不改变规则结论的前提下，直接输出完整中文正文。默认用 1-2 句简短回答，先说重点；若用户明显在追问深层原因、规划或比较，再补充原因、建议和下一步。不要空白，不要只重复一句话。`,
+    },
+  ];
+}
+
+function getChatAiMaxTokens(value = CHAT_AI_MAX_TOKENS) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return null;
+  return Math.round(num);
+}
+
+function canUseDirectChatRoute() {
+  if (CHAT_AI_ALLOW_DIRECT) return true;
+  return CHAT_PUBLIC_RELEASE && !!state?.devMode && !!String(chatAiSettings.apiKey || "").trim();
+}
+
+async function fetchJsonWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort("timeout"), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    const data = await response.json().catch(() => ({}));
+    return { response, data };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function extractMimoReplyFromData(data) {
+  if (!data || typeof data !== "object") return "";
+  if (typeof data.reply === "string" && data.reply.trim()) {
+    return data.reply.trim();
+  }
+  const message = data?.choices?.[0]?.message;
+  const content = message?.content;
+  if (typeof content === "string") return content.trim();
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (part && typeof part === "object" && typeof part.text === "string") return part.text;
+        return "";
+      })
+      .join("")
+      .trim();
+  }
+  return "";
+}
+
+function shouldRetryEmptyMimoReply(data) {
+  const choice = data?.choices?.[0] || {};
+  const message = choice?.message || {};
+  const reasoning = String(message?.reasoning_content || "").trim();
+  const finishReason = String(choice?.finish_reason || "").trim();
+  return !!reasoning || finishReason === "length";
+}
+
+async function requestMimoViaProxy(payload, retryContext = null, allowRetry = true) {
+  const requestPayload = {
+    model: payload.model,
+    baseUrl: payload.baseUrl,
+    apiKey: getEffectiveChatAiApiKey(payload.apiKey),
+    temperature: payload.temperature,
+    messages: payload.messages,
+  };
+  if (payload.response_format) {
+    requestPayload.response_format = payload.response_format;
+  }
+  const maxTokens = getChatAiMaxTokens(payload.max_tokens);
+  if (maxTokens) {
+    requestPayload.max_tokens = maxTokens;
+  }
+  const { response, data } = await fetchJsonWithTimeout(
+    "/api/mimo/chat",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestPayload),
+    },
+    CHAT_AI_PROXY_TIMEOUT_MS,
+  );
+  if (!response.ok) {
+    throw new Error(data?.error || `请求失败 (${response.status})`);
+  }
+  const reply = extractMimoReplyFromData(data);
+  if (!reply) {
+    if (allowRetry && retryContext && shouldRetryEmptyMimoReply(data)) {
+      const retryPayload = {
+        ...payload,
+        temperature: 0.35,
+        max_tokens: null,
+        messages: buildMimoRetryMessages(retryContext.roleId, retryContext.userText, retryContext.localReply),
+      };
+      return requestMimoViaProxy(retryPayload, retryContext, false);
+    }
+    throw new Error("MiMo 未返回有效文本");
+  }
+  return { reply, source: "proxy" };
+}
+
+async function requestMimoDirect(payload, retryContext = null, allowRetry = true) {
+  if (!canUseDirectChatRoute()) {
+    throw new Error("公开版已禁用前端直连");
+  }
+  const baseUrl = String(payload.baseUrl || chatAiSettings.baseUrl || CHAT_AI_DEFAULTS.baseUrl).replace(/\/+$/, "");
+  const apiKey = getEffectiveChatAiApiKey(payload.apiKey);
+  if (!apiKey) {
+    throw new Error("缺少 API Key");
+  }
+  const requestBody = {
+    model: payload.model,
+    messages: payload.messages,
+    temperature: payload.temperature,
+  };
+  if (payload.response_format) {
+    requestBody.response_format = payload.response_format;
+  }
+  const maxTokens = getChatAiMaxTokens(payload.max_tokens);
+  if (maxTokens) {
+    requestBody.max_tokens = maxTokens;
+  }
+  const { response, data } = await fetchJsonWithTimeout(
+    `${baseUrl}/chat/completions`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(requestBody),
+    },
+    CHAT_AI_DIRECT_TIMEOUT_MS,
+  );
+  if (!response.ok) {
+    throw new Error(data?.error?.message || data?.error || data?.message || `请求失败 (${response.status})`);
+  }
+  const reply = extractMimoReplyFromData(data);
+  if (!reply) {
+    if (allowRetry && retryContext && shouldRetryEmptyMimoReply(data)) {
+      const retryPayload = {
+        ...payload,
+        temperature: 0.35,
+        max_tokens: null,
+        messages: buildMimoRetryMessages(retryContext.roleId, retryContext.userText, retryContext.localReply),
+      };
+      return requestMimoDirect(retryPayload, retryContext, false);
+    }
+    throw new Error("MiMo 未返回有效文本");
+  }
+  return { reply, source: "direct" };
+}
+
+async function requestMimoByBestRoute(payload, retryContext = null) {
+  const protocol = typeof window !== "undefined" ? window.location?.protocol : "";
+  const routeOrder = chatAiPreferredRoute === "proxy" ? ["proxy", "direct"] : ["direct", "proxy"];
+  const preferredOrder = canUseDirectChatRoute()
+    ? protocol === "file:"
+      ? ["direct", "proxy"]
+      : routeOrder
+    : ["proxy"];
+  const errors = [];
+  for (const route of preferredOrder) {
+    try {
+      const result =
+        route === "direct"
+          ? await requestMimoDirect(payload, retryContext, true)
+          : await requestMimoViaProxy(payload, retryContext, true);
+      chatAiPreferredRoute = route;
+      return result;
+    } catch (error) {
+      errors.push(error);
+      continue;
+    }
+  }
+  const firstError = errors[0];
+  throw firstError || new Error("MiMo 请求失败");
+}
+
+async function requestMimoChatReply(roleId, userText, localReply) {
+  const payload = {
+    model: chatAiSettings.model,
+    baseUrl: chatAiSettings.baseUrl,
+    apiKey: chatAiSettings.apiKey,
+    temperature: 0.6,
+    messages: buildMimoChatMessages(roleId, userText, localReply),
+  };
+  const maxTokens = getChatAiMaxTokens();
+  if (maxTokens) {
+    payload.max_tokens = maxTokens;
+  }
+  return requestMimoByBestRoute(payload, { roleId, userText, localReply });
+}
+
+async function resolveChatReply(roleId, userText, localReply) {
+  if (!shouldUseMimoChat(roleId)) {
+    return localReply;
+  }
+  try {
+    const { reply, source } = await requestMimoChatReply(roleId, userText, localReply);
+    const routeLabel = source === "direct" ? "直连" : "代理";
+    setChatAiStatus(
+      CHAT_PUBLIC_RELEASE
+        ? `内置 AI 已响应：${chatAiSettings.model} · ${routeLabel} · 异常时会自动切换离线`
+        : `MiMo 已响应：${chatAiSettings.model} · ${routeLabel}`,
+    );
+    return reply;
+  } catch (error) {
+    setChatAiStatus(
+      CHAT_PUBLIC_RELEASE
+        ? `内置 AI 暂不可用，已自动切换离线：${error.message || "未知错误"}`
+        : `MiMo 调用失败，已回退离线：${error.message || "未知错误"}`,
+    );
+    return localReply;
+  }
+}
+
+async function processChatTurn(roleId, text) {
+  if (!text) return;
+  setChatSendBusy(true);
+  try {
+    ensureChatRoleState(roleId);
+    addChatMessage("user", text, { targetRole: roleId });
+    updateChatMemory(roleId, text);
+    adjustRelationship(roleId, text);
+    const localReply = generateReply(roleId, text);
+    const reply = await resolveChatReply(roleId, text, localReply);
+    addChatMessage("ai", reply, { targetRole: roleId });
+    updateChatControls();
+  } finally {
+    setChatSendBusy(false);
+  }
+}
+
 function runChatQuickAction(promptText) {
   if (!promptText || !chatRole) return;
+  if (chatSendBusy) return;
   const roleId = chatRole.value || "counselor";
-  ensureChatRoleState(roleId);
-  addChatMessage("user", promptText, { targetRole: roleId });
-  updateChatMemory(roleId, promptText);
-  adjustRelationship(roleId, promptText);
-  const reply = generateReply(roleId, promptText);
-  addChatMessage("ai", reply, { targetRole: roleId });
-  updateChatControls();
+  void processChatTurn(roleId, promptText).catch((error) => {
+    setChatAiStatus(`发送失败：${error.message || "未知错误"}`);
+  });
 }
 
 function updateChatControls() {
@@ -19561,12 +24062,16 @@ function getTopWeakStats(limit = 2) {
 function getMiniActionSuggestions(limit = 2) {
   if (!MINI_ACTIONS?.length) return [];
   const needs = {
+    test: (state.stats.test ?? 0) < 1350,
+    english: (state.stats.english ?? 0) < 100,
     essayTrack: (state.stats.essayTrack ?? 0) < 45,
     recStrength: (state.stats.recStrength ?? 0) < 45,
     reputation: (state.stats.reputation ?? 0) < 45,
   };
   const scores = MINI_ACTIONS.map((action) => {
     let score = 0;
+    if (needs.test && (action.effects?.test || 0) > 0) score += 2.2;
+    if (needs.english && (action.effects?.english || 0) > 0) score += 2;
     if (needs.essayTrack && (action.effects?.essayTrack || 0) > 0) score += 2;
     if (needs.recStrength && (action.effects?.recStrength || 0) > 0) score += 2;
     if (needs.reputation && (action.effects?.reputation || 0) > 0) score += 1.5;
@@ -19584,11 +24089,15 @@ function getMiniActionSuggestions(limit = 2) {
 function scoreMiniAction(action) {
   if (!action) return -999;
   const needs = {
+    test: (state.stats.test ?? 0) < 1350,
+    english: (state.stats.english ?? 0) < 100,
     essayTrack: (state.stats.essayTrack ?? 0) < 55,
     recStrength: (state.stats.recStrength ?? 0) < 55,
     reputation: (state.stats.reputation ?? 0) < 50,
   };
   let score = 0;
+  if (needs.test && (action.effects?.test || 0) > 0) score += 2.3;
+  if (needs.english && (action.effects?.english || 0) > 0) score += 2.1;
   if (needs.essayTrack && (action.effects?.essayTrack || 0) > 0) score += 2.2;
   if (needs.recStrength && (action.effects?.recStrength || 0) > 0) score += 2.2;
   if (needs.reputation && (action.effects?.reputation || 0) > 0) score += 1.6;
@@ -20463,6 +24972,8 @@ function handleGradAdmissionsAppeal(roleId, school, result, text) {
 
 function handleCombinedDegreeRequest(roleId, school, result) {
   const memoryLine = getMemoryLine(roleId);
+  const windowKey = getUndergradCombinedWindowKey(school?.id);
+  const appliedTerm = state.undergradStarted ? getHigherEdCurrentTermNumber("undergrad") : 0;
   if (result.status !== "录取") {
     return `${memoryLine} 本硕连读仅面向已录取学生开放。`;
   }
@@ -20472,13 +24983,17 @@ function handleCombinedDegreeRequest(roleId, school, result) {
   if (state.finalChoice !== school.id) {
     return `${memoryLine} 本硕连读申请需向你的最终就读学校提交。`;
   }
+  if (!windowKey) {
+    return `${memoryLine} 本硕连读申请仅开放在本科第一学期前，或本科最后两个学期。`;
+  }
+  if (state.combinedDegreeApproved) {
+    return `${memoryLine} 你已通过本硕连读预审，后续按学院培养方案执行。`;
+  }
+  if (!hasUnusedCombinedWindow(state.combinedDegreeLastWindow, windowKey, state.combinedDegreeApproved)) {
+    return `${memoryLine} 你已在${getCombinedWindowLabel(windowKey)}提交过本硕连读申请，本窗口无需重复提交。`;
+  }
   if (!canApplyCombinedDegreeForSchool(school, result)) {
     return `${memoryLine} 当前档案未达到本硕连读直通标准，建议入学后通过 GPA 与科研成果再申请。`;
-  }
-  if (state.combinedDegreeApplied) {
-    return state.combinedDegreeApproved
-      ? `${memoryLine} 你已通过本硕连读预审，后续按学院培养方案执行。`
-      : `${memoryLine} 你的本硕连读申请已评估完成，本轮未通过。`;
   }
 
   const academic = result.academicScore ?? 0;
@@ -20490,8 +25005,10 @@ function handleCombinedDegreeRequest(roleId, school, result) {
   chance = clamp(chance, 0.28, 0.9);
   const passed = Math.random() <= chance;
   state.combinedDegreeApplied = true;
+  state.combinedDegreeLastWindow = windowKey;
   state.combinedDegreeApproved = passed;
   state.combinedDegreeSchoolId = school.id;
+  queueCombinedDecisionAnnouncement({ type: "bsms", school, passed, windowKey, appliedTerm });
   if (passed) {
     state.combinedDegreeEligible = true;
     state.log.unshift(`本硕连读通过：${school.name}`);
@@ -20502,16 +25019,18 @@ function handleCombinedDegreeRequest(roleId, school, result) {
     pushReplayNode("本硕连读通过");
     updateAchievements();
     updateUI();
-    return `${memoryLine} 你的本硕连读申请已通过预审。后续将纳入连读培养路径。`;
+    return `${memoryLine} 已收到你的本硕连读申请，结果会在下一个学期开学前或毕业去向阶段自动通知。`;
   }
   state.log.unshift(`本硕连读未通过：${school.name}`);
   pushReplayNode("本硕连读未通过");
   updateUI();
-  return `${memoryLine} 你的本硕连读申请已评估完成，本轮未通过。建议先在本科阶段提升 GPA 与科研产出后再争取。`;
+  return `${memoryLine} 已收到你的本硕连读申请，结果会在下一个学期开学前或毕业去向阶段自动通知。`;
 }
 
 function handleCombinedDoctoralRequest(roleId, school, result) {
   const memoryLine = getMemoryLine(roleId);
+  const windowKey = getUndergradCombinedWindowKey(school?.id);
+  const appliedTerm = state.undergradStarted ? getHigherEdCurrentTermNumber("undergrad") : 0;
   if (!result || result.status !== "录取") {
     return `${memoryLine} 本硕博连读仅面向已录取学生开放。`;
   }
@@ -20524,10 +25043,14 @@ function handleCombinedDoctoralRequest(roleId, school, result) {
   if (state.mastersStarted || state.phdStarted) {
     return `${memoryLine} 本硕博连读申请需在硕士/博士阶段启动前提交。`;
   }
-  if (state.directPhdApplied) {
-    return state.directPhdApproved
-      ? `${memoryLine} 你已通过本硕博连读预审。`
-      : `${memoryLine} 你的本硕博连读申请已评估完成，本轮未通过。`;
+  if (!windowKey) {
+    return `${memoryLine} 本硕博连读申请仅开放在本科第一学期前，或本科最后两个学期。`;
+  }
+  if (state.directPhdApproved) {
+    return `${memoryLine} 你已通过本硕博连读预审。`;
+  }
+  if (!hasUnusedCombinedWindow(state.directPhdLastWindow, windowKey, state.directPhdApproved)) {
+    return `${memoryLine} 你已在${getCombinedWindowLabel(windowKey)}提交过本硕博连读申请，本窗口无需重复提交。`;
   }
   if (!canApplyCombinedDoctoralForSchool(school, result)) {
     return `${memoryLine} 当前档案暂未达到本硕博连读门槛，建议先补强学术、科研与专业匹配度。`;
@@ -20558,8 +25081,10 @@ function handleCombinedDoctoralRequest(roleId, school, result) {
   const passed = Math.random() <= chance;
 
   state.directPhdApplied = true;
+  state.directPhdLastWindow = windowKey;
   state.directPhdApproved = passed;
   state.directPhdSchoolId = passed ? school.id : null;
+  queueCombinedDecisionAnnouncement({ type: "bsmsphd", school, passed, windowKey, appliedTerm });
   if (passed) {
     state.combinedDegreeSchoolId = school.id;
     state.combinedDegreeApplied = true;
@@ -20568,22 +25093,30 @@ function handleCombinedDoctoralRequest(roleId, school, result) {
     pushReplayNode("本硕博连读通过");
     updateAchievements();
     updateUI();
-    return `${memoryLine} 你的本硕博连读申请已通过预审。`;
+    return `${memoryLine} 已收到你的本硕博连读申请，结果会在下一个学期开学前或毕业去向阶段自动通知。`;
   }
   state.log.unshift(`本硕博连读未通过：${school.name}`);
   pushReplayNode("本硕博连读未通过");
   updateUI();
-  return `${memoryLine} 你的本硕博连读申请已评估完成，本轮未通过。`;
+  return `${memoryLine} 已收到你的本硕博连读申请，结果会在下一个学期开学前或毕业去向阶段自动通知。`;
 }
 
 function handleMsPhdRequest(roleId, school, gradResultInput = null) {
   const memoryLine = getMemoryLine(roleId);
   const gradResult = gradResultInput || getAdmissionsGradResult(school.id);
+  const windowKey = getMastersCombinedWindowKey(school?.id);
+  const appliedTerm = state.mastersStarted ? getHigherEdCurrentTermNumber("masters") : 0;
   if (state.phdStarted) {
     return `${memoryLine} 博士阶段已启动，当前无法再申请硕博连读。`;
   }
-  if (state.msPhdApplied && state.msPhdSchoolId === school.id && state.msPhdApproved) {
+  if (state.msPhdApproved && state.msPhdSchoolId === school.id) {
     return `${memoryLine} 你已通过硕博连读评估。`;
+  }
+  if (!windowKey) {
+    return `${memoryLine} 硕博连读申请仅开放在硕士入学前、第一学期，或硕士最后两个学期。`;
+  }
+  if (!hasUnusedCombinedWindow(state.msPhdLastWindow, windowKey, state.msPhdApproved)) {
+    return `${memoryLine} 你已在${getCombinedWindowLabel(windowKey)}提交过硕博连读申请，本窗口无需重复提交。`;
   }
   if (!canApplyMsPhdForSchool(school, gradResult)) {
     return `${memoryLine} 当前不满足硕博连读申请条件。`;
@@ -20609,8 +25142,10 @@ function handleMsPhdRequest(roleId, school, gradResultInput = null) {
   const passed = Math.random() <= chance;
 
   state.msPhdApplied = true;
+  state.msPhdLastWindow = windowKey;
   state.msPhdApproved = passed;
   state.msPhdSchoolId = passed ? school.id : null;
+  queueCombinedDecisionAnnouncement({ type: "msphd", school, passed, windowKey, appliedTerm });
   if (passed) {
     if (gradResult && gradResult.programType !== "phd") {
       gradResult.programType = "msphd";
@@ -20622,12 +25157,12 @@ function handleMsPhdRequest(roleId, school, gradResultInput = null) {
     pushReplayNode("硕博连读通过");
     updateAchievements();
     updateUI();
-    return `${memoryLine} 你的硕博连读申请已通过评估。`;
+    return `${memoryLine} 已收到你的硕博连读申请，结果会在下一个学期开学前或毕业去向阶段自动通知。`;
   }
   state.log.unshift(`硕博连读未通过：${school.name}`);
   pushReplayNode("硕博连读未通过");
   updateUI();
-  return `${memoryLine} 你的硕博连读申请已评估完成，本轮未通过。`;
+  return `${memoryLine} 已收到你的硕博连读申请，结果会在下一个学期开学前或毕业去向阶段自动通知。`;
 }
 
 function getPendingInterviewApplications() {
@@ -20725,6 +25260,9 @@ function getInterviewPriorityTags(app) {
 
 function buildInterviewQuestionPoolForApp(app) {
   const priorityTags = getInterviewPriorityTags(app);
+  const role = String(app?.role || "").toLowerCase();
+  const advancedRole =
+    /research|scientist|phd|quant|ml|ai|legal|policy|compliance/.test(role) || (app?.difficulty || 0) >= 0.86;
   const scored = INTERVIEW_QUESTION_BANK.map((question) => {
     const qTags = Array.isArray(question?.tags) ? question.tags : [];
     let score = 0;
@@ -20735,12 +25273,41 @@ function buildInterviewQuestionPoolForApp(app) {
     });
     if (qTags.includes("general")) score += 1.5;
     if (qTags.includes("behavioral")) score += 1;
+    if (question?.id === "self_intro" || question?.id === "motivation") score += 2.6;
+    if (question?.id === "project_ownership" || question?.id === "learning_speed") score += 1.4;
+    const complexity = Number(question?.complexity || 1.5);
+    score -= complexity * 1.6;
+    if (!advancedRole && complexity >= 2.2) score -= 3.2;
+    if (!advancedRole && qTags.includes("technical")) score -= 0.8;
     if (qTags.length === 0) score += 0.5;
     return { question, score };
   })
     .sort((a, b) => b.score - a.score)
     .map((item) => item.question);
   return scored.length ? scored : INTERVIEW_QUESTION_BANK;
+}
+
+function getInterviewCandidatePoolForIndex(pool, questionIndex, usedIds, usedTypes) {
+  const available = pool.filter((item) => item && !usedIds.has(item.id));
+  if (!available.length) return pool;
+
+  const openerIds = new Set(["self_intro", "motivation", "project_ownership", "learning_speed", "collaboration_conflict", "future_plan"]);
+  if (questionIndex === 0) {
+    const openers = available.filter(
+      (item) => openerIds.has(item.id) || ((item.type === "general" || item.type === "behavioral") && (item.complexity || 1.5) <= 1.5),
+    );
+    if (openers.length) return openers;
+  }
+
+  const preferredMaxComplexity = questionIndex === 0 ? 1.6 : 2.15;
+  const preferred = available.filter(
+    (item) => (item.complexity || 1.5) <= preferredMaxComplexity && !usedTypes.has(item.type || "general"),
+  );
+  if (preferred.length) return preferred;
+
+  const easy = available.filter((item) => (item.complexity || 1.5) <= preferredMaxComplexity + 0.35);
+  if (easy.length) return easy;
+  return available;
 }
 
 function pickInterviewQuestionForApp(app, questionIndex) {
@@ -20759,17 +25326,20 @@ function pickInterviewQuestionForApp(app, questionIndex) {
   const usedTypes = new Set();
   let picked = pool[0];
   for (let i = 0; i <= targetIndex; i += 1) {
-    let idx = (seed + i * step) % pool.length;
+    const candidatePool = getInterviewCandidatePoolForIndex(pool, i, used, usedTypes);
+    let idx = (seed + i * step) % candidatePool.length;
     let guard = 0;
-    while (guard < pool.length && used.has(pool[idx]?.id)) {
-      idx = (idx + 1) % pool.length;
+    while (guard < candidatePool.length && used.has(candidatePool[idx]?.id)) {
+      idx = (idx + 1) % candidatePool.length;
       guard += 1;
     }
-    const candidate = pool[idx] || pool[0];
+    const candidate = candidatePool[idx] || candidatePool[0] || pool[0];
     if (!candidate) break;
     const candidateType = candidate.type || "general";
     if (usedTypes.has(candidateType)) {
-      const replacement = pool.find(
+      const replacement = candidatePool.find(
+        (item) => item && !used.has(item.id) && !usedTypes.has(item.type || "general"),
+      ) || pool.find(
         (item) => item && !used.has(item.id) && !usedTypes.has(item.type || "general"),
       );
       if (replacement) {
@@ -20819,7 +25389,7 @@ function evaluateInterviewAnswerContent(answer, question) {
   const matched = keywords.filter((word) => normalized.includes(String(word).toLowerCase())).length;
   const keywordRatio = keywords.length ? matched / keywords.length : 0.5;
   const keywordScore = keywordRatio * 100;
-  const lengthScore = clamp(text.length / 190, 0, 1) * 100;
+  const lengthScore = clamp(text.length / 90, 0, 1) * 100;
   const tokenList = (text.match(/[a-zA-Z0-9\u4e00-\u9fa5]+/g) || []).map((item) => item.toLowerCase());
   const uniqueTokenRatio = tokenList.length
     ? clamp(new Set(tokenList).size / tokenList.length, 0, 1)
@@ -20827,11 +25397,13 @@ function evaluateInterviewAnswerContent(answer, question) {
   const diversityScore = uniqueTokenRatio * 100;
   const structureSignals = ["因为", "所以", "例如", "结果", "改进", "复盘", "挑战", "解决", "数据", "指标"];
   const structureHit = structureSignals.filter((token) => text.includes(token)).length;
-  const starSignals = ["情境", "任务", "行动", "结果", "复盘", "目标", "影响", "权衡", "取舍"];
+  const starSignals = ["情境", "任务", "行动", "结果", "复盘", "目标", "影响", "权衡", "取舍", "后来", "最后"];
   const starHit = starSignals.filter((token) => text.includes(token)).length;
-  const structureScore = clamp(structureHit / 5 + starHit / 5, 0, 1) * 100;
+  const detailSignals = ["例如", "比如", "一次", "当时", "后来", "最后", "项目", "团队", "用户", "客户", "实验"];
+  const detailHit = detailSignals.filter((token) => text.includes(token)).length;
+  const structureScore = clamp(structureHit / 5 + starHit / 6 + detailHit / 8, 0, 1) * 100;
   const evidenceHit = (text.match(/(\d+%|\d+\.\d+%|\d+个月|\d+天|\d+周|\d+个|kpi|roi|ctr|a\/b|ab)/gi) || []).length;
-  const evidenceScore = clamp(evidenceHit / 2 + (text.includes("数据") ? 0.4 : 0), 0, 1) * 100;
+  const evidenceScore = clamp(evidenceHit / 2 + detailHit / 6 + (text.includes("数据") ? 0.2 : 0), 0, 1) * 100;
   const keywordMentions = keywords.reduce((sum, word) => {
     const safe = String(word || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     if (!safe) return sum;
@@ -20847,16 +25419,17 @@ function evaluateInterviewAnswerContent(answer, question) {
   const lowDiversityPenalty = uniqueTokenRatio < 0.42 ? (0.42 - uniqueTokenRatio) * 55 : 0;
   const templatePenalty = templateCopy ? 20 : 0;
   const listPenalty = listyPattern ? 8 : 0;
+  const conciseBonus = text.length >= 18 && text.length <= 120 ? 8 : text.length <= 180 ? 4 : 0;
   const clarityPenalty =
-    (text.length < 30 ? 0.22 : 0) +
+    (text.length < 14 ? 0.2 : 0) +
     (/不知道|不清楚|没想好|不会|随便/.test(text) ? 0.36 : 0) +
     (/没做过|没有经验/.test(text) ? 0.24 : 0);
-  const clarityScore = clamp(lengthScore / 100 - clarityPenalty + 0.35, 0, 1) * 100;
+  const clarityScore = clamp(lengthScore / 100 - clarityPenalty + 0.42, 0, 1) * 100;
   const dimensions = {
-    structure: Math.round(structureScore),
-    relevance: Math.round(clamp(keywordScore * 0.7 + lengthScore * 0.3, 0, 100)),
-    evidence: Math.round(clamp(evidenceScore * 0.75 + keywordScore * 0.25, 0, 100)),
-    clarity: Math.round(clarityScore),
+    structure: Math.round(clamp(structureScore * 0.74 + detailHit * 4, 0, 100)),
+    relevance: Math.round(clamp(keywordScore * 0.65 + lengthScore * 0.15 + detailHit * 4, 0, 100)),
+    evidence: Math.round(clamp(evidenceScore * 0.6 + keywordScore * 0.15 + detailHit * 5, 0, 100)),
+    clarity: Math.round(clamp(clarityScore + conciseBonus, 0, 100)),
   };
   const weights = getInterviewDimensionWeights(question);
   const weighted =
@@ -20864,21 +25437,22 @@ function evaluateInterviewAnswerContent(answer, question) {
     dimensions.relevance * (weights.relevance || 0) +
     dimensions.evidence * (weights.evidence || 0) +
     dimensions.clarity * (weights.clarity || 0);
-  const diversityBlend = diversityScore * 0.14;
+  const diversityBlend = diversityScore * 0.1;
   let penalty = stuffingPenalty + lowDiversityPenalty + templatePenalty + listPenalty;
-  if (text.length < 24) penalty += 8;
+  if (text.length < 10) penalty += 12;
+  else if (text.length < 18) penalty += 4;
   if (/不知道|不清楚|没想好|不会|随便/.test(text)) penalty += 16;
   if (/没做过|没有经验/.test(text)) penalty += 10;
-  const score = clamp(Math.round(weighted + diversityBlend - penalty), 5, 100);
+  const score = clamp(Math.round(weighted + diversityBlend + conciseBonus - penalty), 8, 100);
   const weakest = Object.entries(dimensions).sort((a, b) => a[1] - b[1])[0]?.[0] || "structure";
   const feedback =
     score >= 80
-      ? "结构完整，岗位匹配表达清晰"
+      ? "回答简洁清楚，岗位匹配表达不错"
       : score >= 60
-        ? `信息较完整，建议加强${INTERVIEW_DIMENSION_LABELS[weakest] || "关键维度"}`
+        ? `回答已达标，建议再补强${INTERVIEW_DIMENSION_LABELS[weakest] || "关键维度"}`
         : templatePenalty > 0 || stuffingPenalty > 0
-          ? "关键词堆叠明显，建议改为真实经历与量化结果"
-          : "说服力偏弱，建议按“场景-行动-结果-复盘”组织";
+          ? "关键词堆叠明显，建议改成自然表达和真实例子"
+          : "说服力偏弱，建议用 2-4 句说清场景、做法和结果";
   return { score, matched, dimensions, feedback };
 }
 
@@ -20908,7 +25482,7 @@ function buildInterviewQuestionPrompt(app, question, index) {
     .map(([key]) => INTERVIEW_DIMENSION_LABELS[key] || key)
     .join(" / ");
   const questionText = question?.prompt ? question.prompt(app) : "请介绍你的岗位匹配优势。";
-  return `问题 ${index + 1}/${INTERVIEW_SESSION_QUESTION_COUNT}（${typeLabel}）：${questionText} 回答建议：给出真实情境、你的动作、结果数据和复盘，不要只罗列词。重点维度：${dimensionLine}。`.trim();
+  return `问题 ${index + 1}/${INTERVIEW_SESSION_QUESTION_COUNT}（${typeLabel}）：${questionText} 简短回答即可：用 2-4 句说清场景、你的做法和结果/收获；有 1 个具体细节会更好。重点维度：${dimensionLine}。`.trim();
 }
 
 function buildInterviewEvalLine(evaluated, question) {
@@ -20921,23 +25495,23 @@ function buildInterviewEvalLine(evaluated, question) {
     : "";
   const actionLine =
     evaluated.score >= 80
-      ? "继续保持量化结果和复盘细节。"
+      ? "继续保持这种简洁但具体的表达。"
       : evaluated.score >= 60
-        ? "可再补 1 个可量化结果，提升说服力。"
-        : "建议下题按“场景-行动-结果-复盘”作答。";
+        ? "可再补 1 个具体结果或收获，会更有说服力。"
+        : "建议下题用 2-4 句说清场景、做法和结果。";
   return `${evaluated.feedback}（${evaluated.score}分，${hitLine}${dimensionLine ? `，${dimensionLine}` : ""}）。${actionLine}`;
 }
 
 function buildInterviewFollowupPrompt(app, question, evaluated) {
   const role = app?.role || "目标岗位";
   if (evaluated.score < 42) {
-    return `请按“场景-行动-结果-复盘”重答一次，并至少给 1 个量化结果（${role}相关）。`;
+    return `请用 2-4 句重答一次：说清场景、你的动作，以及结果或收获（最好和 ${role} 相关）。`;
   }
   const keywords = Array.isArray(question?.keywords) ? question.keywords.slice(0, 2) : [];
   if (keywords.length) {
-    return `请补充一个细节：围绕“${keywords.join("、")}”补一段更具体的案例。`;
+    return `请补充一个细节：围绕“${keywords.join("、")}”再说具体一点。`;
   }
-  return "请再补一段具体案例，强调你的行动和可量化结果。";
+  return "请再补一句具体案例，强调你的行动和结果。";
 }
 
 function shouldAskInterviewFollowup(answer, evaluated, session, qIndex) {
@@ -20950,7 +25524,7 @@ function shouldAskInterviewFollowup(answer, evaluated, session, qIndex) {
   if (!text) return true;
   if (evaluated.score >= INTERVIEW_FOLLOWUP_SCORE_THRESHOLD) return false;
   if (/不知道|不清楚|没想好|不会|随便/.test(text)) return true;
-  return text.length < 46 || evaluated.score < 56;
+  return text.length < 24 || evaluated.score < 54;
 }
 
 function mergeInterviewFollowupScore(baseScore, followupScore) {
@@ -20964,9 +25538,9 @@ function buildInterviewDecisionReason(app, avgScore, passChance, passed) {
   const majorFitPct = Math.round(clamp(app?.majorFit || 0, 0, 1) * 100);
   const difficultyLabel = app?.difficultyLabel || getJobDifficultyLabel(app?.difficulty || 0.7);
 
-  if (avgScore >= 85) strengths.push("回答结构完整，案例与量化结果清晰");
-  else if (avgScore >= 72) strengths.push("回答基本完整，岗位相关性较好");
-  else risks.push("回答说服力偏弱，案例细节和量化结果不足");
+  if (avgScore >= 85) strengths.push("回答简洁清楚，例子具体且岗位相关");
+  else if (avgScore >= 72) strengths.push("回答基本完整，表达和岗位匹配较好");
+  else risks.push("回答说服力偏弱，案例细节或结果说明不足");
 
   if ((app?.majorFit || 0) >= 0.9) strengths.push("专业与岗位高度匹配");
   else if ((app?.majorFit || 0) >= 0.78) strengths.push("专业与岗位方向匹配");
@@ -21004,20 +25578,21 @@ function finalizeInterviewByChat(app, session) {
   const stageBonus = HIRING_STAGE_PASS_BONUS[currentStage] ?? 0;
   let passChance = clamp(
     (app.baseChance || app.chance || 0.25) * 0.5 +
-      answerSignal * 0.42 +
+      answerSignal * 0.46 +
       careerSignals.candidateSignal * 0.08 +
       careerSignals.degreeBonus * 0.16 +
       universitySignal * 0.04 +
       getJobDifficultyBias() * 0.26 -
-      (app.difficulty || 0) * 0.07 +
+      (app.difficulty || 0) * 0.05 +
       stageBonus,
     HIRING_CHAT_PASS_CHANCE_MIN,
     HIRING_CHAT_PASS_CHANCE_MAX,
   );
-  if (avgScore <= 40) passChance = Math.min(passChance, 0.36);
+  if (avgScore >= 70) passChance = clamp(passChance + 0.04, HIRING_CHAT_PASS_CHANCE_MIN, HIRING_CHAT_PASS_CHANCE_MAX);
+  if (avgScore <= 40) passChance = Math.min(passChance, 0.42);
   if (avgScore >= 88) passChance = Math.max(passChance, clamp(0.58 - (app.difficulty || 0) * 0.08, 0.4, 0.78));
   if (state.difficultyId === "relaxed") {
-    passChance = clamp(passChance + 0.03, HIRING_CHAT_PASS_CHANCE_MIN, HIRING_CHAT_PASS_CHANCE_MAX);
+    passChance = clamp(passChance + 0.04, HIRING_CHAT_PASS_CHANCE_MIN, HIRING_CHAT_PASS_CHANCE_MAX);
   }
   if (state.difficultyId === "hard") {
     passChance = clamp(passChance - 0.02, HIRING_CHAT_PASS_CHANCE_MIN, HIRING_CHAT_PASS_CHANCE_MAX);
@@ -21200,7 +25775,7 @@ function generateInterviewerReply(userText, roleId = "interviewer") {
           scores: [],
           startedRound,
         };
-        return `${memoryLine} ${focusLine} 你可以先这样答：先说场景和目标，再讲你的动作，最后给可量化结果与复盘。${buildInterviewQuestionPrompt(
+        return `${memoryLine} ${focusLine} 你可以先这样答：用 2-4 句，先说场景，再说你的做法，最后说结果或收获。${buildInterviewQuestionPrompt(
           picked,
           firstQuestion,
           0,
@@ -21269,7 +25844,7 @@ function generateInterviewerReply(userText, roleId = "interviewer") {
   const qIndex = clamp(Math.round(session.questionIndex || 0), 0, INTERVIEW_SESSION_QUESTION_COUNT - 1);
   const question = pickInterviewQuestionForApp(currentApp, qIndex);
   if (/不知道|不会|怎么答|没思路|不清楚/.test(String(userText || "").toLowerCase())) {
-    return `${memoryLine} 建议直接按“场景-任务-行动-结果-复盘”答，至少给 1 个数字结果。${buildInterviewQuestionPrompt(
+    return `${memoryLine} 建议直接用 2-4 句回答：先讲场景，再讲你的做法，最后说结果或收获。${buildInterviewQuestionPrompt(
       currentApp,
       question,
       qIndex,
@@ -21367,7 +25942,7 @@ function generateAdmissionsReply(roleId, school, userText) {
       return `${memoryLine} 本硕连读属于本科录取后通道，请在本科去向学校窗口申请。`;
     }
     if (intent.combinedProgram) {
-      return `${memoryLine} 当前窗口可申请硕博连读，可直接点击自动申请按钮或发送“申请硕博连读”。`;
+      return `${memoryLine} 当前正处于硕博连读开放窗口（硕士入学前、第一学期或最后两个学期），可直接点击自动申请按钮或发送“申请硕博连读”。`;
     }
     if (isAppealIntent(userText)) {
       if (!gradResult) {
@@ -21648,10 +26223,14 @@ function generateReply(roleId, userText) {
       const chosen = getFinalChoiceResult();
       if (!chosen || chosen.status !== "录取") return `${memoryLine} 当前没有可申请连读的录取学校。`;
       if (state.combinedDegreeApproved || state.directPhdApproved) return `${memoryLine} 你已通过连读预审，可以直接推进后续培养规划。`;
-      if (!state.combinedDegreeEligible) {
-        return `${memoryLine} 当前不满足直通门槛，建议先在本科阶段提高 GPA 与科研，再走硕士/博士申请路径。`;
+      const chosenSchool = UNIVERSITIES.find((school) => school.id === chosen.id) || chosen;
+      const actions = getAdmissionsQuickActions(`admissions-${chosen.id}`, chosenSchool);
+      if (!actions.length) {
+        return `${memoryLine} 当前不在连读申请开放窗口。入学前和最后两个学期可再到该校招生委员会窗口提交。`;
       }
-      return `${memoryLine} 你具备申请条件，切换到“招生委员会 · ${chosen.name}”可直接点击自动申请按钮。`;
+      return `${memoryLine} 你已具备申请资格，切换到“招生委员会 · ${chosen.name}”可直接点击：${actions
+        .map((action) => action.label)
+        .join(" / ")}。`;
     }
     if (intent.stageProgress || intent.graduate || intent.career) {
       const higherEdStage = getActiveHigherEdStage();
@@ -21701,7 +26280,7 @@ function generateReply(roleId, userText) {
       return `${memoryLine} 可以申请贷款解燃眉之急，但会计利息并增加压力，建议控制次数。`;
     }
     if (intent.gapYear) {
-      return `${memoryLine} 再读一年会花费 ${formatUsd(EXTRA_YEAR_COST)}，压力 +${EXTRA_YEAR_STRESS}，但可以重刷成果。`;
+      return `${memoryLine} 再读一年会花费 ${formatUsd(EXTRA_YEAR_COST)}，压力 +${EXTRA_YEAR_STRESS}；若现金不够，会自动记入贷款，但你可以重刷成果。`;
     }
     if (intent.donation) {
       return `${memoryLine} 申诉时可选择捐款滑条，捐款越多加成越高，但需要有更新材料才生效。`;
@@ -21845,6 +26424,33 @@ function generateReply(roleId, userText) {
       }`;
   }
 
+  if (roleId === "teacher") {
+    const teacherHint = statePrefix ? `${statePrefix} ` : "";
+    const major = MAJORS.find((item) => item.id === state.majorId);
+    if (lastQuestion) {
+      return `${memoryLine} 收到你对“${lastQuestion.text}”的回答。接下来建议用一个可量化成果去验证。`;
+    }
+    if (intent.project) {
+      return `${teacherHint}${memoryLine} 先把项目做“深”而不是做“多”。建议围绕 ${major?.name || "当前专业"} 完成一条完整产出链：问题定义→方法→结果→反思。`;
+    }
+    if (intent.essay) {
+      return `${teacherHint}${memoryLine} 文书建议用“问题-行动-结果-复盘”结构，并用具体证据支撑，不要只写感受。`;
+    }
+    if (intent.results) {
+      return `${teacherHint}${memoryLine} 结果背后通常是证据强度与叙事一致性。你可以补一项高质量更新材料再行动。`;
+    }
+    if (intent.interview || intent.career) {
+      return `${teacherHint}${memoryLine} 面试回答建议遵循 STAR：情境、任务、行动、结果，最后补一句反思与迁移。`;
+    }
+    if (intent.major || intent.school) {
+      return `${teacherHint}${memoryLine} 目标是让活动、文书和推荐形成同一条学术主线，避免“广而散”。`;
+    }
+    if (intent.checklist) {
+      return `${teacherHint}${memoryLine} 本周建议：1) 完成一项可展示成果 2) 写出 150 字复盘 3) 找到一位可验证成果的推荐人。`;
+    }
+    return `${teacherHint}${memoryLine} 从老师视角看，你当前优势是 ${strength}，短板是 ${weakness}。建议优先补短板并保留证据。`;
+  }
+
   if (roleId === "peer") {
     const digest = buildJourneyDigestLine();
     const peerHint = statePrefix ? `${statePrefix} ` : "";
@@ -21907,17 +26513,14 @@ function generateReply(roleId, userText) {
 
 function sendChat() {
   if (!chatInput || !chatRole) return;
+  if (chatSendBusy) return;
   const text = chatInput.value.trim();
   if (!text) return;
   const roleId = chatRole.value || "counselor";
-  ensureChatRoleState(roleId);
-  addChatMessage("user", text, { targetRole: roleId });
-  updateChatMemory(roleId, text);
-  adjustRelationship(roleId, text);
-  const reply = generateReply(roleId, text);
-  addChatMessage("ai", reply, { targetRole: roleId });
   chatInput.value = "";
-  updateChatControls();
+  void processChatTurn(roleId, text).catch((error) => {
+    setChatAiStatus(`发送失败：${error.message || "未知错误"}`);
+  });
 }
 
 function renderProjectProgress() {
@@ -21965,6 +26568,12 @@ function getMainViewStage() {
   if (!state.undergradStarted || !state.undergradGraduated) {
     return "undergrad";
   }
+  if (state.mastersStarted && !state.mastersGraduated) {
+    return "masters";
+  }
+  if (state.phdStarted && !state.phdGraduated) {
+    return "phd";
+  }
   if (state.postGradPath === POSTGRAD_PATHS.JOB || !!state.jobOutcome) {
     return "career";
   }
@@ -21986,6 +26595,9 @@ function getMemoryLimitForRole(roleId) {
   }
   if (roleId === "peer") {
     return toPositiveInt(CHAT_MEMORY_LIMIT_BY_ROLE.peer, 8);
+  }
+  if (roleId === "teacher") {
+    return toPositiveInt(CHAT_MEMORY_LIMIT_BY_ROLE.teacher, 8);
   }
   return toPositiveInt(CHAT_MEMORY_LIMIT_BY_ROLE.default, 8);
 }
@@ -22088,24 +26700,6 @@ function renderPhase() {
   }
 
   if (stageView === "grad") {
-    if (state.mastersStarted && !state.mastersGraduated) {
-      const currentTerm = getCurrentMastersTerm();
-      termLabel.textContent = `硕士第 ${currentTerm} 学期`;
-      termHint.textContent = "硕士阶段独立界面：课程、科研与论文并行。";
-      progressBar.style.width = `${(currentTerm / MASTERS_TOTAL_TERMS) * 100}%`;
-      progressText.textContent = `${currentTerm} / ${MASTERS_TOTAL_TERMS}`;
-      termTimeInfo.textContent = "硕士阶段：每学期 2 个重点项目 + 小行动";
-      return;
-    }
-    if (state.phdStarted && !state.phdGraduated) {
-      const currentTerm = getCurrentPhdTerm();
-      termLabel.textContent = `博士第 ${currentTerm} 学期`;
-      termHint.textContent = "博士阶段独立界面：课题、发表与教学协同推进。";
-      progressBar.style.width = `${(currentTerm / PHD_TOTAL_TERMS) * 100}%`;
-      progressText.textContent = `${currentTerm} / ${PHD_TOTAL_TERMS}`;
-      termTimeInfo.textContent = "博士阶段：每学期 2 个重点项目 + 小行动";
-      return;
-    }
     if (!state.postGradPath) {
       termLabel.textContent = "毕业后规划";
       termHint.textContent = "请选择硕士或就业路径（博士需硕士后申请）。";
@@ -22131,6 +26725,26 @@ function renderPhase() {
     progressBar.style.width = `${total ? (revealed / Math.max(total, 1)) * 100 : 0}%`;
     progressText.textContent = total ? `${revealed} / ${total}` : "0 / 1";
     termTimeInfo.textContent = "研究生阶段：申请与放榜独立进行";
+    return;
+  }
+
+  if (stageView === "masters") {
+    const currentTerm = getCurrentMastersTerm();
+    termLabel.textContent = `硕士第 ${currentTerm} 学期`;
+    termHint.textContent = "硕士阶段独立界面：课程、科研与论文并行。";
+    progressBar.style.width = `${(currentTerm / MASTERS_TOTAL_TERMS) * 100}%`;
+    progressText.textContent = `${currentTerm} / ${MASTERS_TOTAL_TERMS}`;
+    termTimeInfo.textContent = "硕士阶段：每学期 2 个重点项目 + 小行动";
+    return;
+  }
+
+  if (stageView === "phd") {
+    const currentTerm = getCurrentPhdTerm();
+    termLabel.textContent = `博士第 ${currentTerm} 学期`;
+    termHint.textContent = "博士阶段独立界面：课题、发表与教学协同推进。";
+    progressBar.style.width = `${(currentTerm / PHD_TOTAL_TERMS) * 100}%`;
+    progressText.textContent = `${currentTerm} / ${PHD_TOTAL_TERMS}`;
+    termTimeInfo.textContent = "博士阶段：每学期 2 个重点项目 + 小行动";
     return;
   }
 
@@ -22175,6 +26789,7 @@ function addNarrativePulse() {
 
 function updateUI() {
   enforceStateMachineConsistency();
+  maybeAutoSettleEdWaitlistsForRdRelease();
   normalizeWorldState();
   normalizeNarrativeState();
   renderPhase();
@@ -22182,11 +26797,15 @@ function updateUI() {
   renderTimeline();
   renderLog();
   renderAdvisor();
+  renderRouteFeedback();
   renderProjectProgress();
   renderAchievements();
+  renderLegacyPanel();
   renderDevPanel();
+  renderFileModeBanner();
   pushInterviewerProactiveMessages("reminder");
   initChatRoles();
+  flushPendingCombinedAnnouncements();
   triggerPendingAdmissionsCombinedPrompt();
   renderChat();
   renderSavePanel();
@@ -22283,10 +26902,10 @@ function updateUI() {
     if (resultsSubtitle) {
       resultsSubtitle.textContent =
         stage === APPLICATION_STAGES.ED_RELEASE
-          ? "先拆完 ED 邮件；若未录取可进入 RD 选校。"
+          ? "先拆完 ED 邮件；若为候补/拒绝，可在交流室切换到对应学校招生委员会，通过聊天窗复议。"
           : stage === APPLICATION_STAGES.RD_RELEASE
-            ? "RD 邮件按学校逐封查看。"
-            : "所有申请结果已进入复盘阶段。";
+            ? "RD 邮件按学校逐封查看；若为候补/拒绝，可在交流室切换到对应学校招生委员会，通过聊天窗复议。"
+            : "所有申请结果已进入复盘阶段；候补/拒绝仍可在交流室通过聊天窗复议。";
     }
     renderResults();
   }
@@ -22296,11 +26915,13 @@ function updateUI() {
   } else if (undergradPanel) {
     undergradPanel.classList.add("hidden");
     if (postGradPanel) postGradPanel.classList.add("hidden");
+    if (mastersArea) mastersArea.classList.add("hidden");
     if (mastersPanel) mastersPanel.classList.add("hidden");
+    if (phdArea) phdArea.classList.add("hidden");
     if (phdPanel) phdPanel.classList.add("hidden");
   }
 
-  if (collegeArea || gradArea || careerArea) {
+  if (collegeArea || gradArea || mastersArea || phdArea || careerArea) {
     const showCollege = mainViewStage === "undergrad";
     if (collegeArea) {
       collegeArea.classList.toggle("hidden", !showCollege);
@@ -22308,6 +26929,14 @@ function updateUI() {
     const showGrad = mainViewStage === "grad";
     if (gradArea) {
       gradArea.classList.toggle("hidden", !showGrad);
+    }
+    const showMasters = mainViewStage === "masters";
+    if (mastersArea) {
+      mastersArea.classList.toggle("hidden", !showMasters);
+    }
+    const showPhd = mainViewStage === "phd";
+    if (phdArea) {
+      phdArea.classList.toggle("hidden", !showPhd);
     }
     const showCareer = mainViewStage === "career";
     if (careerArea) {
@@ -22500,6 +27129,9 @@ function buildProfessionalFinalReportSections() {
       `画像：${profile?.name || "未选择"} / ${background?.name || "未选择"} / ${region?.name || "未选择"}`,
       `难度：${difficulty?.name || "未选择"} · 中介：${counselor?.name || "未选择"}`,
       `主专业：${major?.name || "未选择"} · 标化策略：${testPlan?.name || "未选择"}`,
+      state.backgroundId === "legacy"
+        ? `Legacy 院校：${state.legacySchoolName || "未分配"}`
+        : "Legacy 院校：无",
     ]),
   );
 
@@ -22537,6 +27169,26 @@ function buildProfessionalFinalReportSections() {
       `连读状态：本硕 ${state.combinedDegreeApproved ? "通过" : state.combinedDegreeApplied ? "已申请未通过" : "未申请"} · 硕博 ${
         state.msPhdApproved ? "通过" : state.msPhdApplied ? "已申请未通过" : "未申请"
       } · 直博 ${state.directPhdApproved ? "通过" : state.directPhdApplied ? "已申请未通过" : "未申请"}`,
+    ]),
+  );
+
+  const dominantRoute = getDominantRouteProfile();
+  const routeScores = getSortedRouteEntries();
+  const recentCombos = (state.comboHistory || []).slice(0, 3);
+  sections.push(
+    buildReportSection("路线画像", [
+      dominantRoute.id
+        ? `当前主路线：${dominantRoute.label}${dominantRoute.second ? ` · 次路线 ${dominantRoute.second.label}` : ""}`
+        : "当前主路线：尚未成型",
+      routeScores.length
+        ? `路线强度：${routeScores.map((item) => `${item.short} ${Math.round(item.value)}`).join(" / ")}`
+        : "路线强度：暂无",
+      recentCombos.length
+        ? `最近组合技：${recentCombos
+            .map((item) => `${item.label}（${item.stage === "highschool" ? "高中" : getHigherEdStageLabel(item.stage)}）`)
+            .join("；")}`
+        : "最近组合技：尚未触发",
+      `专业偏好：${major?.name || "未定"} 当前更偏向 ${dominantRoute.label || "综合积累"}。`,
     ]),
   );
 
@@ -22585,6 +27237,12 @@ function buildProfessionalFinalReportSections() {
       sandboxHistory.length
         ? `最近地区动态：${sandboxHistory.map((item) => item.title || item.source).join("；")}`
         : "最近地区动态：无",
+      getCurrentWorldTailwinds(2).length
+        ? `当前顺风：${getCurrentWorldTailwinds(2).join("；")}`
+        : "当前顺风：无明显外部加成",
+      getCurrentWorldHeadwinds(2).length
+        ? `当前逆风：${getCurrentWorldHeadwinds(2).join("；")}`
+        : "当前逆风：无明显外部压力",
       storyHistory.length
         ? `剧情回顾：${storyHistory.map((item) => `${item.label || item.id}（${item.result || "完成"}）`).join("；")}`
         : "剧情回顾：无",
@@ -22645,6 +27303,21 @@ function buildProfessionalFinalReportSections() {
     }
   }
   sections.push(buildReportSection("风险复盘", riskLines));
+
+  const legacy = state.legacyProgress || createDefaultLegacyProgress();
+  const lastRun = legacy.lastRun;
+  sections.push(
+    buildReportSection("多周目传承", [
+      legacy.completedRuns
+        ? `历史完成局数：${legacy.completedRuns} · 历史最佳赛季 ${legacy.bestScore} 分`
+        : "历史完成局数：0（当前为首局）",
+      legacy.bestSchoolRank ? `历史最佳录取：QS ${legacy.bestSchoolRank}` : "历史最佳录取：暂无",
+      legacy.bestSalary ? `历史最高薪资：${formatUsd(legacy.bestSalary)}` : "历史最高薪资：暂无",
+      lastRun
+        ? `上一局回顾：${lastRun.finalSchool || "未定学校"}${lastRun.chosenJob ? ` → ${lastRun.chosenJob}` : ""} · ${lastRun.dominantRouteLabel || "综合路线"}`
+        : "上一局回顾：暂无",
+    ]),
+  );
 
   const timelineLines = buildCareerSettlementTimelineLines(36);
   sections.push(
@@ -22882,6 +27555,67 @@ if (chatActionPanel) {
     runChatQuickAction(prompt);
   });
 }
+if (chatAiMode) {
+  chatAiMode.addEventListener("change", syncChatAiSettingsFromControls);
+}
+if (chatAiModel) {
+  chatAiModel.addEventListener("change", syncChatAiSettingsFromControls);
+  chatAiModel.addEventListener("blur", syncChatAiSettingsFromControls);
+}
+if (chatAiBaseUrl) {
+  chatAiBaseUrl.addEventListener("change", syncChatAiSettingsFromControls);
+  chatAiBaseUrl.addEventListener("blur", syncChatAiSettingsFromControls);
+}
+if (chatAiKey) {
+  chatAiKey.addEventListener("change", syncChatAiSettingsFromControls);
+  chatAiKey.addEventListener("blur", syncChatAiSettingsFromControls);
+}
+if (chatAiPingBtn) {
+  chatAiPingBtn.addEventListener("click", () => {
+    void checkChatAiAvailability();
+  });
+}
+if (generateCustomProjectBtn) {
+  generateCustomProjectBtn.addEventListener("click", () => {
+    void generateCustomProjectEstimate();
+  });
+}
+if (applyCustomProjectBtn) {
+  applyCustomProjectBtn.addEventListener("click", applyCustomProjectDraft);
+}
+if (resetCustomProjectBtn) {
+  resetCustomProjectBtn.addEventListener("click", () => {
+    resetCustomProjectDialog();
+  });
+}
+if (closeCustomProject) {
+  closeCustomProject.addEventListener("click", () => {
+    closeCustomProjectDialogPanel();
+  });
+}
+if (copyFileModeCommandBtn) {
+  copyFileModeCommandBtn.addEventListener("click", async () => {
+    const command = getStaticModeLaunchCommand();
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(command);
+      }
+      if (fileModeBannerText) {
+        fileModeBannerText.textContent = "已复制启动命令。用 localhost 或线上版打开后，公开版内置 AI 才会生效。";
+      }
+    } catch (error) {
+      if (fileModeBannerText) {
+        fileModeBannerText.textContent = `复制失败，请手动执行：${command}`;
+      }
+    }
+  });
+}
+if (dismissFileModeBannerBtn) {
+  dismissFileModeBannerBtn.addEventListener("click", () => {
+    fileModeBannerDismissed = true;
+    renderFileModeBanner();
+  });
+}
 chatRole.addEventListener("change", updateChatControls);
 if (saveSlotSelect) {
   saveSlotSelect.addEventListener("change", () => {
@@ -23034,6 +27768,15 @@ if (closeCausal) {
 
 applyRuntimeDataOverrides();
 normalizeInterviewQuestionBankInPlace();
+loadChatAiSettings();
+applyChatAiUiMode();
+if (CHAT_PUBLIC_RELEASE) {
+  chatAiSettings = normalizeChatAiSettings(chatAiSettings);
+  saveChatAiSettings();
+}
+renderChatAiSettings();
+refreshChatAiStatus();
+setChatSendBusy(false);
 buildStatsGrid();
 renderRegions();
 renderRigors();
