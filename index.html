@@ -162,10 +162,14 @@
             <div id="outcomeMetrics" class="outcome-grid"></div>
             <div id="postAdmitPanel" class="panel-card hidden">
               <div class="panel-card-head">
-                <h4>录取后阶段</h4>
+                <h4>录取后准备阶段</h4>
                 <span class="tag">入学准备</span>
               </div>
               <p id="postAdmitNote" class="note"></p>
+              <div id="postAdmitReadiness" class="outcome-grid compact-outcome-grid"></div>
+              <h5 class="section-title">准备清单</h5>
+              <ul id="postAdmitChecklist" class="advisor-list"></ul>
+              <h5 class="section-title">可执行动作</h5>
               <div id="postAdmitActions" class="choice-grid"></div>
             </div>
             <div id="reviewPanel" class="panel-card">
@@ -213,6 +217,17 @@
                 <p>长期主线每学期仅能推进 1 条，其余项目按时间点自由选择。</p>
                 <p id="undergradTermTimeInfo" class="note">时间点数：--</p>
                 <p id="undergradFxNote" class="note">汇率系数：--</p>
+              </div>
+              <div class="section-header">
+                <h5>必修项目</h5>
+                <p>核心课程与先修模块单独列出，不补齐会影响毕业与后续高阶项目解锁。</p>
+              </div>
+              <div id="undergradRequiredStatus" class="outcome-grid compact-outcome-grid"></div>
+              <div id="undergradRequiredProjects" class="card-grid"></div>
+              <p id="undergradRequiredNote" class="note"></p>
+              <div class="section-header">
+                <h5>重点项目</h5>
+                <p class="note">完成必修后，再按你的路线自由搭配其余项目。</p>
               </div>
               <div id="undergradYearChoices" class="card-grid"></div>
               <div class="section-header">
@@ -310,6 +325,17 @@
                   <p id="mastersTermTimeInfo" class="note">时间点数：--</p>
                   <p id="mastersFxNote" class="note">汇率系数：--</p>
                 </div>
+                <div class="section-header">
+                  <h5>必修项目</h5>
+                  <p>方法课、开题、论文主线等必修模块会直接影响毕业与申博。</p>
+                </div>
+                <div id="mastersRequiredStatus" class="outcome-grid compact-outcome-grid"></div>
+                <div id="mastersRequiredProjects" class="card-grid"></div>
+                <p id="mastersRequiredNote" class="note"></p>
+                <div class="section-header">
+                  <h5>重点项目</h5>
+                  <p class="note">必修项目优先，其余项目再按科研、就业或领导路线配置。</p>
+                </div>
                 <div id="mastersYearChoices" class="card-grid"></div>
                 <div class="section-header">
                   <h5>小型行动</h5>
@@ -335,6 +361,7 @@
                 <div class="action-row split">
                   <button id="choosePhdAfterMastersBtn" type="button" class="primary">硕士后读博</button>
                   <button id="chooseJobAfterMastersBtn" type="button" class="ghost">硕士后就业</button>
+                  <button id="withdrawMastersToJobBtn" type="button" class="ghost hidden">退学直接就业（本科）</button>
                 </div>
               </div>
           </div>
@@ -361,6 +388,17 @@
                   <p id="phdTermTimeInfo" class="note">时间点数：--</p>
                   <p id="phdFxNote" class="note">汇率系数：--</p>
                 </div>
+                <div class="section-header">
+                  <h5>必修项目</h5>
+                  <p>问题定义、方法协议、投稿与论文成稿等必修模块会决定博士能否顺利毕业。</p>
+                </div>
+                <div id="phdRequiredStatus" class="outcome-grid compact-outcome-grid"></div>
+                <div id="phdRequiredProjects" class="card-grid"></div>
+                <p id="phdRequiredNote" class="note"></p>
+                <div class="section-header">
+                  <h5>重点项目</h5>
+                  <p class="note">补齐必修模块后，再围绕课题、发表、教学或就业展开冲刺。</p>
+                </div>
                 <div id="phdYearChoices" class="card-grid"></div>
                 <div class="section-header">
                   <h5>小型行动</h5>
@@ -385,6 +423,7 @@
                 <ul id="phdTimeline" class="advisor-list"></ul>
                 <div class="action-row split">
                   <button id="chooseJobAfterPhdBtn" type="button" class="primary">博士后就业</button>
+                  <button id="withdrawPhdToJobBtn" type="button" class="ghost hidden">退学直接就业（硕士）</button>
                 </div>
               </div>
           </div>
@@ -396,7 +435,7 @@
             </div>
             <div class="panel-card">
               <div id="jobCompanySelector" class="hidden">
-                <p class="note">选择目标公司（至少 5 家，最多 15 家）</p>
+                <p class="note">选择目标公司（最多 15 家；不选则按专业自动推荐投递）</p>
                 <div id="jobCompanyList" class="school-grid"></div>
                 <div class="action-row split">
                   <span id="jobCompanyCount" class="tag">已选 0</span>
@@ -470,6 +509,19 @@
             <p id="setupNotice" class="note"></p>
           </div>
 
+          <div class="panel-card" id="publicGuideCard">
+            <div class="panel-card-head">
+              <h3>公开版指引</h3>
+              <span id="publicGuideTag" class="tag">新手友好</span>
+            </div>
+            <p id="publicGuideSummary" class="note">第一次玩也能快速上手：先看这里，再开始旅程。</p>
+            <ul id="publicGuideList" class="advisor-list"></ul>
+            <div class="action-row split">
+              <button id="publicGuideToggleBtn" type="button" class="ghost">收起指引</button>
+              <span class="note">交流室、回放、AI 规划都会在流程中逐步解锁。</span>
+            </div>
+          </div>
+
           <div class="panel-card" id="statsCard">
             <div class="panel-card-head">
               <h3>申请画像</h3>
@@ -510,6 +562,46 @@
                 <strong id="projectValue">--</strong>
               </div>
             </div>
+          </div>
+
+          <div class="panel-card" id="goalCard">
+            <div class="panel-card-head">
+              <h3>毕业 / 申请目标仪表盘</h3>
+              <span id="goalStageTag" class="tag">阶段目标</span>
+            </div>
+            <p id="goalSummary" class="note">旅程开始后，这里会告诉你当前阶段最该补什么、离下一步还差什么。</p>
+            <div id="goalMetrics" class="outcome-grid compact-outcome-grid"></div>
+            <ul id="goalList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="entityProfileCard">
+            <div class="panel-card-head">
+              <h3 id="entityProfileTitle">学校 / 公司档案卡</h3>
+              <span id="entityProfileTag" class="tag">实时画像</span>
+            </div>
+            <p id="entityProfileSummary" class="note">点击学校、公司或结果卡片后，这里会显示偏好、难度和与你的匹配点。</p>
+            <div id="entityProfileMetrics" class="outcome-grid compact-outcome-grid"></div>
+            <ul id="entityProfileList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="regionGameplayCard">
+            <div class="panel-card-head">
+              <h3>国家 / 地区玩法差异</h3>
+              <span id="regionGameplayTag" class="tag">地域风格</span>
+            </div>
+            <p id="regionGameplaySummary" class="note">不同国家和地区不只是排名不同，录取、奖学金、求职和签证体验也会不同。</p>
+            <div id="regionGameplayMetrics" class="outcome-grid compact-outcome-grid"></div>
+            <ul id="regionGameplayList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="transitionPrepCard">
+            <div class="panel-card-head">
+              <h3>录取后准备阶段</h3>
+              <span id="transitionPrepTag" class="tag">准备中</span>
+            </div>
+            <p id="transitionPrepSummary" class="note">确定学校后，这里会提示你开学前或入学初期最该补的准备动作。</p>
+            <div id="transitionPrepMetrics" class="outcome-grid compact-outcome-grid"></div>
+            <ul id="transitionPrepList" class="advisor-list"></ul>
           </div>
 
           <div class="panel-card" id="chatCard">
@@ -625,6 +717,7 @@
               <h3>解锁成就</h3>
               <span class="tag">路线徽章</span>
             </div>
+            <p id="achievementSummary" class="note">旅程开始后会按你的路线、录取、奖学金、毕业和求职表现解锁成就。</p>
             <ul id="achievementList" class="advisor-list"></ul>
           </div>
 
@@ -635,6 +728,18 @@
             </div>
             <p id="legacySummary" class="note">完成一局后，会自动解锁跨周目微加成与回顾。</p>
             <ul id="legacyList" class="advisor-list"></ul>
+          </div>
+
+          <div class="panel-card" id="leaderboardCard">
+            <div class="panel-card-head">
+              <h3>排行榜 / 对照局</h3>
+              <span id="leaderboardTag" class="tag">本地赛季榜</span>
+            </div>
+            <p id="leaderboardSummary" class="note">这里会显示你的本地赛季前排成绩，以及当前局和上一局的关键差异。</p>
+            <div id="leaderboardMetrics" class="outcome-grid compact-outcome-grid"></div>
+            <ul id="leaderboardList" class="advisor-list"></ul>
+            <h4 class="section-title">当前局对照</h4>
+            <ul id="compareRunList" class="advisor-list"></ul>
           </div>
 
           <div class="panel-card dev-panel hidden" id="devPanel">
@@ -747,6 +852,8 @@
             <p id="saveNote" class="note"></p>
             <h4 class="section-title">关键节点回放</h4>
             <div id="replayList" class="choice-grid"></div>
+            <h4 class="section-title">阶段回放摘要</h4>
+            <ul id="replaySummaryList" class="advisor-list"></ul>
           </div>
         </aside>
       </section>

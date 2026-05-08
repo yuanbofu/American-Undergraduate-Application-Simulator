@@ -322,6 +322,12 @@ button {
   color: var(--accent-dark);
 }
 
+.tag.required {
+  background: rgba(29, 106, 117, 0.14);
+  color: var(--primary);
+  border: 1px solid rgba(29, 106, 117, 0.22);
+}
+
 .tag.recommend {
   background: rgba(29, 106, 117, 0.16);
   color: var(--primary);
@@ -556,6 +562,11 @@ button {
   gap: 12px;
 }
 
+.compact-outcome-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
 #resultsArea .panel-card {
   margin-top: 14px;
 }
@@ -571,6 +582,44 @@ button {
 
 .outcome-card strong {
   font-size: 16px;
+}
+
+.outcome-card.compact {
+  padding: 10px;
+  gap: 4px;
+}
+
+.outcome-card.compact strong {
+  font-size: 15px;
+}
+
+.outcome-card.compact small {
+  font-size: 11px;
+}
+
+.outcome-card.module-status.complete {
+  border-color: rgba(26, 127, 75, 0.2);
+  background: linear-gradient(160deg, rgba(26, 127, 75, 0.05), #fff);
+}
+
+.outcome-card.module-status.open {
+  border-color: rgba(29, 106, 117, 0.24);
+  background: linear-gradient(160deg, rgba(29, 106, 117, 0.06), #fff);
+}
+
+.outcome-card.module-status.future,
+.outcome-card.module-status.missing {
+  border-style: dashed;
+}
+
+.required-empty {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  background: #fbf8f2;
 }
 
 .review-radar {
@@ -1084,6 +1133,28 @@ button {
 
 .panel-card-head h3 {
   margin: 0;
+}
+
+#publicGuideCard.collapsed .advisor-list,
+#publicGuideCard.collapsed .note,
+#publicGuideCard.collapsed .action-row .note {
+  display: none;
+}
+
+#publicGuideCard.collapsed .action-row {
+  margin-top: 0;
+}
+
+#publicGuideCard.collapsed {
+  gap: 8px;
+}
+
+#goalCard .advisor-list,
+#entityProfileCard .advisor-list,
+#savePanel .advisor-list,
+#postAdmitPanel .advisor-list {
+  max-height: 260px;
+  overflow: auto;
 }
 
 .stats-grid {

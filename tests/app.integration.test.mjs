@@ -12,13 +12,16 @@ const projectRoot = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(projectRoot, "index.html"), "utf8");
 const appJs = fs.readFileSync(path.join(projectRoot, "app.js"), "utf8");
 
-function bootstrap(url = "http://localhost") {
+function bootstrap(url = "http://localhost", runtimeConfig = null) {
   const dom = new JSDOM(html, {
     url,
     runScripts: "dangerously",
     pretendToBeVisual: true,
   });
   const { window } = dom;
+  if (runtimeConfig) {
+    window.GAME_RUNTIME_CONFIG = runtimeConfig;
+  }
   if (!window.crypto) {
     window.crypto = webcrypto;
   }
@@ -352,6 +355,7 @@ describe("chess-game app", () => {
       seasonId: "2026-S2",
       startedAt: Date.now(),
       score: 0,
+      rawScore: 0,
       finished: false,
       completedChallenges: [],
       leaderboardRank: null,
@@ -367,6 +371,99 @@ describe("chess-game app", () => {
     const summary = window.document.getElementById("legacySummary").textContent;
     expect(summary).toContain("已完成 1 局");
     expect(summary).toContain("当前自动加成");
+  });
+
+  it("scales season score by selected difficulty", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    const snapshot = {
+      offerCount: 2,
+      maxSalary: 180000,
+      pipelineAcceptedTotal: 2,
+      avgHigherEdStress: 62,
+      finalSchoolScore: 82,
+      loanBalance: 12000,
+    };
+
+    const relaxed = window.computeSeasonScore(snapshot, "relaxed");
+    const standard = window.computeSeasonScore(snapshot, "standard");
+    const hard = window.computeSeasonScore(snapshot, "hard");
+
+    expect(relaxed).toBeLessThan(standard);
+    expect(hard).toBeGreaterThan(standard);
+  });
+
+  it("includes graduate schools and chosen job quality in season score", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    const base = {
+      offerCount: 1,
+      maxSalary: 150000,
+      chosenJobSalary: 150000,
+      chosenJobDifficultyScore: 60,
+      chosenJobMajorFitScore: 70,
+      pipelineAcceptedTotal: 1,
+      avgHigherEdStress: 45,
+      finalSchoolScore: 78,
+      mastersSchoolScore: 0,
+      phdSchoolScore: 0,
+      loanBalance: 0,
+    };
+
+    const baseScore = window.computeSeasonScore(base, "standard");
+    const withGraduateSchools = window.computeSeasonScore(
+      {
+        ...base,
+        mastersSchoolScore: 88,
+        phdSchoolScore: 92,
+      },
+      "standard",
+    );
+    const withStrongerChosenJob = window.computeSeasonScore(
+      {
+        ...base,
+        chosenJobSalary: 220000,
+        chosenJobDifficultyScore: 92,
+        chosenJobMajorFitScore: 96,
+      },
+      "standard",
+    );
+
+    expect(withGraduateSchools).toBeGreaterThan(baseScore);
+    expect(withStrongerChosenJob).toBeGreaterThan(baseScore);
+  });
+
+  it("penalizes voluntary and academic repeat years in season score", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    const base = {
+      offerCount: 2,
+      chosenJobSalary: 190000,
+      chosenJobDifficultyScore: 82,
+      chosenJobMajorFitScore: 92,
+      pipelineAcceptedTotal: 3,
+      avgHigherEdStress: 48,
+      finalSchoolScore: 84,
+      mastersSchoolScore: 78,
+      phdSchoolScore: 0,
+      loanBalance: 0,
+      highschoolRepeatCount: 0,
+      stageRepeatCount: 0,
+      academicRepeatCount: 0,
+    };
+
+    const noRepeats = window.computeSeasonScore(base, "standard");
+    const withRepeats = window.computeSeasonScore(
+      {
+        ...base,
+        highschoolRepeatCount: 1,
+        stageRepeatCount: 2,
+        academicRepeatCount: 1,
+      },
+      "standard",
+    );
+
+    expect(withRepeats).toBeLessThan(noRepeats);
   });
 
   it("harmonizes paradoxical rd results so multiple top admits do not coexist with all easier schools rejecting", () => {
@@ -467,7 +564,7 @@ describe("chess-game app", () => {
     expect(saferStatuses.some((status) => status === "录取")).toBe(true);
   });
 
-  it("finalizes interviewer chat after 2 concise answers", () => {
+  it("finalizes interviewer chat after 2 concise answers", async () => {
     const dom = bootstrap();
     const { window } = dom;
     startBasicGame(window);
@@ -512,15 +609,15 @@ describe("chess-game app", () => {
     const originalRandom = window.Math.random;
     window.Math.random = () => 0;
     try {
-      const q1 = window.generateInterviewerReply("开始面试");
+      const q1 = await window.generateInterviewerReply("开始面试");
       expect(q1).toContain("1/2");
 
-      const q2 = window.generateInterviewerReply(
+      const q2 = await window.generateInterviewerReply(
         "我做过一个课程项目，当时主要负责核心功能，最后按时交付，效果不错。",
       );
       expect(q2).toContain("2/2");
 
-      const done = window.generateInterviewerReply(
+      const done = await window.generateInterviewerReply(
         "如果事情很多，我会先排优先级，先做影响最大的，再同步进度和结果。",
       );
       expect(done).toContain("面试结论");
@@ -530,6 +627,366 @@ describe("chess-game app", () => {
       expect(app.status).toBe("录用");
       expect(app.chatInterviewPending).toBe(false);
       expect(app.interviewTranscript.length).toBeGreaterThan(0);
+    } finally {
+      window.Math.random = originalRandom;
+    }
+  });
+
+  it("prefers AI for interviewer scoring when available", async () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.postGradPath = "job";
+    snapshot.jobOutcome = {
+      offerCount: 0,
+      interviewRound: 1,
+      applications: [
+        {
+          companyId: "google",
+          company: "Google",
+          role: "Software Engineer",
+          location: "Mountain View",
+          difficulty: 0.62,
+          difficultyLabel: "高",
+          chance: 0.52,
+          baseChance: 0.52,
+          status: "面试中",
+          salaryLow: 130000,
+          salaryHigh: 190000,
+          majorFit: 1,
+          interviewRound: 1,
+          chatInterviewPending: true,
+          interviewTranscript: [],
+          reason: "初筛通过",
+        },
+      ],
+      offers: [],
+      score: 0.7,
+      universitySignal: 0.7,
+      educationLabel: "本科毕业",
+      majorName: "计算机科学/工程",
+    };
+    snapshot.chatContext = snapshot.chatContext || {};
+    snapshot.chatContext.interviewSession = null;
+    applyStateSnapshot(window, snapshot);
+
+    const calls = [];
+    window.fetch = async (url, options = {}) => {
+      const body = JSON.parse(String(options.body || "{}"));
+      calls.push({ url: String(url), body });
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  score: 86,
+                  matched: 2,
+                  dimensions: {
+                    structure: 84,
+                    relevance: 90,
+                    evidence: 78,
+                    clarity: 88,
+                  },
+                  feedback: "回答清楚，岗位匹配度高",
+                  userFacingReply: "这题回答得比较稳，下一题继续保持这种具体度。",
+                }),
+              },
+            },
+          ],
+        }),
+      };
+    };
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0;
+    try {
+      await window.generateInterviewerReply("开始面试");
+      const q2 = await window.generateInterviewerReply("我做过一个项目，负责核心模块，最后如期上线并拿到正向反馈。");
+      expect(q2).toContain("这题回答得比较稳");
+      const done = await window.generateInterviewerReply("我会先拆优先级，再同步风险，最后给出结果和复盘。");
+      expect(done).toContain("面试结论");
+
+      const after = getStateSnapshot(window);
+      expect(after.jobOutcome.applications[0].interviewTranscript[0].source).toBe("ai");
+      expect(window.document.getElementById("chatAiStatus").textContent).toContain("面试评分已由 AI 完成");
+      expect(calls.some((item) => item.body?.response_format?.type === "json_object")).toBe(true);
+    } finally {
+      window.Math.random = originalRandom;
+    }
+  });
+
+  it("falls back to rule scoring when interviewer AI is unavailable", async () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.postGradPath = "job";
+    snapshot.jobOutcome = {
+      offerCount: 0,
+      interviewRound: 1,
+      applications: [
+        {
+          companyId: "google",
+          company: "Google",
+          role: "Software Engineer",
+          location: "Mountain View",
+          difficulty: 0.62,
+          difficultyLabel: "高",
+          chance: 0.52,
+          baseChance: 0.52,
+          status: "面试中",
+          salaryLow: 130000,
+          salaryHigh: 190000,
+          majorFit: 1,
+          interviewRound: 1,
+          chatInterviewPending: true,
+          interviewTranscript: [],
+          reason: "初筛通过",
+        },
+      ],
+      offers: [],
+      score: 0.7,
+      universitySignal: 0.7,
+      educationLabel: "本科毕业",
+      majorName: "计算机科学/工程",
+    };
+    snapshot.chatContext = snapshot.chatContext || {};
+    snapshot.chatContext.interviewSession = null;
+    applyStateSnapshot(window, snapshot);
+
+    window.fetch = async () => {
+      throw new Error("network down");
+    };
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0;
+    try {
+      await window.generateInterviewerReply("开始面试");
+      await window.generateInterviewerReply("我做过一个课程项目，当时负责推进进度，最后按时交付。");
+      const done = await window.generateInterviewerReply("我会先排优先级，再同步风险和结果。");
+      expect(done).toContain("面试结论");
+
+      const after = getStateSnapshot(window);
+      expect(after.jobOutcome.applications[0].interviewTranscript[0].source).toBe("rule");
+      expect(window.document.getElementById("chatAiStatus").textContent).toContain("已回退规则评分");
+    } finally {
+      window.Math.random = originalRandom;
+    }
+  });
+
+  it("prefers AI for undergrad appeal review and explains the receipt warmly", async () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.stats = {
+      ...snapshot.stats,
+      gpa: 3.96,
+      awards: 88,
+      activities: 82,
+      recStrength: 79,
+      reputation: 72,
+    };
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        qsRank: 4,
+        chance: 0.18,
+        fitScore: 0.62,
+        academicScore: 0.74,
+        holisticScore: 0.69,
+        status: "拒绝",
+        roundChoice: "rd",
+        batch: "rd",
+        released: true,
+        revealed: true,
+        reasons: ["竞争激烈", "叙事与同类申请者相比不够突出"],
+      },
+    ];
+    snapshot.chatContext = snapshot.chatContext || {};
+    snapshot.chatContext.appealEvidence = ["evidence-transcript", "evidence-award"];
+    snapshot.appealsUsed = {};
+    applyStateSnapshot(window, snapshot);
+
+    const calls = [];
+    window.fetch = async (url, options = {}) => {
+      const body = JSON.parse(String(options.body || "{}"));
+      calls.push({ url: String(url), body });
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  hasMeaningfulUpdate: true,
+                  chance: 0.66,
+                  recommendedStatus: "录取",
+                  dimensions: {
+                    updateQuality: 88,
+                    evidenceStrength: 90,
+                    majorRelevance: 76,
+                    persuasiveness: 71,
+                  },
+                  feedback: "新增更新较强，足以触发重新考虑",
+                  userFacingReply: "材料已收悉，我们会基于新增更新重新完成复核。",
+                }),
+              },
+            },
+          ],
+        }),
+      };
+    };
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0;
+    try {
+      await window.processChatTurn("admissions-harvard", "我补交了最新成绩单和新增竞赛奖项，也更新了项目进展，请重新考虑我的申请。");
+      const after = getStateSnapshot(window);
+      const result = after.results[0];
+      const latestAi = [...after.chatLog].reverse().find((msg) => msg.role === "ai");
+      expect(latestAi?.text).toContain("已经完成对 Harvard University 本科申请申诉材料的重新复核");
+      expect(latestAi?.text).toContain("新增材料质量");
+      expect(latestAi?.text).toContain("结果已经有更新");
+      expect(latestAi?.text).toContain("请打开新的招生邮件查看最新通知");
+      expect(result.appealEvaluationSource).toBe("ai");
+      expect(result.appealResultChanged).toBe(true);
+      expect(result.appealReply).toBe(latestAi?.text);
+      expect(result.revealed).toBe(false);
+      expect(calls).toHaveLength(1);
+      expect(calls[0].body?.response_format?.type).toBe("json_object");
+    } finally {
+      window.Math.random = originalRandom;
+    }
+  });
+
+  it("lets strong relaxed-mode near-match applicants realistically overturn an undergrad appeal", async () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.difficultyId = "relaxed";
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.majorId = "cs_engineering";
+    snapshot.stats = {
+      ...snapshot.stats,
+      gpa: 3.92,
+      test: 1540,
+      english: 116,
+      activities: 86,
+      awards: 82,
+      leadership: 76,
+      essay: 84,
+      essayTrack: 82,
+      recStrength: 78,
+      reputation: 70,
+      stress: 18,
+    };
+    snapshot.results = [
+      {
+        id: "cmu",
+        name: "Carnegie Mellon University",
+        country: "United States",
+        qsRank: 52,
+        chance: 0.46,
+        fitScore: 0.84,
+        scoreGap: -0.02,
+        status: "拒绝",
+        roundChoice: "rd",
+        batch: "rd",
+        released: true,
+        revealed: true,
+        reasons: ["竞争激烈", "同池申请者项目叙事更集中"],
+      },
+    ];
+    snapshot.chatContext = snapshot.chatContext || {};
+    snapshot.chatContext.appealEvidence = ["evidence-transcript", "evidence-award", "evidence-project"];
+    snapshot.appealsUsed = {};
+    applyStateSnapshot(window, snapshot);
+
+    window.fetch = async () => {
+      throw new Error("ai offline");
+    };
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0.43;
+    try {
+      await window.processChatTurn("admissions-cmu", "我补充了最新成绩单、新增竞赛奖项和项目阶段报告，请重新考虑我的申请。");
+      const after = getStateSnapshot(window);
+      expect(after.results[0].appealEvaluationSource).toBe("rule");
+      expect(after.results[0].appealResultChanged).toBe(true);
+      expect(after.results[0].status).toBe("候补");
+      expect(after.results[0].revealed).toBe(false);
+    } finally {
+      window.Math.random = originalRandom;
+    }
+  });
+
+  it("falls back to rule evaluation for graduate appeals when AI is unavailable", async () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.postGradPath = "masters";
+    snapshot.undergradProfile = {
+      gpa: 3.88,
+      research: 82,
+      internship: 64,
+      leadership: 48,
+      stress: 22,
+    };
+    snapshot.gradResults = [
+      {
+        id: "cambridge",
+        name: "University of Cambridge",
+        country: "United Kingdom",
+        qsRank: 5,
+        status: "拒绝",
+        chance: 0.21,
+        fitScore: 0.73,
+        programType: "masters",
+        majorId: snapshot.majorId,
+        majorName: "计算机科学/工程",
+        revealed: true,
+        reason: "研究深度和持续产出与项目要求仍有差距。",
+        reasons: ["研究深度不足", "同池申请者竞争更强"],
+      },
+    ];
+    snapshot.chatContext = snapshot.chatContext || {};
+    snapshot.chatContext.appealEvidence = [];
+    snapshot.appealsUsed = {};
+    applyStateSnapshot(window, snapshot);
+
+    window.fetch = async () => {
+      throw new Error("ai offline");
+    };
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0;
+    try {
+      await window.processChatTurn("admissions-cambridge", "我新增了一篇研究论文初稿、导师补充推荐和新的研究项目结果，希望学校重新考虑。");
+      const after = getStateSnapshot(window);
+      const result = after.gradResults[0];
+      const latestAi = [...after.chatLog].reverse().find((msg) => msg.role === "ai");
+      expect(String(latestAi?.text || "")).toContain("已经完成对 University of Cambridge 硕士项目申诉材料的重新复核");
+      expect(String(latestAi?.text || "")).toMatch(/结果已经有更新|本次复核结果暂未改变/);
+      expect(result.appealEvaluationSource).toBe("rule");
+      expect(window.document.getElementById("chatAiStatus").textContent).toContain("已回退规则评估");
     } finally {
       window.Math.random = originalRandom;
     }
@@ -901,6 +1358,48 @@ describe("chess-game app", () => {
     expect(multiRoleCompanyCount).toBeGreaterThan(0);
   });
 
+  it("allows career submissions without a minimum company-count requirement", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const selectedCompany = window.getRecommendedJobPool(1)[0];
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        qsRank: 4,
+        status: "录取",
+        revealed: true,
+        fitScore: 0.8,
+        academicScore: 0.78,
+        holisticScore: 0.75,
+      },
+    ];
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.undergradCurrentYear = 8;
+    snapshot.postGradPath = "job";
+    snapshot.jobSelectedCompanies = [selectedCompany.id];
+    snapshot.jobOutcome = null;
+    applyStateSnapshot(window, snapshot);
+
+    expect(window.document.getElementById("jobCompanyCount").textContent).toContain("不设最低数量");
+    expect(window.document.getElementById("submitJobAppsBtn").disabled).toBe(false);
+
+    window.submitJobApplications();
+
+    const after = getStateSnapshot(window);
+    expect(after.jobOutcome.applications).toHaveLength(1);
+    expect(after.jobOutcome.applications[0].companyId).toBe(selectedCompany.id);
+    expect(window.document.getElementById("postGradNote").textContent).toContain("已提交 1 家公司");
+  });
+
   it("keeps elite-school chance lower than mid-tier under same profile", () => {
     const dom = bootstrap();
     const { window } = dom;
@@ -1182,6 +1681,204 @@ describe("chess-game app", () => {
     window.skipUndergradTerm();
     const afterSkip = getStateSnapshot(window);
     expect(afterSkip.undergradCurrentYear).toBe(2);
+  });
+
+  it("capitalizes loan interest and keeps loan-funded cash across undergrad, masters, and phd transitions", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0.99;
+    try {
+      let snapshot = getStateSnapshot(window);
+      snapshot.termIndex = 7;
+      snapshot.applicationStage = "complete";
+      snapshot.resultReleaseStage = "complete";
+      snapshot.finalChoice = "harvard";
+      snapshot.undergradStarted = true;
+      snapshot.undergradGraduated = false;
+      snapshot.undergradCurrentYear = 1;
+      snapshot.cash = 20000;
+      snapshot.loanBalance = 18000;
+      snapshot.undergradProfile = { gpa: 3.4, research: 40, internship: 35, leadership: 30, stress: 48 };
+      applyStateSnapshot(window, snapshot);
+
+      window.skipUndergradTerm();
+      let after = getStateSnapshot(window);
+      expect(after.cash).toBe(20000);
+      expect(after.loanBalance).toBe(19080);
+      expect(after.log.some((line) => String(line).includes("不扣现金"))).toBe(true);
+
+      snapshot = getStateSnapshot(window);
+      snapshot.undergradStarted = true;
+      snapshot.undergradGraduated = false;
+      snapshot.undergradCurrentYear = 8;
+      snapshot.cash = 1000;
+      snapshot.loanBalance = 0;
+      snapshot.postGradPath = null;
+      snapshot.gradApplicationType = null;
+      snapshot.gradResults = [];
+      snapshot.gradSelectedSchools = [];
+      snapshot.undergradLoanTermUsed = 0;
+      snapshot.undergradProfile = { gpa: 3.7, research: 64, internship: 58, leadership: 42, stress: 24 };
+      snapshot.higherEdTermState.undergrad.courseCredits = 30;
+      snapshot.higherEdTermState.undergrad.courseModules = [
+        "ug-core-foundation",
+        "ug-lab-basics",
+        "ug-capstone-proposal",
+      ];
+      applyStateSnapshot(window, snapshot);
+
+      window.applyHigherEdLoan("undergrad");
+      expect(getStateSnapshot(window).cash).toBe(19000);
+      window.skipUndergradTerm();
+      after = getStateSnapshot(window);
+      expect(after.undergradGraduated).toBe(true);
+      expect(after.cash).toBe(19000);
+      expect(after.loanBalance).toBeGreaterThan(18000);
+
+      window.choosePostGradPath("masters");
+      snapshot = getStateSnapshot(window);
+      snapshot.gradSelectedSchools = ["mit", "stanford", "harvard"];
+      applyStateSnapshot(window, snapshot);
+      window.submitMastersApplications();
+      after = getStateSnapshot(window);
+      expect(after.cash).toBe(19000 - 3 * 120);
+      expect(after.postGradPath).toBe("masters");
+
+      snapshot = getStateSnapshot(window);
+      snapshot.undergradGraduated = true;
+      snapshot.mastersStarted = true;
+      snapshot.mastersGraduated = false;
+      snapshot.mastersCurrentYear = 4;
+      snapshot.postGradPath = "masters";
+      snapshot.gradApplicationType = null;
+      snapshot.gradResults = [];
+      snapshot.gradSelectedSchools = [];
+      snapshot.cash = 1000;
+      snapshot.loanBalance = 0;
+      snapshot.mastersLoanTermUsed = 0;
+      snapshot.msPhdApproved = false;
+      snapshot.directPhdApproved = false;
+      snapshot.mastersProfile = { gpa: 3.72, research: 72, internship: 44, leadership: 42, stress: 26, thesis: 76 };
+      snapshot.mastersWorkflow = { advisorMatched: true, advisorTerm: 1, proposalPassed: true, proposalTerm: 2, defensePassed: true, defenseTerm: 4 };
+      snapshot.higherEdTermState.masters.courseCredits = 18;
+      snapshot.higherEdTermState.masters.courseModules = [
+        "ms-core-method",
+        "ms-thesis-proposal",
+        "ms-paper-draft",
+        "ms-thesis-defense",
+      ];
+      applyStateSnapshot(window, snapshot);
+
+      window.applyHigherEdLoan("masters");
+      expect(getStateSnapshot(window).cash).toBe(23000);
+      window.skipMastersTerm();
+      after = getStateSnapshot(window);
+      expect(after.mastersGraduated).toBe(true);
+      expect(after.cash).toBe(23000);
+      expect(after.loanBalance).toBeGreaterThan(22000);
+
+      window.choosePostGradPath("phd");
+      snapshot = getStateSnapshot(window);
+      snapshot.gradSelectedSchools = ["mit", "stanford", "harvard"];
+      applyStateSnapshot(window, snapshot);
+      window.submitPhdApplications();
+      after = getStateSnapshot(window);
+      expect(after.cash).toBe(23000 - 3 * 150);
+      expect(after.postGradPath).toBe("phd");
+
+      snapshot = getStateSnapshot(window);
+      snapshot.undergradGraduated = true;
+      snapshot.mastersStarted = true;
+      snapshot.mastersGraduated = true;
+      snapshot.phdStarted = true;
+      snapshot.phdGraduated = false;
+      snapshot.phdCurrentYear = 8;
+      snapshot.postGradPath = "phd";
+      snapshot.gradApplicationType = null;
+      snapshot.gradResults = [];
+      snapshot.gradSelectedSchools = [];
+      snapshot.cash = 1000;
+      snapshot.loanBalance = 0;
+      snapshot.phdLoanTermUsed = 0;
+      snapshot.phdProfile = { research: 72, internship: 30, leadership: 42, stress: 28, publication: 66, teaching: 32 };
+      snapshot.phdWorkflow = { advisorMatched: true, advisorTerm: 1, candidacyPassed: true, candidacyTerm: 3, defensePassed: true, defenseTerm: 8 };
+      snapshot.higherEdTermState.phd.courseCredits = 32;
+      snapshot.higherEdTermState.phd.courseModules = [
+        "phd-problem-framing",
+        "phd-method-protocol",
+        "phd-paper-submit",
+        "phd-review-cycle",
+        "phd-dissertation-draft",
+        "phd-defense",
+      ];
+      applyStateSnapshot(window, snapshot);
+
+      window.applyHigherEdLoan("phd");
+      expect(getStateSnapshot(window).cash).toBe(27000);
+      window.skipPhdTerm();
+      after = getStateSnapshot(window);
+      expect(after.phdGraduated).toBe(true);
+      expect(after.cash).toBe(27000);
+      expect(after.loanBalance).toBeGreaterThan(26000);
+
+      window.choosePostGradPath("job");
+      after = getStateSnapshot(window);
+      expect(after.postGradPath).toBe("job");
+      expect(after.cash).toBe(27000);
+    } finally {
+      window.Math.random = originalRandom;
+    }
+  });
+
+  it("carries unused higher-ed loan cash into the next semester inside each degree stage", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const setupStage = (stage) => {
+      const snapshot = getStateSnapshot(window);
+      snapshot.termIndex = 7;
+      snapshot.applicationStage = "complete";
+      snapshot.resultReleaseStage = "complete";
+      snapshot.finalChoice = "harvard";
+      snapshot.cash = 1000;
+      snapshot.loanBalance = 0;
+      snapshot.undergradStarted = true;
+      snapshot.undergradGraduated = stage !== "undergrad";
+      snapshot.undergradCurrentYear = stage === "undergrad" ? 1 : 8;
+      snapshot.mastersStarted = stage === "masters" || stage === "phd";
+      snapshot.mastersGraduated = stage === "phd";
+      snapshot.mastersCurrentYear = stage === "masters" ? 1 : stage === "phd" ? 4 : 0;
+      snapshot.phdStarted = stage === "phd";
+      snapshot.phdGraduated = false;
+      snapshot.phdCurrentYear = stage === "phd" ? 1 : 0;
+      snapshot.postGradPath = stage === "masters" ? "masters" : stage === "phd" ? "phd" : null;
+      snapshot.undergradProfile = { gpa: 3.4, research: 42, internship: 36, leadership: 30, stress: 24 };
+      snapshot.mastersProfile = { gpa: 3.5, research: 46, internship: 32, leadership: 30, stress: 24, thesis: 28 };
+      snapshot.phdProfile = { research: 48, internship: 28, leadership: 30, stress: 24, publication: 22, teaching: 20 };
+      applyStateSnapshot(window, snapshot);
+    };
+
+    [
+      { stage: "undergrad", method: "skipUndergradTerm", amount: 18000 },
+      { stage: "masters", method: "skipMastersTerm", amount: 22000 },
+      { stage: "phd", method: "skipPhdTerm", amount: 26000 },
+    ].forEach(({ stage, method, amount }) => {
+      setupStage(stage);
+      window.applyHigherEdLoan(stage);
+      let after = getStateSnapshot(window);
+      expect(after.cash).toBe(1000 + amount);
+      expect(after[`${stage}LoanTermUsed`]).toBe(1);
+      expect(after.higherEdTermState[stage].financeNote).toContain("结转到下学期");
+
+      window[method]();
+      after = getStateSnapshot(window);
+      expect(after.cash).toBe(1000 + amount);
+      expect(after.loanBalance).toBeGreaterThan(amount);
+    });
   });
 
   it("can enter undergrad flow immediately after choosing final school in release stage", () => {
@@ -1494,6 +2191,8 @@ describe("chess-game app", () => {
     expect(after.undergradGraduated).toBe(true);
     expect(after.mastersStarted).toBe(true);
     expect(after.mastersGraduated).toBe(false);
+    expect(after.mastersCurrentYear).toBe(1);
+    expect(after.mastersHistory).toEqual([]);
   });
 
   it("applies _devPatch overrides on top of flow template", () => {
@@ -1539,6 +2238,93 @@ describe("chess-game app", () => {
     expect(after.devMode).toBe(true);
     expect(after.phdStarted).toBe(true);
     expect(after.mastersGraduated).toBe(true);
+    expect(after.phdCurrentYear).toBe(1);
+    expect(after.phdHistory).toEqual([]);
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0.99;
+    try {
+      window.document.getElementById("phdConfirmBtn").click();
+      const afterConfirm = getStateSnapshot(window);
+      expect(afterConfirm.phdCurrentYear).toBe(2);
+      expect(afterConfirm.phdHistory.map((entry) => entry.term)).toEqual([1]);
+    } finally {
+      window.Math.random = originalRandom;
+    }
+  });
+
+  it("starts developer undergrad, masters, and phd flow templates from the first term", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    window.applyDevState(JSON.stringify({ _devApplyFlow: "undergrad" }));
+    let snapshot = getStateSnapshot(window);
+    expect(snapshot.undergradStarted).toBe(true);
+    expect(snapshot.undergradCurrentYear).toBe(1);
+    expect(snapshot.undergradHistory).toEqual([]);
+
+    window.applyDevState(JSON.stringify({ _devApplyFlow: "masters" }));
+    snapshot = getStateSnapshot(window);
+    expect(snapshot.mastersStarted).toBe(true);
+    expect(snapshot.mastersCurrentYear).toBe(1);
+    expect(snapshot.mastersHistory).toEqual([]);
+
+    window.applyDevState(JSON.stringify({ _devApplyFlow: "phd" }));
+    snapshot = getStateSnapshot(window);
+    expect(snapshot.phdStarted).toBe(true);
+    expect(snapshot.phdCurrentYear).toBe(1);
+    expect(snapshot.phdHistory).toEqual([]);
+  });
+
+  it("advances normal phd study from term 1 to term 2 without skipping", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.undergradCurrentYear = 8;
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = true;
+    snapshot.mastersCurrentYear = 4;
+    snapshot.postGradPath = "phd";
+    snapshot.phdStarted = true;
+    snapshot.phdGraduated = false;
+    snapshot.phdCurrentYear = 1;
+    snapshot.phdSchoolId = "mit";
+    snapshot.phdSchoolName = "Massachusetts Institute of Technology";
+    snapshot.phdEntryTrack = "regular";
+    snapshot.phdProfile = { research: 68, internship: 22, leadership: 31, stress: 38, publication: 28, teaching: 20 };
+    snapshot.phdHistory = [];
+    snapshot.storyArcs = { active: [], completed: [], history: [] };
+    snapshot.usedConflictDecisionIds = [];
+    snapshot.conflictCooldown = 0;
+    snapshot.higherEdTermState.phd.currentEvents = [];
+    snapshot.higherEdTermState.phd.selectedEventIds = [];
+    snapshot.higherEdTermState.phd.selectedMiniIds = [];
+    snapshot.higherEdTermState.phd.timeBudget = 8;
+    applyStateSnapshot(window, snapshot);
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0.99;
+    try {
+      window.document.getElementById("phdConfirmBtn").click();
+      let after = getStateSnapshot(window);
+      expect(after.phdCurrentYear).toBe(2);
+      expect(after.phdHistory.map((entry) => entry.term)).toEqual([1]);
+
+      window.document.getElementById("phdConfirmBtn").click();
+      after = getStateSnapshot(window);
+      expect(after.phdCurrentYear).toBe(3);
+      expect(after.phdHistory.map((entry) => entry.term)).toEqual([1, 2]);
+    } finally {
+      window.Math.random = originalRandom;
+    }
   });
 
   it("shows admissions quick actions for BS-MS / BS-MS-PhD and can trigger them", () => {
@@ -1674,6 +2460,68 @@ describe("chess-game app", () => {
     expect(undergradYearChoices).toContain("已解锁连读申请");
   });
 
+  it("screens out weak BS-MS applications instead of approving them too easily", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = false;
+    snapshot.undergradGraduated = false;
+    snapshot.mastersStarted = false;
+    snapshot.phdStarted = false;
+    snapshot.combinedDegreeApplied = false;
+    snapshot.combinedDegreeApproved = false;
+    snapshot.directPhdApplied = false;
+    snapshot.directPhdApproved = false;
+    snapshot.stats.awards = 42;
+    snapshot.stats.activities = 46;
+    snapshot.stats.essayTrack = 54;
+    snapshot.stats.stress = 48;
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        qsRank: 4,
+        chance: 0.22,
+        fitScore: 0.56,
+        academicScore: 0.52,
+        holisticScore: 0.48,
+        status: "录取",
+        roundChoice: "rd",
+        batch: "rd",
+        released: true,
+        revealed: true,
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    const chatRole = window.document.getElementById("chatRole");
+    chatRole.value = "admissions-harvard";
+    chatRole.dispatchEvent(new window.Event("change"));
+
+    const bsmsBtn = Array.from(window.document.querySelectorAll("#chatActionPanel .chat-action-btn")).find((btn) =>
+      String(btn.textContent).includes("申请本硕连读"),
+    );
+    expect(bsmsBtn).toBeTruthy();
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0.25;
+    try {
+      bsmsBtn.click();
+    } finally {
+      window.Math.random = originalRandom;
+    }
+
+    const after = getStateSnapshot(window);
+    expect(after.combinedDegreeApplied).toBe(true);
+    expect(after.combinedDegreeApproved).toBe(false);
+  });
+
   it("shows admissions quick action for MS-PhD and can trigger it", () => {
     const dom = bootstrap();
     const { window } = dom;
@@ -1743,6 +2591,8 @@ describe("chess-game app", () => {
     snapshot.undergradGraduated = false;
     snapshot.undergradCurrentYear = 7;
     snapshot.undergradProfile = { gpa: 3.9, research: 92, internship: 70, leadership: 68, stress: 30 };
+    snapshot.higherEdTermState.undergrad.courseCredits = 26;
+    snapshot.higherEdTermState.undergrad.courseModules = ["ug-core-foundation", "ug-lab-basics", "ug-capstone-proposal"];
     snapshot.combinedDegreeApplied = false;
     snapshot.combinedDegreeApproved = false;
     snapshot.combinedDegreeSchoolId = "harvard";
@@ -1816,6 +2666,58 @@ describe("chess-game app", () => {
     expect(afterPath.gradResults.length).toBe(0);
   });
 
+  it("shows disabled late-undergrad combined buttons with a graduation-requirement note and proactive reminder", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = false;
+    snapshot.undergradCurrentYear = 7;
+    snapshot.undergradProfile = { gpa: 3.2, research: 14, internship: 16, leadership: 40, stress: 28 };
+    snapshot.higherEdTermState.undergrad.courseCredits = 10;
+    snapshot.higherEdTermState.undergrad.courseModules = ["ug-core-foundation"];
+    snapshot.combinedDegreeApplied = false;
+    snapshot.combinedDegreeApproved = false;
+    snapshot.directPhdApplied = false;
+    snapshot.directPhdApproved = false;
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        qsRank: 4,
+        chance: 0.76,
+        fitScore: 0.86,
+        academicScore: 0.84,
+        holisticScore: 0.8,
+        status: "录取",
+        roundChoice: "rd",
+        batch: "rd",
+        released: true,
+        revealed: true,
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    const chatRole = window.document.getElementById("chatRole");
+    chatRole.value = "admissions-harvard";
+    chatRole.dispatchEvent(new window.Event("change"));
+
+    const buttons = Array.from(window.document.querySelectorAll("#chatActionPanel .chat-action-btn"));
+    const labels = buttons.map((btn) => btn.querySelector("strong")?.textContent?.trim());
+    expect(labels).toContain("申请本硕连读");
+    expect(labels).toContain("申请本硕博连读");
+    expect(buttons.some((btn) => btn.disabled && String(btn.textContent).includes("需先满足毕业要求"))).toBe(true);
+
+    const after = getStateSnapshot(window);
+    expect(after.chatLog.some((msg) => String(msg.text).includes("请先补齐本科毕业要求"))).toBe(true);
+  });
+
   it("automatically announces combined-degree results at the next semester boundary", () => {
     const dom = bootstrap();
     const { window } = dom;
@@ -1829,6 +2731,8 @@ describe("chess-game app", () => {
     snapshot.undergradGraduated = false;
     snapshot.undergradCurrentYear = 7;
     snapshot.undergradProfile = { gpa: 3.92, research: 94, internship: 70, leadership: 68, stress: 24 };
+    snapshot.higherEdTermState.undergrad.courseCredits = 27;
+    snapshot.higherEdTermState.undergrad.courseModules = ["ug-core-foundation", "ug-research-design", "ug-capstone-proposal"];
     snapshot.combinedDegreeSchoolId = "harvard";
     snapshot.results = [
       {
@@ -2063,6 +2967,54 @@ describe("chess-game app", () => {
       window.document.querySelectorAll("#chatActionPanel .chat-action-btn strong"),
     ).map((item) => item.textContent.trim());
     expect(labels).toContain("申请硕博连读");
+  });
+
+  it("shows disabled late-masters MS-PhD button with a graduation-requirement note and proactive reminder", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.postGradPath = "masters";
+    snapshot.gradApplicationType = "masters";
+    snapshot.gradProgramMode = "masters";
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = false;
+    snapshot.mastersCurrentYear = 3;
+    snapshot.mastersSchoolId = "cambridge";
+    snapshot.mastersSchoolName = "University of Cambridge";
+    snapshot.mastersProfile = { gpa: 3.02, research: 28, internship: 44, leadership: 40, stress: 32, thesis: 21 };
+    snapshot.higherEdTermState.masters.courseCredits = 8;
+    snapshot.higherEdTermState.masters.courseModules = ["ms-core-method"];
+    snapshot.mastersWorkflow = {
+      advisorMatched: true,
+      advisorTerm: 1,
+      proposalPassed: false,
+      proposalTerm: 0,
+      defensePassed: false,
+      defenseTerm: 0,
+    };
+    snapshot.msPhdApplied = false;
+    snapshot.msPhdApproved = false;
+    snapshot.msPhdSchoolId = null;
+    snapshot.msPhdLastWindow = null;
+    applyStateSnapshot(window, snapshot);
+
+    const chatRole = window.document.getElementById("chatRole");
+    chatRole.value = "admissions-cambridge";
+    chatRole.dispatchEvent(new window.Event("change"));
+
+    const buttons = Array.from(window.document.querySelectorAll("#chatActionPanel .chat-action-btn"));
+    expect(buttons.some((btn) => btn.disabled && String(btn.textContent).includes("申请硕博连读"))).toBe(true);
+    expect(buttons.some((btn) => String(btn.textContent).includes("需先满足毕业要求"))).toBe(true);
+
+    const after = getStateSnapshot(window);
+    expect(after.chatLog.some((msg) => String(msg.text).includes("请先补齐硕士毕业要求"))).toBe(true);
   });
 
   it("blocks submitApplications when main stage is not application", () => {
@@ -2716,8 +3668,135 @@ describe("chess-game app", () => {
 
     expect(window.getMainViewStage()).toBe("masters");
     expect(window.document.getElementById("gradArea").classList.contains("hidden")).toBe(true);
+    expect(window.document.getElementById("gradArea").inert).toBe(true);
     expect(window.document.getElementById("mastersArea").classList.contains("hidden")).toBe(false);
+    expect(window.document.getElementById("mastersArea").inert).toBe(false);
     expect(window.document.getElementById("mastersPanel").classList.contains("hidden")).toBe(false);
+  });
+
+  it("hides stale masters application results after masters graduation", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.postGradPath = "masters";
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = true;
+    snapshot.mastersCurrentYear = 4;
+    snapshot.mastersSchoolId = "cambridge";
+    snapshot.mastersSchoolName = "University of Cambridge";
+    snapshot.mastersProfile = { gpa: 3.72, research: 78, internship: 62, leadership: 48, stress: 22, thesis: 74 };
+    snapshot.mastersWorkflow = {
+      advisorMatched: true,
+      proposalPassed: true,
+      defensePassed: true,
+      advisorTerm: 1,
+      proposalTerm: 2,
+      defenseTerm: 4,
+    };
+    snapshot.higherEdTermState.masters.courseCredits = 16;
+    snapshot.higherEdTermState.masters.courseModules = [
+      "ms-core-method",
+      "ms-thesis-proposal",
+      "ms-paper-draft",
+      "ms-thesis-defense",
+    ];
+    snapshot.gradResults = [
+      {
+        id: "cambridge",
+        name: "University of Cambridge",
+        country: "United Kingdom",
+        qsRank: 6,
+        status: "录取",
+        chance: 0.72,
+        fitScore: 0.8,
+        programType: "masters",
+        majorId: snapshot.majorId,
+        majorName: "计算机科学/工程",
+        revealed: true,
+        reason: "本科成绩稳定。",
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    const normalized = getStateSnapshot(window);
+    expect(normalized.postGradPath).toBeNull();
+    expect(normalized.gradApplicationType).toBeNull();
+    expect(normalized.gradResults).toEqual([]);
+    expect(window.getMainViewStage()).toBe("grad");
+    expect(window.document.getElementById("gradArea").classList.contains("hidden")).toBe(false);
+    expect(window.document.getElementById("gradApplicationPanel").classList.contains("hidden")).toBe(false);
+    expect(window.document.getElementById("gradResultsPanel").classList.contains("hidden")).toBe(true);
+    expect(window.document.getElementById("gradResultsPanel").inert).toBe(true);
+    expect(window.document.getElementById("gradResultsGrid").textContent).not.toContain("University of Cambridge");
+    expect(window.document.getElementById("postGradResults").textContent).not.toContain("University of Cambridge");
+    expect(window.document.getElementById("chooseMastersBtn").classList.contains("primary")).toBe(false);
+    expect(window.document.getElementById("postGradNote").textContent).toContain("硕士已毕业");
+  });
+
+  it("fully disables hidden grad application controls during masters study so project selection is not blocked by grad-stage guards", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    window.applyDevState(JSON.stringify({ _devApplyFlow: "masters" }));
+
+    expect(window.getMainViewStage()).toBe("masters");
+    expect(window.document.getElementById("postGradPanel").classList.contains("hidden")).toBe(true);
+    expect(window.document.getElementById("postGradPanel").inert).toBe(true);
+    expect(window.document.getElementById("submitMastersBtn").disabled).toBe(true);
+    expect(window.document.getElementById("gradRevealNextBtn").disabled).toBe(true);
+    expect(window.document.getElementById("gradResolveWaitlistBtn").disabled).toBe(true);
+
+    const staleSubmitBtn = window.document.getElementById("submitMastersBtn");
+    staleSubmitBtn.disabled = false;
+    staleSubmitBtn.click();
+    const staleRevealBtn = window.document.getElementById("gradRevealNextBtn");
+    staleRevealBtn.disabled = false;
+    staleRevealBtn.click();
+
+    expect(window.document.getElementById("postGradNote").textContent).not.toContain("当前阶段不可执行");
+    expect(window.document.getElementById("gradReleaseNote").textContent).not.toContain("当前阶段不可执行");
+
+    const firstProjectBtn = window.document.querySelector("#mastersYearChoices .event-card button");
+    expect(firstProjectBtn).toBeTruthy();
+    firstProjectBtn.click();
+
+    expect(window.document.getElementById("mastersEventCount").textContent).toContain("已选 1");
+    expect(window.document.getElementById("postGradNote").textContent).toBe("");
+  });
+
+  it("keeps masters term confirmation fixed to the masters stage even if runtime tuning supplies stale guards", () => {
+    const dom = bootstrap("http://localhost", {
+      stateMachine: {
+        actionStages: {
+          confirmMastersTerm: ["grad"],
+        },
+      },
+    });
+    const { window } = dom;
+    startBasicGame(window);
+
+    window.applyDevState(JSON.stringify({ _devApplyFlow: "masters" }));
+    expect(window.getMainViewStage()).toBe("masters");
+
+    const originalRandom = window.Math.random;
+    window.Math.random = () => 0.99;
+    try {
+      window.document.getElementById("mastersConfirmBtn").click();
+
+      const after = getStateSnapshot(window);
+      expect(after.mastersCurrentYear).toBe(2);
+      expect(window.document.getElementById("mastersEventNotice").textContent).not.toContain("当前阶段不可执行");
+    } finally {
+      window.Math.random = originalRandom;
+    }
   });
 
   it("separates phd study UI from graduate application UI", () => {
@@ -2743,7 +3822,9 @@ describe("chess-game app", () => {
 
     expect(window.getMainViewStage()).toBe("phd");
     expect(window.document.getElementById("gradArea").classList.contains("hidden")).toBe(true);
+    expect(window.document.getElementById("gradArea").inert).toBe(true);
     expect(window.document.getElementById("phdArea").classList.contains("hidden")).toBe(false);
+    expect(window.document.getElementById("phdArea").inert).toBe(false);
     expect(window.document.getElementById("phdPanel").classList.contains("hidden")).toBe(false);
   });
 
@@ -2762,6 +3843,15 @@ describe("chess-game app", () => {
     snapshot.cash = 9000;
     snapshot.loanBalance = 0;
     snapshot.undergradProfile = { gpa: 1.9, research: 12, internship: 10, leadership: 18, stress: 96 };
+    snapshot.higherEdTermState.undergrad.courseCredits = 21;
+    snapshot.higherEdTermState.undergrad.courseModules = ["ug-core-foundation", "ug-capstone-proposal"];
+    snapshot.higherEdTermState.undergrad.projectStreaks = { "research-track": 3 };
+    snapshot.combinedDegreeApplied = true;
+    snapshot.combinedDegreeApproved = true;
+    snapshot.combinedDegreeSchoolId = "harvard";
+    snapshot.directPhdApplied = true;
+    snapshot.directPhdApproved = true;
+    snapshot.directPhdSchoolId = "harvard";
     snapshot.results = [
       {
         id: "harvard",
@@ -2779,8 +3869,263 @@ describe("chess-game app", () => {
     expect(after.undergradGraduated).toBe(false);
     expect(after.undergradCurrentYear).toBe(7);
     expect(after.academicRepeatCounts.undergrad).toBe(1);
+    expect(after.combinedDegreeApproved).toBe(false);
+    expect(after.directPhdApproved).toBe(false);
+    expect(after.higherEdTermState.undergrad.courseCredits).toBe(21);
+    expect(after.higherEdTermState.undergrad.courseModules).toEqual(expect.arrayContaining(["ug-core-foundation", "ug-capstone-proposal"]));
+    expect(after.higherEdTermState.undergrad.projectStreaks["research-track"]).toBeGreaterThan(0);
     expect(after.loanBalance).toBeGreaterThan(0);
+    expect(after.log.some((line) => String(line).includes("资格已失效"))).toBe(true);
     expect(after.log.some((line) => String(line).includes("学业审核未过"))).toBe(true);
+  });
+
+  it("does not allow undergrad graduation after eight inactive semesters with no credits or capstone progress", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = false;
+    snapshot.undergradCurrentYear = 8;
+    snapshot.cash = 30000;
+    snapshot.loanBalance = 0;
+    snapshot.undergradProfile = { gpa: 3.42, research: 18, internship: 20, leadership: 22, stress: 36 };
+    snapshot.higherEdTermState.undergrad.courseCredits = 0;
+    snapshot.higherEdTermState.undergrad.courseModules = [];
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        qsRank: 4,
+        status: "录取",
+        revealed: true,
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    window.skipUndergradTerm();
+    const after = getStateSnapshot(window);
+    expect(after.undergradGraduated).toBe(false);
+    expect(after.undergradCurrentYear).toBe(7);
+    expect(after.academicRepeatCounts.undergrad).toBe(1);
+    expect(after.log.some((line) => String(line).includes("学分不足"))).toBe(true);
+  });
+
+  it("revokes MS-PhD style progression after masters graduation failure", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = false;
+    snapshot.mastersCurrentYear = 4;
+    snapshot.mastersSchoolId = "cambridge";
+    snapshot.mastersSchoolName = "University of Cambridge";
+    snapshot.mastersProfile = { gpa: 2.28, research: 22, internship: 42, leadership: 28, stress: 88, thesis: 14 };
+    snapshot.higherEdTermState.masters.courseCredits = 11;
+    snapshot.higherEdTermState.masters.courseModules = ["ms-research-methods"];
+    snapshot.higherEdTermState.masters.publicationPipeline = {
+      active: [{ id: "paper-1", title: "Paper 1", stage: "draft", quality: 62 }],
+      history: [{ id: "paper-0", title: "Paper 0", stage: "submission", quality: 58 }],
+      accepted: 1,
+      submitted: 2,
+    };
+    snapshot.postGradPath = "masters";
+    snapshot.msPhdApplied = true;
+    snapshot.msPhdApproved = true;
+    snapshot.msPhdSchoolId = "cambridge";
+    snapshot.directPhdApplied = true;
+    snapshot.directPhdApproved = true;
+    snapshot.directPhdSchoolId = "cambridge";
+    applyStateSnapshot(window, snapshot);
+
+    window.skipMastersTerm();
+    const after = getStateSnapshot(window);
+    expect(after.mastersGraduated).toBe(false);
+    expect(after.mastersCurrentYear).toBe(3);
+    expect(after.academicRepeatCounts.masters).toBe(1);
+    expect(after.msPhdApproved).toBe(false);
+    expect(after.directPhdApproved).toBe(false);
+    expect(after.higherEdTermState.masters.courseCredits).toBe(11);
+    expect(after.higherEdTermState.masters.courseModules).toEqual(expect.arrayContaining(["ms-research-methods"]));
+    expect(after.higherEdTermState.masters.publicationPipeline.accepted).toBe(1);
+    expect(after.higherEdTermState.masters.publicationPipeline.active).toHaveLength(1);
+    expect(after.log.some((line) => String(line).includes("硕博连读"))).toBe(true);
+  });
+
+  it("blocks masters graduation when the thesis defense module is missing even with strong metrics", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = false;
+    snapshot.mastersCurrentYear = 4;
+    snapshot.mastersSchoolId = "cambridge";
+    snapshot.mastersSchoolName = "University of Cambridge";
+    snapshot.mastersProfile = { gpa: 3.75, research: 82, internship: 60, leadership: 55, stress: 24, thesis: 78 };
+    snapshot.mastersWorkflow = {
+      advisorMatched: true,
+      proposalPassed: true,
+      defensePassed: true,
+      advisorTerm: 1,
+      proposalTerm: 2,
+      defenseTerm: 4,
+    };
+    snapshot.higherEdTermState.masters.courseCredits = 16;
+    snapshot.higherEdTermState.masters.courseModules = ["ms-core-method", "ms-thesis-proposal", "ms-paper-draft"];
+    snapshot.postGradPath = "masters";
+    applyStateSnapshot(window, snapshot);
+
+    window.skipMastersTerm();
+    const after = getStateSnapshot(window);
+    expect(after.mastersGraduated).toBe(false);
+    expect(after.mastersCurrentYear).toBe(3);
+    expect(after.academicRepeatCounts.masters).toBe(1);
+    expect(after.log.some((line) => String(line).includes("论文答辩模块未完成"))).toBe(true);
+  });
+
+  it("blocks phd graduation when the final defense module is missing even with strong metrics", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = true;
+    snapshot.phdStarted = true;
+    snapshot.phdGraduated = false;
+    snapshot.phdCurrentYear = 8;
+    snapshot.phdSchoolId = "mit";
+    snapshot.phdSchoolName = "Massachusetts Institute of Technology";
+    snapshot.phdProfile = { research: 88, internship: 54, leadership: 62, stress: 26, publication: 76, teaching: 42 };
+    snapshot.phdWorkflow = {
+      advisorMatched: true,
+      candidacyPassed: true,
+      defensePassed: true,
+      advisorTerm: 1,
+      candidacyTerm: 3,
+      defenseTerm: 8,
+    };
+    snapshot.higherEdTermState.phd.courseCredits = 32;
+    snapshot.higherEdTermState.phd.courseModules = [
+      "phd-problem-framing",
+      "phd-method-protocol",
+      "phd-paper-submit",
+      "phd-review-cycle",
+      "phd-dissertation-draft",
+    ];
+    snapshot.postGradPath = "phd";
+    applyStateSnapshot(window, snapshot);
+
+    window.skipPhdTerm();
+    const after = getStateSnapshot(window);
+    expect(after.phdGraduated).toBe(false);
+    expect(after.phdCurrentYear).toBe(7);
+    expect(after.academicRepeatCounts.phd).toBe(1);
+    expect(after.log.some((line) => String(line).includes("最终答辩模块未完成"))).toBe(true);
+  });
+
+  it("does not allow masters graduation after four inactive semesters with no credits or required modules", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    window.applyDevState(JSON.stringify({ _devApplyFlow: "masters" }));
+
+    for (let i = 0; i < 4; i += 1) {
+      window.skipMastersTerm();
+    }
+
+    const after = getStateSnapshot(window);
+    expect(after.mastersGraduated).toBe(false);
+    expect(after.mastersCurrentYear).toBe(3);
+    expect(after.academicRepeatCounts.masters).toBe(1);
+    expect(after.higherEdTermState.masters.courseCredits).toBe(0);
+    expect(after.higherEdTermState.masters.courseModules).toEqual([]);
+    expect(after.log.some((line) => String(line).includes("硕士流程未完成"))).toBe(true);
+    expect(after.log.some((line) => String(line).includes("学分不足"))).toBe(true);
+  });
+
+  it("does not allow phd graduation after eight inactive semesters with no credits or required modules", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    window.applyDevState(JSON.stringify({ _devApplyFlow: "phd" }));
+
+    for (let i = 0; i < 8; i += 1) {
+      window.skipPhdTerm();
+    }
+
+    const after = getStateSnapshot(window);
+    expect(after.phdGraduated).toBe(false);
+    expect(after.phdCurrentYear).toBe(7);
+    expect(after.academicRepeatCounts.phd).toBe(1);
+    expect(after.higherEdTermState.phd.courseCredits).toBe(0);
+    expect(after.higherEdTermState.phd.courseModules).toEqual([]);
+    expect(after.log.some((line) => String(line).includes("博士流程未完成"))).toBe(true);
+    expect(after.log.some((line) => String(line).includes("学分不足"))).toBe(true);
+  });
+
+  it("repairs stale invalid phd graduation states from older saves", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = true;
+    snapshot.phdStarted = true;
+    snapshot.phdGraduated = true;
+    snapshot.phdCurrentYear = 8;
+    snapshot.phdSchoolId = "mit";
+    snapshot.phdSchoolName = "Massachusetts Institute of Technology";
+    snapshot.phdProfile = { research: 48, internship: 18, leadership: 24, stress: 24, publication: 20, teaching: 16 };
+    snapshot.higherEdTermState.phd.courseCredits = 0;
+    snapshot.higherEdTermState.phd.courseModules = [];
+    snapshot.phdWorkflow = {
+      advisorMatched: false,
+      candidacyPassed: false,
+      defensePassed: false,
+      advisorTerm: 0,
+      candidacyTerm: 0,
+      defenseTerm: 0,
+    };
+    applyStateSnapshot(window, snapshot);
+
+    const after = getStateSnapshot(window);
+    expect(after.phdGraduated).toBe(false);
+    expect(after.phdCurrentYear).toBe(7);
+    expect(after.academicRepeatCounts.phd).toBe(1);
+    expect(after.log.some((line) => String(line).includes("系统复核：博士毕业状态已撤回"))).toBe(true);
   });
 
   it("supports waiting another year in the career stage after zero offers", () => {
@@ -2816,6 +4161,11 @@ describe("chess-game app", () => {
     };
     applyStateSnapshot(window, snapshot);
 
+    expect(window.document.getElementById("careerResultList").textContent).toContain("再等一年继续求职");
+    expect(window.document.getElementById("careerResultList").querySelector("button")?.textContent).toContain(
+      "再等一年继续求职",
+    );
+
     window.takeStageRepeatYear("career");
     const after = getStateSnapshot(window);
     expect(after.undergradGraduated).toBe(true);
@@ -2824,6 +4174,168 @@ describe("chess-game app", () => {
     expect(after.cash).toBe(0);
     expect(after.loanBalance).toBeGreaterThan(0);
     expect(after.stageRepeatCounts.career).toBe(1);
+  });
+
+  it("allows repeated high-school extra years before entering undergrad", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.undergradStarted = false;
+    snapshot.extraYearCount = 2;
+    snapshot.cash = 50000;
+    applyStateSnapshot(window, snapshot);
+
+    expect(window.document.getElementById("extraYearBtn").disabled).toBe(false);
+    window.takeExtraYear();
+
+    const after = getStateSnapshot(window);
+    expect(after.extraYearCount).toBe(3);
+    expect(after.termIndex).toBe(4);
+  });
+
+  it("allows unlimited career wait years after repeated zero-offer rounds", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const makeNoOfferState = (count = 0) => {
+      const snapshot = getStateSnapshot(window);
+      snapshot.termIndex = 7;
+      snapshot.applicationStage = "complete";
+      snapshot.finalChoice = "harvard";
+      snapshot.undergradStarted = true;
+      snapshot.undergradGraduated = true;
+      snapshot.postGradPath = "job";
+      snapshot.stageRepeatCounts = { ...(snapshot.stageRepeatCounts || {}), career: count };
+      snapshot.jobOutcome = {
+        applications: [
+          {
+            companyId: "google",
+            company: "Google",
+            role: "Software Engineer",
+            status: "拒绝",
+            revealed: true,
+          },
+        ],
+        offers: ["Google · Software Engineer · 拒绝"],
+        interviewCount: 0,
+        offerCount: 0,
+      };
+      applyStateSnapshot(window, snapshot);
+    };
+
+    makeNoOfferState(1);
+    expect(window.canTakeStageRepeatYear("career")).toBe(true);
+    window.takeStageRepeatYear("career");
+
+    let after = getStateSnapshot(window);
+    expect(after.stageRepeatCounts.career).toBe(2);
+
+    makeNoOfferState(2);
+    expect(window.canTakeStageRepeatYear("career")).toBe(true);
+  });
+
+  it("lets undergrad and masters graduates pivot from failed job search into grad applications", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const base = getStateSnapshot(window);
+    base.termIndex = 7;
+    base.applicationStage = "complete";
+    base.finalChoice = "harvard";
+    base.undergradStarted = true;
+    base.undergradGraduated = true;
+    base.undergradCurrentYear = 8;
+    base.postGradPath = "job";
+    base.jobOutcome = {
+      applications: [{ companyId: "google", company: "Google", role: "Software Engineer", status: "拒绝", revealed: true }],
+      offers: ["Google · Software Engineer · 拒绝"],
+      interviewCount: 0,
+      offerCount: 0,
+    };
+    applyStateSnapshot(window, base);
+
+    expect(window.document.getElementById("careerResultList").textContent).toContain("改申请硕士");
+    window.pivotCareerFailureToGradPath("masters");
+    let after = getStateSnapshot(window);
+    expect(after.postGradPath).toBe("masters");
+    expect(after.jobOutcome).toBe(null);
+
+    after.mastersStarted = true;
+    after.mastersGraduated = true;
+    after.mastersCurrentYear = 4;
+    after.mastersProfile = { gpa: 3.74, research: 74, internship: 48, leadership: 42, stress: 24, thesis: 76 };
+    after.mastersWorkflow = {
+      advisorMatched: true,
+      proposalPassed: true,
+      defensePassed: true,
+      advisorTerm: 1,
+      proposalTerm: 2,
+      defenseTerm: 4,
+    };
+    after.higherEdTermState.masters.courseCredits = 16;
+    after.higherEdTermState.masters.courseModules = [
+      "ms-core-method",
+      "ms-thesis-proposal",
+      "ms-paper-draft",
+      "ms-thesis-defense",
+    ];
+    after.postGradPath = "job";
+    after.jobOutcome = {
+      applications: [{ companyId: "bcg", company: "Boston Consulting Group", role: "Associate", status: "拒绝", revealed: true }],
+      offers: ["BCG · Associate · 拒绝"],
+      interviewCount: 0,
+      offerCount: 0,
+    };
+    applyStateSnapshot(window, after);
+
+    expect(window.document.getElementById("careerResultList").textContent).toContain("改申请博士");
+    window.pivotCareerFailureToGradPath("phd");
+    after = getStateSnapshot(window);
+    expect(after.postGradPath).toBe("phd");
+    expect(after.gradApplicationType).toBe("phd");
+    expect(after.jobOutcome).toBe(null);
+  });
+
+  it("does not show the career repeat-year button while interviews are still pending", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.postGradPath = "job";
+    snapshot.jobOutcome = {
+      applications: [
+        {
+          companyId: "google",
+          company: "Google",
+          role: "Software Engineer",
+          status: "面试中",
+          revealed: true,
+          hiringStage: "终面",
+          chance: 0.48,
+          chatInterviewPending: true,
+        },
+      ],
+      offers: ["Google · Software Engineer · 面试中"],
+      interviewCount: 1,
+      offerCount: 0,
+    };
+    applyStateSnapshot(window, snapshot);
+
+    expect(window.document.getElementById("careerReleaseNote").textContent).toContain("面试未结束");
+    expect(window.document.getElementById("careerResultList").textContent).not.toContain("再等一年继续求职");
+    expect(window.canTakeStageRepeatYear("career")).toBe(false);
   });
 
   it("applies dev tuning only when developer mode is enabled", () => {
@@ -3037,6 +4549,113 @@ describe("chess-game app", () => {
     expect(window.document.getElementById("gradResultsGrid").textContent).toContain("聊天窗提交申诉");
   });
 
+  it("uses undergrad metrics in the masters appeal template instead of high-school stats", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.postGradPath = "masters";
+    snapshot.stats = {
+      ...snapshot.stats,
+      gpa: 3.12,
+      test: 1210,
+    };
+    snapshot.undergradProfile = {
+      gpa: 3.86,
+      research: 81,
+      internship: 67,
+      leadership: 52,
+      stress: 24,
+    };
+    snapshot.gradResults = [
+      {
+        id: "cambridge",
+        name: "University of Cambridge",
+        country: "United Kingdom",
+        qsRank: 5,
+        status: "拒绝",
+        chance: 0.21,
+        fitScore: 0.73,
+        programType: "masters",
+        majorId: snapshot.majorId,
+        majorName: "计算机科学/工程",
+        revealed: true,
+        reason: "研究深度与方向匹配仍可加强。",
+        reasons: ["研究深度不足"],
+      },
+    ];
+    snapshot.chatContext = snapshot.chatContext || {};
+    snapshot.chatContext.appealEvidence = [];
+    applyStateSnapshot(window, snapshot);
+
+    const chatRole = window.document.getElementById("chatRole");
+    chatRole.value = "admissions-cambridge";
+    chatRole.dispatchEvent(new window.Event("change"));
+    window.document.getElementById("appealTemplateBtn").click();
+
+    const template = window.document.getElementById("chatInput").value;
+    expect(template).toContain("本科 GPA 为 3.86");
+    expect(template).toContain("本科研究深度 81 / 100");
+    expect(template).not.toContain("标化/语言成绩 1210");
+  });
+
+  it("uses masters metrics in the phd appeal template instead of high-school stats", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "complete";
+    snapshot.postGradPath = "phd";
+    snapshot.stats = {
+      ...snapshot.stats,
+      gpa: 3.08,
+      test: 1180,
+    };
+    snapshot.mastersProfile = {
+      gpa: 3.91,
+      research: 88,
+      internship: 42,
+      leadership: 30,
+      stress: 21,
+      thesis: 79,
+    };
+    snapshot.gradResults = [
+      {
+        id: "yale",
+        name: "Yale University",
+        country: "United States",
+        qsRank: 12,
+        status: "拒绝",
+        chance: 0.17,
+        fitScore: 0.69,
+        programType: "phd",
+        majorId: snapshot.majorId,
+        majorName: "计算机科学/工程",
+        revealed: true,
+        reason: "研究成果与论文完成度仍可增强。",
+        reasons: ["论文完成度不足"],
+      },
+    ];
+    snapshot.chatContext = snapshot.chatContext || {};
+    snapshot.chatContext.appealEvidence = [];
+    applyStateSnapshot(window, snapshot);
+
+    const chatRole = window.document.getElementById("chatRole");
+    chatRole.value = "admissions-yale";
+    chatRole.dispatchEvent(new window.Event("change"));
+    window.document.getElementById("appealTemplateBtn").click();
+
+    const template = window.document.getElementById("chatInput").value;
+    expect(template).toContain("硕士 GPA 为 3.91");
+    expect(template).toContain("论文/开题进展：当前进度 79 / 100");
+    expect(template).not.toContain("标化/语言成绩 1180");
+  });
+
   it("uses world state to shift admission and career chances", () => {
     const dom = bootstrap();
     const { window } = dom;
@@ -3169,5 +4788,402 @@ describe("chess-game app", () => {
     } finally {
       window.Math.random = originalRandom;
     }
+  });
+
+  it("shows a public release onboarding guide and supports collapsing it", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    const guideCard = window.document.getElementById("publicGuideCard");
+    const guideText = guideCard.textContent;
+    expect(guideText).toContain("先输入姓名");
+    expect(guideText).toContain("交流室");
+
+    window.document.getElementById("publicGuideToggleBtn").click();
+    expect(guideCard.classList.contains("collapsed")).toBe(true);
+
+    window.document.getElementById("publicGuideToggleBtn").click();
+    expect(guideCard.classList.contains("collapsed")).toBe(false);
+  });
+
+  it("renders a stage goal dashboard during high school play", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const goalCard = window.document.getElementById("goalCard");
+    expect(goalCard.textContent).toContain("GPA 底盘");
+    expect(goalCard.textContent).toContain("长期主线");
+    expect(goalCard.textContent).toContain("标化");
+  });
+
+  it("updates the school/company profile card after clicking a school in application stage", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 6;
+    snapshot.applicationStage = "ed_apply";
+    snapshot.timeBudget = 8;
+    snapshot.timeUsed = 0;
+    snapshot.essayChoices = ["research"];
+    snapshot.recChoice = "teacher";
+    applyStateSnapshot(window, snapshot);
+
+    const firstSchool = window.document.querySelector("#schoolList .school-card strong");
+    expect(firstSchool).toBeTruthy();
+    const schoolName = firstSchool.textContent;
+    firstSchool.closest(".school-card").click();
+
+    const profileCard = window.document.getElementById("entityProfileCard");
+    expect(profileCard.textContent).toContain(schoolName);
+    expect(profileCard.textContent).toContain("综合匹配");
+  });
+
+  it("shows a transition prep card after confirming an undergrad offer", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "rd_release";
+    snapshot.resultReleaseStage = "regular";
+    snapshot.finalChoice = null;
+    snapshot.cash = 28000;
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        region: "US",
+        status: "录取",
+        batch: "rd",
+        released: true,
+        revealed: true,
+        fitScore: 0.82,
+        academicScore: 0.8,
+        holisticScore: 0.75,
+        chance: 0.7,
+        aidPercent: 0.55,
+        netCost: 36000,
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    window.chooseOffer("harvard");
+    const prepCard = window.document.getElementById("transitionPrepCard");
+    expect(prepCard.textContent).toContain("本科入学前");
+    expect(prepCard.textContent).toContain("Harvard University");
+    expect(prepCard.textContent).toContain("准备度");
+  });
+
+  it("shows replay summary lines in the save panel once the run has started", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const replaySummary = window.document.getElementById("replaySummaryList").textContent;
+    expect(replaySummary).toContain("高中阶段");
+    expect(replaySummary).toContain("主路线");
+  });
+
+  it("shows credit gain labels on higher-ed project cards", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "rd_release";
+    snapshot.resultReleaseStage = "regular";
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        region: "US",
+        status: "录取",
+        batch: "rd",
+        released: true,
+        revealed: true,
+        fitScore: 0.82,
+        academicScore: 0.8,
+        holisticScore: 0.75,
+        chance: 0.7,
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    window.chooseOffer("harvard");
+    window.startUndergradJourney();
+
+    const eventCardsText = window.document.getElementById("undergradYearChoices").textContent;
+    const miniCardsText = window.document.getElementById("undergradMiniActions").textContent;
+    expect(eventCardsText).toContain("预计新增学分 +");
+    expect(miniCardsText).toContain("预计新增学分 +");
+  });
+
+  it("renders required higher-ed modules in a dedicated section instead of mixing them into optional projects", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "rd_release";
+    snapshot.resultReleaseStage = "regular";
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        region: "US",
+        status: "录取",
+        batch: "rd",
+        released: true,
+        revealed: true,
+        fitScore: 0.82,
+        academicScore: 0.8,
+        holisticScore: 0.75,
+        chance: 0.7,
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    window.chooseOffer("harvard");
+    window.startUndergradJourney();
+
+    const requiredStatusText = window.document.getElementById("undergradRequiredStatus").textContent;
+    const requiredProjectsText = window.document.getElementById("undergradRequiredProjects").textContent;
+    const optionalProjectsText = window.document.getElementById("undergradYearChoices").textContent;
+
+    expect(requiredStatusText).toContain("本科核心课程基础");
+    expect(requiredProjectsText).toContain("核心课程适应");
+    expect(optionalProjectsText).not.toContain("核心课程适应");
+  });
+
+  it("keeps missing undergrad module projects available as carryover options", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.applicationStage = "rd_release";
+    snapshot.resultReleaseStage = "regular";
+    snapshot.results = [
+      {
+        id: "harvard",
+        name: "Harvard University",
+        country: "United States",
+        region: "US",
+        status: "录取",
+        batch: "rd",
+        released: true,
+        revealed: true,
+        fitScore: 0.82,
+        academicScore: 0.8,
+        holisticScore: 0.75,
+        chance: 0.7,
+      },
+    ];
+    applyStateSnapshot(window, snapshot);
+
+    window.chooseOffer("harvard");
+    window.startUndergradJourney();
+
+    const afterStart = getStateSnapshot(window);
+    afterStart.undergradCurrentYear = 2;
+    afterStart.higherEdTermState.undergrad.currentEvents = [];
+    afterStart.higherEdTermState.undergrad.courseModules = [];
+    afterStart.higherEdTermState.undergrad.usedEventIds = [];
+    applyStateSnapshot(window, afterStart);
+
+    const catalog = window.getHigherEdEventCatalog("undergrad", 2).map((item) => item.id);
+    expect(catalog).toContain("ug-t1-core-foundation");
+    expect(catalog).toContain("ug-t1-writing-bootcamp");
+    expect(catalog).toContain("ug-t2-lab-assistant");
+  });
+
+  it("keeps missing masters module projects available as carryover options", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 7;
+    snapshot.finalChoice = "harvard";
+    snapshot.undergradStarted = true;
+    snapshot.undergradGraduated = true;
+    snapshot.postGradPath = "masters";
+    snapshot.mastersStarted = true;
+    snapshot.mastersGraduated = false;
+    snapshot.mastersCurrentYear = 2;
+    snapshot.higherEdTermState.masters = snapshot.higherEdTermState.masters || {};
+    snapshot.higherEdTermState.masters.currentEvents = [];
+    snapshot.higherEdTermState.masters.courseModules = [];
+    snapshot.higherEdTermState.masters.usedEventIds = [];
+    snapshot.higherEdTermState.masters.timeBudget = 8;
+    snapshot.mastersProfile = { gpa: 3.4, research: 22, internship: 12, leadership: 10, stress: 25, thesis: 10 };
+    applyStateSnapshot(window, snapshot);
+
+    const catalog = window.getHigherEdEventCatalog("masters", 2).map((item) => item.id);
+    expect(catalog).toContain("ms-t1-core-course");
+    expect(catalog).toContain("ms-t1-advisor-alignment");
+    expect(catalog).toContain("ms-t2-lab-deepdive");
+  });
+
+  it("renders region gameplay guidance based on the focused school", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.termIndex = 6;
+    snapshot.applicationStage = "ed_apply";
+    snapshot.essayChoices = ["research"];
+    snapshot.recChoice = "teacher";
+    applyStateSnapshot(window, snapshot);
+
+    const target = Array.from(window.document.querySelectorAll("#schoolList .school-card")).find((card) =>
+      card.textContent.includes("University of Cambridge"),
+    );
+    expect(target).toBeTruthy();
+    target.click();
+
+    const regionCard = window.document.getElementById("regionGameplayCard");
+    expect(regionCard.textContent).toContain("英国");
+    expect(regionCard.textContent).toContain("学术硬实力");
+    expect(regionCard.textContent).toContain("50 / 100");
+    expect(regionCard.textContent).toContain("中性");
+  });
+
+  it("applies region-based gameplay differences to comparable job applications", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.majorId = "business_finance";
+    applyStateSnapshot(window, snapshot);
+
+    const baseCompany = {
+      id: "test-role",
+      name: "Test Advisory",
+      role: "Business Analyst",
+      difficulty: 0.68,
+      location: "Sydney, Australia",
+      salaryLow: 100000,
+      salaryHigh: 150000,
+      preferredMajors: ["business_finance"],
+      preferredTags: ["商业", "就业"],
+    };
+    const sgCompany = { ...baseCompany, id: "test-role-sg", location: "Singapore" };
+
+    const auEval = window.evaluateCompanyApplication(baseCompany, 0.74, 0.71, { educationLabel: "本科毕业" });
+    const sgEval = window.evaluateCompanyApplication(sgCompany, 0.74, 0.71, { educationLabel: "本科毕业" });
+
+    expect(auEval.chance).toBeGreaterThan(sgEval.chance);
+    expect(sgEval.reason).toContain("地区玩法 新加坡");
+  });
+
+  it("shows leaderboard rows and current-vs-last-run comparison", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    window.localStorage.setItem(
+      "college-sim-season-leaderboard-v1",
+      JSON.stringify([
+        { playerName: "Ada", score: 91, finalSchool: "Harvard University", createdAt: 1 },
+        { playerName: "Ben", score: 84, finalCompany: "Google", createdAt: 2 },
+      ]),
+    );
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.legacyProgress = {
+      completedRuns: 1,
+      bestScore: 84,
+      bestSchoolRank: 15,
+      bestSalary: 160000,
+      routeWins: {
+        research: 1,
+        career: 0,
+        impact: 0,
+        leadership: 0,
+        creative: 0,
+        law: 0,
+      },
+      recentRuns: [
+        {
+          playerName: "Test User",
+          score: 84,
+          finalSchool: "University of Michigan",
+          finalSchoolRank: 15,
+          chosenJob: "",
+          bestSalary: 160000,
+          offerCount: 2,
+          dominantRoute: "research",
+          dominantRouteLabel: "科研学术流",
+          ts: 1,
+        },
+      ],
+      lastRun: {
+        playerName: "Test User",
+        score: 84,
+        finalSchool: "University of Michigan",
+        finalSchoolRank: 15,
+        chosenJob: "",
+        bestSalary: 160000,
+        offerCount: 2,
+        dominantRoute: "research",
+        dominantRouteLabel: "科研学术流",
+        ts: 1,
+      },
+    };
+    snapshot.results = [
+      { id: "harvard", name: "Harvard University", region: "US", country: "United States", status: "录取", released: true, revealed: true },
+    ];
+    snapshot.finalChoice = "harvard";
+    applyStateSnapshot(window, snapshot);
+    window.updateUI();
+
+    const leaderboardCard = window.document.getElementById("leaderboardCard");
+    expect(leaderboardCard.textContent).toContain("Ada");
+    expect(leaderboardCard.textContent).toContain("Harvard University");
+    expect(leaderboardCard.textContent).toContain("较上一局");
+  });
+
+  it("renders achievement progress with current unlocks and historical badges", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    window.localStorage.setItem(
+      "college-sim-achievement-vault-v1",
+      JSON.stringify({
+        unlockedIds: ["doctor-finish"],
+        unlockedAt: { "doctor-finish": 1 },
+        totalRuns: 1,
+      }),
+    );
+    startBasicGame(window);
+
+    const snapshot = getStateSnapshot(window);
+    snapshot.projectStreaks = { "research-track": 3 };
+    snapshot.routeScores = {
+      research: 45,
+      career: 0,
+      impact: 0,
+      leadership: 0,
+      creative: 0,
+      law: 0,
+    };
+    applyStateSnapshot(window, snapshot);
+    window.updateAchievements();
+    window.updateUI();
+
+    const achievementCard = window.document.getElementById("achievementCard");
+    expect(achievementCard.textContent).toContain("本局已解锁");
+    expect(achievementCard.textContent).toContain("已解锁 · 科研主线成型");
+    expect(achievementCard.textContent).toContain("历史达成 · 博士毕业");
   });
 });
