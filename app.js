@@ -352,6 +352,9 @@ const saveSlotSelect = document.getElementById("saveSlotSelect");
 const saveBtn = document.getElementById("saveBtn");
 const loadBtn = document.getElementById("loadBtn");
 const deleteSaveBtn = document.getElementById("deleteSaveBtn");
+const exportSaveFileBtn = document.getElementById("exportSaveFileBtn");
+const importSaveFileBtn = document.getElementById("importSaveFileBtn");
+const importSaveFileInput = document.getElementById("importSaveFileInput");
 const saveNote = document.getElementById("saveNote");
 const replayList = document.getElementById("replayList");
 const replaySummaryList = document.getElementById("replaySummaryList");
@@ -10459,6 +10462,107 @@ function saveToSlot(slot) {
   } catch (error) {
     if (saveNote) saveNote.textContent = "保存失败：浏览器存储不可用。";
   }
+}
+
+function buildPortableSavePayload() {
+  const exportedAt = new Date().toISOString();
+  return {
+    type: "college-sim-portable-save",
+    version: 2,
+    exportedAt,
+    label: `${state.playerName || "未命名"} · ${TERMS[state.termIndex]?.name || "未开始"}`,
+    snapshot: createSerializableState({ excludeReplayNodes: false }),
+  };
+}
+
+function getPortableSaveFileName(payload = {}) {
+  const rawName = String(state.playerName || payload.label || "player")
+    .trim()
+    .replace(/[^a-zA-Z0-9\u4e00-\u9fa5_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 28);
+  const safeName = rawName || "player";
+  const stamp = new Date()
+    .toISOString()
+    .replace(/\.\d+Z$/, "Z")
+    .replace(/[:.]/g, "-");
+  return `college-sim-save-${safeName}-${stamp}.json`;
+}
+
+function exportCurrentSaveFile() {
+  const payload = buildPortableSavePayload();
+  const text = JSON.stringify(payload, null, 2);
+  try {
+    const blob = new Blob([text], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = getPortableSaveFileName(payload);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+    if (saveNote) saveNote.textContent = "已导出 JSON 存档文件，可在其他设备/浏览器导入。";
+    return { ok: true, payload };
+  } catch (error) {
+    if (saveNote) saveNote.textContent = "导出失败：当前浏览器不支持文件下载。";
+    return { ok: false, error };
+  }
+}
+
+function getSnapshotFromPortableSavePayload(payload) {
+  if (!payload || typeof payload !== "object") return null;
+  if (payload.snapshot && typeof payload.snapshot === "object") return payload.snapshot;
+  // 兼容直接导出的开发者 JSON / 旧槽位 payload。
+  if ("started" in payload || "termIndex" in payload || "playerName" in payload) return payload;
+  return null;
+}
+
+function applyImportedSaveText(rawText) {
+  if (!rawText || typeof rawText !== "string") {
+    return { ok: false, message: "导入失败：文件内容为空。" };
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (error) {
+    return { ok: false, message: "导入失败：不是有效的 JSON 存档。" };
+  }
+  const snapshot = getSnapshotFromPortableSavePayload(parsed);
+  if (!snapshot) {
+    return { ok: false, message: "导入失败：没有识别到游戏存档数据。" };
+  }
+  const applied = applyStateObject(snapshot, { preserveReplayNodes: false });
+  if (!applied) {
+    return { ok: false, message: "导入失败：存档数据损坏或版本不兼容。" };
+  }
+  if (state.started) {
+    const importedLabel = typeof parsed.label === "string" && parsed.label.trim() ? parsed.label.trim() : "外部文件";
+    state.log.unshift(`导入存档：${importedLabel}`);
+  }
+  updateUI();
+  const timeLabel = parsed.exportedAt
+    ? new Date(parsed.exportedAt).toLocaleString("zh-CN")
+    : parsed.savedAt
+      ? new Date(parsed.savedAt).toLocaleString("zh-CN")
+      : "--";
+  return { ok: true, message: `已导入存档（${timeLabel}）。当前槽位不会被覆盖，若要保留请再点击“保存”。` };
+}
+
+function importSaveFile(file) {
+  if (!file) {
+    if (saveNote) saveNote.textContent = "未选择存档文件。";
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const result = applyImportedSaveText(String(reader.result || ""));
+    if (saveNote) saveNote.textContent = result.message;
+  };
+  reader.onerror = () => {
+    if (saveNote) saveNote.textContent = "导入失败：无法读取该文件。";
+  };
+  reader.readAsText(file, "utf-8");
 }
 
 function loadFromSlot(slot) {
@@ -31159,6 +31263,19 @@ if (loadBtn) {
 if (deleteSaveBtn) {
   deleteSaveBtn.addEventListener("click", () => {
     deleteSaveSlot(getSelectedSaveSlot());
+  });
+}
+if (exportSaveFileBtn) {
+  exportSaveFileBtn.addEventListener("click", exportCurrentSaveFile);
+}
+if (importSaveFileBtn && importSaveFileInput) {
+  importSaveFileBtn.addEventListener("click", () => {
+    importSaveFileInput.click();
+  });
+  importSaveFileInput.addEventListener("change", () => {
+    const file = importSaveFileInput.files?.[0] || null;
+    importSaveFile(file);
+    importSaveFileInput.value = "";
   });
 }
 if (donationRange && donationValue) {

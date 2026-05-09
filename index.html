@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>远航：国际生申请模拟</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260509-1" />
   </head>
   <body>
     <div class="ambient" aria-hidden="true"></div>
@@ -849,6 +849,11 @@
               <button id="loadBtn" type="button" class="ghost">读取</button>
               <button id="deleteSaveBtn" type="button" class="ghost">删除</button>
             </div>
+            <div class="action-row split">
+              <button id="exportSaveFileBtn" type="button" class="ghost">导出存档</button>
+              <button id="importSaveFileBtn" type="button" class="ghost">导入存档</button>
+              <input id="importSaveFileInput" type="file" accept="application/json,.json" class="hidden" />
+            </div>
             <p id="saveNote" class="note"></p>
             <h4 class="section-title">关键节点回放</h4>
             <div id="replayList" class="choice-grid"></div>
@@ -956,7 +961,7 @@
       </div>
     </dialog>
 
-    <script src="game-config.js"></script>
-    <script src="app.js"></script>
+    <script src="game-config.js?v=20260509-1"></script>
+    <script src="app.js?v=20260509-1"></script>
   </body>
 </html>

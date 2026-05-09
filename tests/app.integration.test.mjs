@@ -4888,6 +4888,38 @@ describe("chess-game app", () => {
     expect(replaySummary).toContain("主路线");
   });
 
+  it("exports and imports portable JSON saves without overwriting local slots", () => {
+    const dom = bootstrap();
+    const { window } = dom;
+    startBasicGame(window);
+
+    const before = getStateSnapshot(window);
+    window.saveToSlot(1);
+    const slotBefore = window.localStorage.getItem("college-sim-save-slot-1");
+    const payload = window.buildPortableSavePayload();
+    expect(payload.type).toBe("college-sim-portable-save");
+    expect(payload.snapshot.playerName).toBe(before.playerName);
+
+    const changed = getStateSnapshot(window);
+    changed.playerName = "Changed Player";
+    changed.cash = 123456;
+    applyStateSnapshot(window, changed);
+    expect(getStateSnapshot(window).playerName).toBe("Changed Player");
+
+    const result = window.applyImportedSaveText(JSON.stringify(payload));
+    const after = getStateSnapshot(window);
+    expect(result.ok).toBe(true);
+    expect(after.playerName).toBe(before.playerName);
+    expect(after.cash).toBe(before.cash);
+    expect(window.localStorage.getItem("college-sim-save-slot-1")).toBe(slotBefore);
+    expect(window.document.getElementById("exportSaveFileBtn").textContent).toContain("导出存档");
+    expect(window.document.getElementById("importSaveFileBtn").textContent).toContain("导入存档");
+
+    const invalid = window.applyImportedSaveText("{bad json");
+    expect(invalid.ok).toBe(false);
+    expect(invalid.message).toContain("不是有效的 JSON");
+  });
+
   it("shows credit gain labels on higher-ed project cards", () => {
     const dom = bootstrap();
     const { window } = dom;
