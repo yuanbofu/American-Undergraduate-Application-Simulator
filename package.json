@@ -1,7 +1,7 @@
 {
-  "name": "chess-game",
+  "name": "college-sim",
   "version": "1.0.0",
-  "description": "- Option 1: Open `index.html` directly in a browser - Option 2: Start a local static server",
+  "description": "Interactive simulator for overseas college applications, university study, and career outcomes.",
   "main": "app.js",
   "scripts": {
     "start": "node server.mjs",
